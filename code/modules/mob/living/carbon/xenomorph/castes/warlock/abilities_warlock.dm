@@ -291,8 +291,10 @@
 	var/obj/effect/abstract/particle_holder/particle_holder
 	///The particle type this ability uses
 	var/channel_particle = /particles/warlock_charge
-	var/debug_sighting = TRUE
-	var/debug_sighting2 = FALSE
+	var/debug_normal_los = FALSE
+	var/debug_viewers = FALSE
+	var/debug_viewrange = FALSE
+	var/debug_trueLOS = TRUE
 
 /datum/action/ability/activable/xeno/psy_crush/use_ability(atom/target)
 	if(channel_loop_timer)
@@ -339,11 +341,19 @@
 	if(get_dist(owner, target) > ability_range)
 		owner.balloon_alert(owner, "Too far!")
 		return FALSE
-	if(sight_needed && debug_sighting2 && !line_of_sight(owner, target, 9))
+	// Works some of the time, but I want to select places that are visible.
+	if(sight_needed && debug_normal_los && !line_of_sight(owner, target, 9))
 		owner.balloon_alert(owner, "Out of sight!")
 		return FALSE
-	if(debug_sighting && !(owner in viewers(9, target)))
-		owner.balloon_alert(owner, "Out of sight! (DEBUG)")
+	// Viewers gets everything in a x-radius.
+	if(debug_viewers && !(owner in viewers(9, target)))
+		owner.balloon_alert(owner, "Out of sight! (DEBUG - VIEWERS)")
+		return FALSE
+	if(debug_viewrange && !in_view_range(owner, target))
+		owner.balloon_alert(owner, "Out of sight! (DEBUG - VIEW RANGE)")
+		return FALSE
+	if(debug_trueLOS && !is_in_sight(owner, target))
+		owner.balloon_alert(owner, "Out of sight! (DEBUG - SIGHT)")
 		return FALSE
 
 	return TRUE
