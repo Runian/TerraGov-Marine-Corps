@@ -291,6 +291,8 @@
 	var/obj/effect/abstract/particle_holder/particle_holder
 	///The particle type this ability uses
 	var/channel_particle = /particles/warlock_charge
+	var/debug_sighting = TRUE
+	var/debug_sighting2 = FALSE
 
 /datum/action/ability/activable/xeno/psy_crush/use_ability(atom/target)
 	if(channel_loop_timer)
@@ -337,9 +339,13 @@
 	if(get_dist(owner, target) > ability_range)
 		owner.balloon_alert(owner, "Too far!")
 		return FALSE
-	if(sight_needed && !line_of_sight(owner, target, 9))
+	if(sight_needed && debug_sighting2 && !line_of_sight(owner, target, 9))
 		owner.balloon_alert(owner, "Out of sight!")
 		return FALSE
+	if(debug_sighting && !(owner in viewers(9, target)))
+		owner.balloon_alert(owner, "Out of sight! (DEBUG)")
+		return FALSE
+
 	return TRUE
 
 ///Increases the area of effect, or triggers the crush if we've reached max iterations
