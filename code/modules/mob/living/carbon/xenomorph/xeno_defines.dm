@@ -199,6 +199,12 @@
 	/// The maximum amount of Wrath that we can have stored at a time.
 	var/wrath_max = 0
 
+	// *** Dragon Abilities ***
+	/// The maximum amount of Stamina that we can have stored at a time.
+	var/stamina_max = 0
+	/// The amount of Stamina currently stored.
+	var/stamina_stored = 0
+
 	///the 'abilities' available to a caste.
 	var/list/actions
 
