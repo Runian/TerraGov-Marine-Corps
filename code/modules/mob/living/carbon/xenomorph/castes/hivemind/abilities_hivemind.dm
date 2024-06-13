@@ -154,8 +154,20 @@
 /datum/action/ability/xeno_action/weed_trail/proc/handle_movement()
 	SIGNAL_HANDLER
 
-	var/area/area = get_area(A)
-	if(area.area_flags & MARINE_BASE)
-		to_chat(owner, span_xenowarning("You cannot weed here!"))
-		end_ability()
+	var/turf/current_turf = get_turf(owner)
+	if(!current_turf.check_alien_construction(owner, TRUE, weed_type))
 		return
+
+	if(!current_turf.is_weedable())
+		return
+
+	var/obj/alien/weeds/alien_weeds = locate() in current_turf
+	if(alien_weeds)
+		return
+
+	var/obj/alien/weeds/node/alien_node = locate() in range(3, current_turf)
+	if(alien_node)
+		return // make normal weeds
+
+/datum/action/ability/xeno_action/weed_trail/proc/should_place_weeds()
+	var/turf/T = get_turf(owner)
