@@ -1,3 +1,4 @@
+#define PRIMORDIAL_TIER_ZERO "Primordial tier zero"
 #define PRIMORDIAL_TIER_ONE "Primordial tier one"
 #define PRIMORDIAL_TIER_TWO "Primordial tier two"
 #define PRIMORDIAL_TIER_THREE "Primordial tier three"
@@ -5,6 +6,7 @@
 
 GLOBAL_LIST_INIT(upgrade_categories, list("Buildings", "Defences", "Xenos"))//, "Primordial"))//uncomment to unlock globally
 GLOBAL_LIST_INIT(tier_to_primo_upgrade, list(
+	XENO_TIER_ZERO = PRIMORDIAL_TIER_ZERO,
 	XENO_TIER_ONE = PRIMORDIAL_TIER_ONE,
 	XENO_TIER_TWO = PRIMORDIAL_TIER_TWO,
 	XENO_TIER_THREE = PRIMORDIAL_TIER_THREE,
@@ -431,3 +433,9 @@ GLOBAL_LIST_INIT(tier_to_primo_upgrade, list(
 	desc = "Unlocks the primordial for the first tier"
 	psypoint_cost = 600
 	icon = "primosent"
+
+/datum/hive_upgrade/primordial/tier_zero
+	name = PRIMORDIAL_TIER_ZERO
+	desc = "Unlocks the primordial for the initial tier"
+	psypoint_cost = 300
+	icon = "primohivemind"
