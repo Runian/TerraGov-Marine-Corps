@@ -132,3 +132,30 @@
 		hivemind_owner.start_teleport(turf_to_teleport_to)
 		return
 	hivemind_owner.abstract_move(turf_to_teleport_to)
+
+/datum/action/ability/xeno_action/weed_trail
+	name = "Weed Trail"
+	action_icon_state = "weed trail"
+	desc = "Create a trail of normal weeds everywhere you move to while manifested."
+	ability_cost = 5
+	keybinding_signals = list(
+		KEYBINDING_NORMAL = COMISG_XENOMORPH_HIVEMIND_WEED_TRAIL,
+	)
+	keybind_flags = ABILITY_KEYBIND_USE_ABILITY
+	cooldown_duration = 1 SECONDS
+	var/active = FALSE
+
+/datum/action/ability/xeno_action/weed_trail/action_activate()
+	RegisterSignal(owner, COMSIG_MOVABLE_MOVED, PROC_REF(handle_movement))
+
+/datum/action/ability/xeno_action/weed_trail/proc/end_ability()
+	UnregisterSignal(owner, COMSIG_MOVABLE_MOVED)
+
+/datum/action/ability/xeno_action/weed_trail/proc/handle_movement()
+	SIGNAL_HANDLER
+
+	var/area/area = get_area(A)
+	if(area.area_flags & MARINE_BASE)
+		to_chat(owner, span_xenowarning("You cannot weed here!"))
+		end_ability()
+		return
