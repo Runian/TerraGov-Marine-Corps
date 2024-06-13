@@ -45,11 +45,13 @@
 	RegisterSignal(src, COMSIG_XENOMORPH_HIVEMIND_CHANGE_FORM, PROC_REF(change_form))
 	update_action_buttons()
 
+/*
 /mob/living/carbon/xenomorph/hivemind/upgrade_possible()
 	return FALSE
+*/
 
 /mob/living/carbon/xenomorph/hivemind/upgrade_xeno(newlevel, silent = FALSE)
-	newlevel = XENO_UPGRADE_BASETYPE
+	//newlevel = XENO_UPGRADE_BASETYPE
 	return ..()
 
 /mob/living/carbon/xenomorph/hivemind/updatehealth()
@@ -302,8 +304,10 @@
 /mob/living/carbon/xenomorph/hivemind/med_hud_set_status()
 	return
 
+/*
 /mob/living/carbon/xenomorph/hivemind/update_progression()
 	return
+*/
 
 /obj/fire/flamer/CanAllowThrough(atom/movable/mover, turf/target)
 	if(isxenohivemind(mover))

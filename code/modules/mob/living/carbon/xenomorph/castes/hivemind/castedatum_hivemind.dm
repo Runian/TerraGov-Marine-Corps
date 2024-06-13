@@ -61,6 +61,15 @@
 		/datum/action/ability/activable/xeno/secrete_special_resin/hivemind,
 	)
 
+/datum/xeno_caste/hivemind/normal
+	upgrade = XENO_UPGRADE_NORMAL
+
+/datum/xeno_caste/hivemind/primordial
+	upgrade_name = "Primordial"
+	caste_desc = "The all-seeing mind."
+	primordial_message = "We see all, know all, and are all. Let all be the hive's."
+	upgrade = XENO_UPGRADE_PRIMO
+
 /datum/xeno_caste/hivemind/on_caste_applied(mob/xenomorph)
 	return
 
