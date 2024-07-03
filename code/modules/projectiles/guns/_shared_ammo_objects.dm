@@ -206,6 +206,11 @@
 		target.apply_status_effect(STATUS_EFFECT_MELTING_FIRE, PYROGEN_MELTING_FIRE_EFFECT_STACK)
 	target.take_overall_damage(damage, BURN, ACID, max_limbs = 2)
 
+/obj/fire/melting_fire/affect_obj(obj/affected)
+	. = ..()
+	if(isgrenade(affected))
+		affected.fire_act(burn_level)
+
 /obj/fire/melting_fire/on_cross(datum/source, mob/living/carbon/human/crosser, oldloc, oldlocs)
 	if(istype(crosser))
 		affect_mob(crosser)
