@@ -196,6 +196,9 @@
 					continue
 				H.apply_effects(2 SECONDS, 2 SECONDS)
 				shake_camera(H, 2, 1)
+				// COMSIG_MOVABLE_MOVED -> damage on move (the main point)
+				// COMSIG_MOB_STAT_CHANGED -> remove signals (when not UNCONSCIOUS)
+				// COMSIG_MOVABLE_POST_THROW -> remove signals (done)
 			things_to_throw += affected
 
 	for(var/atom/movable/affected AS in things_to_throw)
