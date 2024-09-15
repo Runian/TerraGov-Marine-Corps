@@ -115,10 +115,9 @@
 		/datum/action/ability/xeno_action/xeno_resting,
 		/datum/action/ability/xeno_action/watch_xeno,
 		/datum/action/ability/activable/xeno/psydrain,
-		// Apprehread // Replaces Charge
-		// Clothesline // Replaces Ravage
-		// Eviscerate // Replaces Endure and Rage
-		// Gets a verison of Vampirism that is faster and that scales off of damage dealt.
+		/datum/action/ability/xeno_action/apprehread, // Replaces Charge
+		/datum/action/ability/activable/xeno/clothesline, // Replaces Ravage
+		/datum/action/ability/activable/xeno/eviscerate, // Replaces Endure and Rage
 	)
 
 /datum/xeno_caste/ravager/berserker/normal
@@ -134,5 +133,8 @@
 		/datum/action/ability/xeno_action/xeno_resting,
 		/datum/action/ability/xeno_action/watch_xeno,
 		/datum/action/ability/activable/xeno/psydrain,
+		/datum/action/ability/xeno_action/apprehread,
+		/datum/action/ability/activable/xeno/clothesline,
+		/datum/action/ability/activable/xeno/eviscerate,
 	)
 
