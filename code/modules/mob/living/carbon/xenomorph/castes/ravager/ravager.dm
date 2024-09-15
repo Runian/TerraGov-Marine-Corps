@@ -112,22 +112,6 @@
 		return
 	owner.add_movespeed_modifier(MOVESPEED_ID_RAVAGER_BERSERKER_RAGE, TRUE, 0, NONE, TRUE, -0.15 * rage_level)
 
-///removes the buff from xenos
-/datum/action/ability/xeno_action/bulwark/proc/remove_buff(datum/source, mob/living/carbon/xenomorph/xeno, direction)
-	SIGNAL_HANDLER
-	if(direction) // triggered by moving signal, check if next turf is in bulwark
-		var/turf/next = get_step(source, direction)
-		if(HAS_TRAIT(next, TRAIT_BULWARKED_TURF))
-			return
-	if(armor_mod_keys[xeno])
-		xeno.soft_armor = xeno.soft_armor.detachArmor(armor_mod_keys[xeno])
-		armor_mod_keys -= xeno
-
-	switch(rage_level)
-
-	// Remove old buffs as needed.
-	// Add new buff based on current rage.
-
 /// Drains 50 plasma every tick if considered out-of-combat.
 /mob/living/carbon/xenomorph/ravager/berserker/Life()
 	. = ..()
