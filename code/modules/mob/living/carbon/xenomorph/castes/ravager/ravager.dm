@@ -96,9 +96,11 @@
 	// 2.5 armor per 100 plasma.
 	if(additional_armor)
 		soft_armor = soft_armor.detachArmor(additional_armor)
+		additional_armor = null
 	if(rage_level)
 		var/datum/armor/base_armor = getArmor(arglist(xeno_caste.soft_armor))
-		additional_armor = base_armor.scaleAllRatings(rage_level * 2.5)
+		var/armor_amount = rage_level * 2.5
+		additional_armor = base_armor.modifyRating(armor_amount, armor_amount, armor_amount, armor_amount, 0, 0, armor_amount, 0)
 		soft_armor = soft_armor.attachArmor(additional_armor)
 
 	// -0.25 attack delay per 100 plasma.
