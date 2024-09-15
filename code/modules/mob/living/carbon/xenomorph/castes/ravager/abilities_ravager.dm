@@ -599,7 +599,7 @@
 	name = "Clothesline"
 	action_icon_state = "clothesline"
 	action_icon = 'icons/Xeno/actions/ravager.dmi'
-	desc = "Flings and deals moderate damage to a target while healing you for 20% health. When available, exchanges 200 rage for increased fling distance and heals 30% health."
+	desc = "Flings and deals moderate damage to a target while healing you for 20% health. When available, exchanges 200 rage for increased fling distance and healing 30% health instead."
 	ability_cost = 0
 	cooldown_duration = 14 SECONDS
 	keybinding_signals = list(

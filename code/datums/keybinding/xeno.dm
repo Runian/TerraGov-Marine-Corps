@@ -789,7 +789,7 @@
 /datum/keybinding/xeno/clothesline
 	name = "Clothesline"
 	full_name = "Ravager: Clothesline"
-	description = "Flings and deals moderate damage to a target while healing you for 20% health. When available, exchanges 200 rage for increased fling distance and heals 30% health."
+	description = "Flings and deals moderate damage to a target while healing you for 20% health. When available, exchanges 200 rage for increased fling distance and healing 30% health instead."
 	keybind_signal = COMSIG_XENOABILITY_CLOTHESLINE
 
 /datum/keybinding/xeno/eviscerate
