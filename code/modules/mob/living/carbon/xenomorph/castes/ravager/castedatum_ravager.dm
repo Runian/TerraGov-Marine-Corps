@@ -51,16 +51,20 @@
 		/datum/action/ability/xeno_action/endure,
 		/datum/action/ability/xeno_action/rage,
 	)
+	/// If this should receive elements related to getting plasma from attacking/getting attacked.
+	var/uses_plasma_on_attack = TRUE
 
 /datum/xeno_caste/ravager/on_caste_applied(mob/xenomorph)
 	. = ..()
-	xenomorph.AddElement(/datum/element/plasma_on_attack, 1.5)
-	xenomorph.AddElement(/datum/element/plasma_on_attacked, 0.5)
+	if(uses_plasma_on_attack)
+		xenomorph.AddElement(/datum/element/plasma_on_attack, 1.5)
+		xenomorph.AddElement(/datum/element/plasma_on_attacked, 0.5)
 
 /datum/xeno_caste/ravager/on_caste_removed(mob/xenomorph)
 	. = ..()
-	xenomorph.RemoveElement(/datum/element/plasma_on_attack, 1.5)
-	xenomorph.RemoveElement(/datum/element/plasma_on_attacked, 0.5)
+	if(uses_plasma_on_attack)
+		xenomorph.RemoveElement(/datum/element/plasma_on_attack, 1.5)
+		xenomorph.RemoveElement(/datum/element/plasma_on_attacked, 0.5)
 
 /datum/xeno_caste/ravager/normal
 	upgrade = XENO_UPGRADE_NORMAL
@@ -82,3 +86,53 @@
 		/datum/action/ability/xeno_action/rage,
 		/datum/action/ability/xeno_action/vampirism,
 	)
+
+/datum/xeno_caste/ravager/berserker
+	caste_type_path = /mob/living/carbon/xenomorph/ravager/berserker
+	upgrade_name = ""
+	caste_name = "Berserker Ravager"
+	display_name = "Ravager"
+	upgrade = XENO_UPGRADE_BASETYPE
+	caste_desc = "TBD"
+
+	// Loses some common armor (-5) initially.
+	soft_armor = list(MELEE = 45, BULLET = 50, LASER = 45, ENERGY = 45, BOMB = 10, BIO = 40, FIRE = 65, ACID = 40)
+
+	// Only regenerates plasma when attacking.
+	// For every 100 plasma, gain 2.5 armor, -0.1 speed, -0.5 attack delay.
+	plasma_max = 500
+	plasma_gain = 0
+	plasma_regen_limit = 0
+
+	caste_flags = CASTE_PLASMADRAIN_IMMUNE|CASTE_EVOLUTION_ALLOWED
+
+	/// Has an unique way of getting plasma.
+	uses_plasma_on_attack = FALSE
+
+	// Changes how they initiate, how they disable, and how they all-in.
+	// Gets Vampirism immediately that scales off of damage dealt instead of 12.5% of Ravager's lost health per hit.
+	actions = list(
+		/datum/action/ability/xeno_action/xeno_resting,
+		/datum/action/ability/xeno_action/watch_xeno,
+		/datum/action/ability/activable/xeno/psydrain,
+		// Apprehread // Replaces Charge
+		// Clothesline // Replaces Ravage
+		// Eviscerate // Replaces Endure and Rage
+		// Gets a verison of Vampirism that is faster and that scales off of damage dealt.
+	)
+
+/datum/xeno_caste/ravager/berserker/normal
+	upgrade = XENO_UPGRADE_NORMAL
+
+/datum/xeno_caste/praetorian/berserker/primordial
+	upgrade_name = "Primordial"
+	caste_desc = "TBD"
+	upgrade = XENO_UPGRADE_PRIMO
+	primordial_message = "TBD"
+
+	actions = list(
+		/datum/action/ability/xeno_action/xeno_resting,
+		/datum/action/ability/xeno_action/watch_xeno,
+		/datum/action/ability/activable/xeno/psydrain,
+	)
+

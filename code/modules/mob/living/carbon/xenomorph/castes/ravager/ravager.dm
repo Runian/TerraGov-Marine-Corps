@@ -13,6 +13,8 @@
 	upgrade = XENO_UPGRADE_NORMAL
 	pixel_x = -16
 	bubble_icon = "alienroyal"
+	/// Whether or not that they get special effects / plasma from being on fire.
+	var/fiery_plasma = TRUE
 
 /mob/living/carbon/xenomorph/ravager/Initialize(mapload)
 	. = ..()
@@ -25,6 +27,8 @@
 	. = ..()
 	if(stat)
 		return
+	if(!fiery_plasma)
+		return FALSE
 	if(TIMER_COOLDOWN_CHECK(src, COOLDOWN_RAVAGER_FLAMER_ACT))
 		return FALSE
 	gain_plasma(50)
@@ -50,3 +54,26 @@
 	var/datum/action/ability/xeno_action/endure/endure_ability = actions_by_path[/datum/action/ability/xeno_action/endure]
 	return endure_ability.endure_threshold
 
+// ***************************************
+// *********** Berserker
+// ***************************************
+/mob/living/carbon/xenomorph/ravager/berserker
+	caste_base_type = /datum/xeno_caste/ravager/berserker
+	plasma_stored = 0
+	fiery_plasma = FALSE
+
+/mob/living/carbon/xenomorph/ravager/berserker/Initialize(mapload)
+	. = ..()
+	RegisterSignal(src, COMSIG_XENOMORPH_POSTATTACK_LIVING, PROC_REF(on_postattack))
+
+/// Handles rage regeneration and life steal after attacking.
+/mob/living/carbon/xenomorph/ravager/berserker/proc/on_postattack(mob/living/source, mob/living/target, damage)
+	SIGNAL_HANDLER
+	// Increase rage by 100 per hit.
+	// Increase health by 50% of damage plus 5% per 100 rage.
+
+/// Updates armor, movement speed, and attack speed changes based on current rage.
+/mob/living/carbon/xenomorph/ravager/berserker/proc/update_rage_stats()
+	// Get current rage.
+	// Remove old buffs as needed.
+	// Add new buff based on current rage.
