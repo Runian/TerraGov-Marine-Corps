@@ -64,16 +64,28 @@
 
 /mob/living/carbon/xenomorph/ravager/berserker/Initialize(mapload)
 	. = ..()
+	RegisterSignal(src, COMSIG_XENOMORPH_TAKING_DAMAGE, PROC_REF(on_attacked))
+	RegisterSignal(src, COMSIG_XENOMORPH_ATTACK_LIVING, PROC_REF(on_attack)) // Even if it did zero damage or was blocked (aka didn't reach postattack), still want to give plasma.
 	RegisterSignal(src, COMSIG_XENOMORPH_POSTATTACK_LIVING, PROC_REF(on_postattack))
+	// Need to make it so that six seconds "out-of-combat" starts draining 50 plasma per tick.
 
-/// Handles rage regeneration and life steal after attacking.
-/mob/living/carbon/xenomorph/ravager/berserker/proc/on_postattack(mob/living/source, mob/living/target, damage)
+/// Resets the out-of-combat timer.
+/mob/living/carbon/xenomorph/ravager/berserker/proc/on_attacked(damage)
+	SIGNAL_HANDLER
+	// Update out-of-combat timer.
+
+/// Handles rage regeneration and resets the out-of-combat timer.
+/mob/living/carbon/xenomorph/ravager/berserker/proc/on_attack(mob/living/source, mob/living/target, damage, list/damage_mod, list/armor_mod)
 	SIGNAL_HANDLER
 	// Increase rage by 100 per hit.
+	// Update out-of-combat timer.
+
+/// Handle life stealing.
+/mob/living/carbon/xenomorph/ravager/berserker/proc/on_postattack(mob/living/source, mob/living/target, damage)
+	SIGNAL_HANDLER
 	// Increase health by 50% of damage plus 5% per 100 rage.
 
 /// Updates armor, movement speed, and attack speed changes based on current rage.
 /mob/living/carbon/xenomorph/ravager/berserker/proc/update_rage_stats()
-	// Get current rage.
 	// Remove old buffs as needed.
 	// Add new buff based on current rage.
