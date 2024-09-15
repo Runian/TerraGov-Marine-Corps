@@ -780,6 +780,24 @@
 	description = ""
 	keybind_signal = COMSIG_XENOABILITY_RAVAGE_SELECT
 
+/datum/keybinding/xeno/apprehread
+	name = "ravanger_apprehread"
+	full_name = "Ravager: Apprehread"
+	description = "Gain a speed boost upon activation. Immediately ends upon hitting an enemy which also inflicts a powerful slow upon them."
+	keybind_signal = COMSIG_XENOABILITY_APPREHREAD
+
+/datum/keybinding/xeno/clothesline
+	name = "Clothesline"
+	full_name = "Ravager: Clothesline"
+	description = "Flings and deals moderate damage to a target while healing you for 20% health. When available, exchanges 200 rage for increased fling distance and heals 30% health."
+	keybind_signal = COMSIG_XENOABILITY_CLOTHESLINE
+
+/datum/keybinding/xeno/eviscerate
+	name = "Eviscerate"
+	full_name = "Ravager: Eviscerate"
+	description = "Consume all of your rage and deal damage to all enemies around you after a wind-up. Wind-up length, damage, and area of effect is based on the amount of rage consumed."
+	keybind_signal = COMSIG_XENOABILITY_EVISCERATE
+
 /datum/keybinding/xeno/pounce
 	name = "pounce"
 	full_name = "Runner: Pounce"

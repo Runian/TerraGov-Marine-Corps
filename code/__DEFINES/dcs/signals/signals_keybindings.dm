@@ -247,6 +247,9 @@
 #define COMSIG_XENOABILITY_ENDURE "xenoability_endure"
 #define COMSIG_XENOABILITY_RAGE "xenoability_rage"
 #define COMSIG_XENOABILITY_VAMPIRISM "xenoability_vampirism"
+#define COMSIG_XENOABILITY_APPREHREAD "xenoability_apprehread"
+#define COMSIG_XENOABILITY_CLOTHESLINE "xenoability_clothesline"
+#define COMSIG_XENOABILITY_EVISCERATE "xenoability_eviscerate"
 
 #define COMSIG_XENOABILITY_RUNNER_POUNCE "xenoability_runner_pounce"
 #define COMSIG_XENOABILITY_HUNTER_POUNCE "xenoability_hunter_pounce"
