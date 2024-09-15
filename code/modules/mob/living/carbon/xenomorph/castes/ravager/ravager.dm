@@ -104,7 +104,7 @@
 		soft_armor = soft_armor.attachArmor(additional_armor)
 
 	// -0.25 attack delay per 100 plasma.
-	xeno_caste.attack_delay = initial(xeno_caste.attack_delay) - (rage_level * 0.25)
+	xeno_caste.attack_delay = initial(xeno_caste.attack_delay) - (rage_level * 0.20)
 
 	// -0.1 speed per 100 plasma.
 	if(!rage_level && has_movespeed_modifier(MOVESPEED_ID_RAVAGER_BERSERKER_RAGE))
