@@ -94,13 +94,13 @@
 	var/rage_level = round(min(plasma_stored, 0)/100)
 
 	// 2.5 armor per 100 plasma.
-	var/datum/armor/base_armor = getArmor(arglist(xeno.xeno_caste.soft_armor))
+	var/datum/armor/base_armor = getArmor(arglist(xeno_caste.soft_armor))
 	var/datum/armor/old_armor_diff = base_armor.scaleAllRatings(rage_level)
 	var/datum/armor/new_armor_diff = base_armor.scaleAllRatings(rage_level * 2.5)
 
 	if(rage_buffed)
-		xeno.soft_armor = xeno.soft_armor.detachArmor(old_armor_diff)
-	xeno.soft_armor = xeno.soft_armor.attachArmor(new_armor_diff)
+		soft_armor = soft_armor.detachArmor(old_armor_diff)
+	soft_armor = soft_armor.attachArmor(new_armor_diff)
 	rage_buffed = rage_level
 
 	// -0.5 attack delay per 100 plasma.
@@ -108,9 +108,9 @@
 
 	// -0.15 speed per 100 plasma.
 	if(!rage_level && has_movespeed_modifier(MOVESPEED_ID_RAVAGER_BERSERKER_RAGE))
-		owner.remove_movespeed_modifier(MOVESPEED_ID_RAVAGER_BERSERKER_RAGE)
+		remove_movespeed_modifier(MOVESPEED_ID_RAVAGER_BERSERKER_RAGE)
 		return
-	owner.add_movespeed_modifier(MOVESPEED_ID_RAVAGER_BERSERKER_RAGE, TRUE, 0, NONE, TRUE, -0.15 * rage_level)
+	add_movespeed_modifier(MOVESPEED_ID_RAVAGER_BERSERKER_RAGE, TRUE, 0, NONE, TRUE, -0.15 * rage_level)
 
 /// Drains 50 plasma every tick if considered out-of-combat.
 /mob/living/carbon/xenomorph/ravager/berserker/Life()
