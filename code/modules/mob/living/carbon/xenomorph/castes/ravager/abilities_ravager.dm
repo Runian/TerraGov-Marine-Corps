@@ -617,7 +617,7 @@
 	action_icon_state = "eviscerate"
 	action_icon = 'icons/Xeno/actions/ravager.dmi'
 	desc = "Consume all of your rage and deal damage to all enemies around you after a wind-up. Wind-up length, damage, and area of effect is based on the amount of rage consumed."
-	ability_cost = 100
+	ability_cost = 100 // Ability would be garbage if it was free.
 	cooldown_duration = 23 SECONDS
 	keybinding_signals = list(
 		KEYBINDING_NORMAL = COMSIG_XENOABILITY_EVISCERATE,
