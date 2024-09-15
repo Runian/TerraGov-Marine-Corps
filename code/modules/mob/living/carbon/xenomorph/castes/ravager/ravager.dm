@@ -77,6 +77,9 @@
 /// Handles rage regeneration and resets the out-of-combat timer.
 /mob/living/carbon/xenomorph/ravager/berserker/proc/on_attack(mob/living/source, mob/living/target, damage, list/damage_mod, list/armor_mod)
 	SIGNAL_HANDLER
+	if(target.stat == DEAD)
+		return
+
 	gain_plasma(100)
 	update_rage_stats()
 	TIMER_COOLDOWN_START(src, COOLDOWN_OUT_OF_COMBAT, 6 SECONDS)
@@ -84,6 +87,9 @@
 /// Handle life stealing.
 /mob/living/carbon/xenomorph/ravager/berserker/proc/on_postattack(mob/living/source, mob/living/target, damage)
 	SIGNAL_HANDLER
+	if(target.stat == DEAD)
+		return
+
 	var/rage_level = round(max(plasma_stored, 0)/100)
 	var/lifesteal_percentage = 0.5 + (0.05 * rage_level)
 	var/damage_to_heal = damage * lifesteal_percentage
@@ -98,9 +104,8 @@
 		soft_armor = soft_armor.detachArmor(additional_armor)
 		additional_armor = null
 	if(rage_level)
-		var/datum/armor/base_armor = getArmor(arglist(xeno_caste.soft_armor))
 		var/armor_amount = rage_level * 2.5
-		additional_armor = base_armor.modifyRating(armor_amount, armor_amount, armor_amount, armor_amount, 0, 0, armor_amount, 0)
+		additional_armor = getArmor().modifyRating(armor_amount, armor_amount, armor_amount, armor_amount, 0, 0, armor_amount, 0)
 		soft_armor = soft_armor.attachArmor(additional_armor)
 
 	// -0.25 attack delay per 100 plasma.
