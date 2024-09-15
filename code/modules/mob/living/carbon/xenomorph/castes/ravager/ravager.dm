@@ -110,7 +110,7 @@
 	if(!rage_level && has_movespeed_modifier(MOVESPEED_ID_RAVAGER_BERSERKER_RAGE))
 		remove_movespeed_modifier(MOVESPEED_ID_RAVAGER_BERSERKER_RAGE)
 		return
-	add_movespeed_modifier(MOVESPEED_ID_RAVAGER_BERSERKER_RAGE, TRUE, 0, NONE, TRUE, -0.1 * rage_level)
+	add_movespeed_modifier(MOVESPEED_ID_RAVAGER_BERSERKER_RAGE, TRUE, 0, NONE, TRUE, -0.05 * rage_level)
 
 /// Drains 50 plasma every tick if considered out-of-combat.
 /mob/living/carbon/xenomorph/ravager/berserker/Life()
