@@ -115,7 +115,7 @@
 /// Drains 50 plasma every tick if considered out-of-combat.
 /mob/living/carbon/xenomorph/ravager/berserker/Life()
 	. = ..()
-	if(!.)
+	if(stat == DEAD)
 		return
 	if(TIMER_COOLDOWN_CHECK(src, COOLDOWN_OUT_OF_COMBAT))
 		return
