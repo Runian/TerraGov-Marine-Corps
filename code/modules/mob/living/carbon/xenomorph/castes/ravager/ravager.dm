@@ -61,31 +61,79 @@
 	caste_base_type = /datum/xeno_caste/ravager/berserker
 	plasma_stored = 0
 	fiery_plasma = FALSE
+	var/rage_buffed = 0
 
 /mob/living/carbon/xenomorph/ravager/berserker/Initialize(mapload)
 	. = ..()
 	RegisterSignal(src, COMSIG_XENOMORPH_TAKING_DAMAGE, PROC_REF(on_attacked))
 	RegisterSignal(src, COMSIG_XENOMORPH_ATTACK_LIVING, PROC_REF(on_attack)) // Even if it did zero damage or was blocked (aka didn't reach postattack), still want to give plasma.
 	RegisterSignal(src, COMSIG_XENOMORPH_POSTATTACK_LIVING, PROC_REF(on_postattack))
-	// Need to make it so that six seconds "out-of-combat" starts draining 50 plasma per tick.
 
 /// Resets the out-of-combat timer.
 /mob/living/carbon/xenomorph/ravager/berserker/proc/on_attacked(damage)
 	SIGNAL_HANDLER
-	// Update out-of-combat timer.
+	TIMER_COOLDOWN_START(src, COOLDOWN_OUT_OF_COMBAT, 6 SECONDS)
 
 /// Handles rage regeneration and resets the out-of-combat timer.
 /mob/living/carbon/xenomorph/ravager/berserker/proc/on_attack(mob/living/source, mob/living/target, damage, list/damage_mod, list/armor_mod)
 	SIGNAL_HANDLER
-	// Increase rage by 100 per hit.
-	// Update out-of-combat timer.
+	gain_plasma(100)
+	update_rage_stats()
+	TIMER_COOLDOWN_START(src, COOLDOWN_OUT_OF_COMBAT, 6 SECONDS)
 
 /// Handle life stealing.
 /mob/living/carbon/xenomorph/ravager/berserker/proc/on_postattack(mob/living/source, mob/living/target, damage)
 	SIGNAL_HANDLER
-	// Increase health by 50% of damage plus 5% per 100 rage.
+	var/rage_level = round(min(plasma_stored, 0)/100)
+	var/lifesteal_percentage = 0.5 + (0.05 * rage_level)
+	var/damage_to_heal = damage * lifesteal_percentage
+	HEAL_XENO_DAMAGE(src, damage_to_heal, FALSE)
 
 /// Updates armor, movement speed, and attack speed changes based on current rage.
 /mob/living/carbon/xenomorph/ravager/berserker/proc/update_rage_stats()
+	var/rage_level = round(min(plasma_stored, 0)/100)
+
+	// 2.5 armor per 100 plasma.
+	var/datum/armor/base_armor = getArmor(arglist(xeno.xeno_caste.soft_armor))
+	var/datum/armor/old_armor_diff = base_armor.scaleAllRatings(rage_level)
+	var/datum/armor/new_armor_diff = base_armor.scaleAllRatings(rage_level * 2.5)
+
+	if(rage_buffed)
+		xeno.soft_armor = xeno.soft_armor.detachArmor(old_armor_diff)
+	xeno.soft_armor = xeno.soft_armor.attachArmor(new_armor_diff)
+	rage_buffed = rage_level
+
+	// -0.5 attack delay per 100 plasma.
+	xeno_caste.attack_delay = initial(xeno_caste.attack_delay) - (rage_level * 0.5)
+
+	// -0.15 speed per 100 plasma.
+	if(!rage_level && has_movespeed_modifier(MOVESPEED_ID_RAVAGER_BERSERKER_RAGE))
+		owner.remove_movespeed_modifier(MOVESPEED_ID_RAVAGER_BERSERKER_RAGE)
+		return
+	owner.add_movespeed_modifier(MOVESPEED_ID_RAVAGER_BERSERKER_RAGE, TRUE, 0, NONE, TRUE, -0.15 * rage_level)
+
+///removes the buff from xenos
+/datum/action/ability/xeno_action/bulwark/proc/remove_buff(datum/source, mob/living/carbon/xenomorph/xeno, direction)
+	SIGNAL_HANDLER
+	if(direction) // triggered by moving signal, check if next turf is in bulwark
+		var/turf/next = get_step(source, direction)
+		if(HAS_TRAIT(next, TRAIT_BULWARKED_TURF))
+			return
+	if(armor_mod_keys[xeno])
+		xeno.soft_armor = xeno.soft_armor.detachArmor(armor_mod_keys[xeno])
+		armor_mod_keys -= xeno
+
+	switch(rage_level)
+
 	// Remove old buffs as needed.
 	// Add new buff based on current rage.
+
+/// Drains 50 plasma every tick if considered out-of-combat.
+/mob/living/carbon/xenomorph/ravager/berserker/Life()
+	. = ..()
+	if(!.)
+		return
+	if(TIMER_COOLDOWN_CHECK(src, COOLDOWN_OUT_OF_COMBAT))
+		return
+	use_plasma(50)
+	update_rage_stats()

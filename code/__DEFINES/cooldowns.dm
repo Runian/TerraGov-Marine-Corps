@@ -14,6 +14,7 @@
 #define COOLDOWN_ENTANGLE "entangle"
 #define COOLDOWN_NEST "nest"
 #define COOLDOWN_BUMP_ATTACK "bump_attack"
+#define COOLDOWN_OUT_OF_COMBAT "out_of_combat"
 #define COOLDOWN_TASTE "taste"
 #define COOLDOWN_VENTSOUND "vendsound"
 #define COOLDOWN_ARMOR_LIGHT "armor_light"
