@@ -572,3 +572,67 @@
 	particle_holder.pixel_y = 18
 	particle_holder.pixel_x = 18
 	timer_ref = QDEL_NULL_IN(src, particle_holder, heal_delay)
+
+// ***************************************
+// *********** Berserker Abilities
+// ***************************************
+/datum/action/ability/xeno_action/apprehread
+	name = "Apprehread"
+	action_icon_state = "apprehread"
+	action_icon = 'icons/Xeno/actions/ravager.dmi'
+	desc = "Gain a speed boost upon activation. Immediately ends upon hitting an enemy which also inflicts a powerful slow upon them."
+	ability_cost = 0
+	cooldown_duration = 9 SECONDS
+	use_state_flags = ABILITY_USE_BUSY
+	keybind_flags = ABILITY_KEYBIND_USE_ABILITY
+	keybinding_signals = list(
+		KEYBINDING_NORMAL = COMSIG_XENOABILITY_APPREHREAD,
+	)
+	/// The increase of speed when ability is active.
+	var/speed_buff = -1.2
+	/// How long the ability will last?
+	var/duration = 8 SECONDS
+	/// How strong is the slow?
+	var/slow_strength = 1.5
+
+/datum/action/ability/activable/xeno/clothesline
+	name = "Clothesline"
+	action_icon_state = "clothesline"
+	action_icon = 'icons/Xeno/actions/ravager.dmi'
+	desc = "Flings and deals moderate damage to a target while healing you for 20% health. When available, exchanges 200 rage for increased fling distance and heals 30% health."
+	ability_cost = 0
+	cooldown_duration = 14 SECONDS
+	keybinding_signals = list(
+		KEYBINDING_NORMAL = COMSIG_XENOABILITY_CLOTHESLINE,
+	)
+	/// How far is the target flung?
+	var/fling_distance = 2
+	/// How much percentage of health is healed on use? Based on max health.
+	var/heal_percentage = 20
+	/// How much brute damage is dealt?
+	var/damage_amount = 20
+
+/datum/action/ability/activable/xeno/eviscerate
+	name = "Eviscerate"
+	action_icon_state = "eviscerate"
+	action_icon = 'icons/Xeno/actions/ravager.dmi'
+	desc = "Consume all of your rage and deal damage to all enemies around you after a wind-up. Wind-up length, damage, and area of effect is based on the amount of rage consumed."
+	ability_cost = 100
+	cooldown_duration = 23 SECONDS
+	keybinding_signals = list(
+		KEYBINDING_NORMAL = COMSIG_XENOABILITY_EVISCERATE,
+	)
+	/// How long is the wind-up length at 0 rage?
+	var/windup_length = 2.25
+	/// For every 100 rage, how much would wind-up length decrease?
+	var/windup_decrease_per_rage = 0.25
+	/// How much does this ability do at 0 rage?
+	var/damage_amount = 5
+	/// For every 100 rage, how much would damage increase?
+	var/damage_per_rage = 15
+	/// How far does this ability reach?
+	var/range_amount = 1
+	/// For every 100 rage, how much would range increase?
+	var/range_per_rage = 0.25 // 4 = 2+ range
+
+
