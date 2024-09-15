@@ -589,11 +589,38 @@
 		KEYBINDING_NORMAL = COMSIG_XENOABILITY_APPREHREAD,
 	)
 	/// The increase of speed when ability is active.
-	var/speed_buff = -1.2
+	var/speed_buff = -0.3
 	/// How long the ability will last?
 	var/duration = 8 SECONDS
 	/// How strong is the slow?
-	var/slow_strength = 1.5
+	var/slow_strength = 1.2
+	/// For removing the timer if it needs to be canceled early.
+	var/timer_id
+
+/datum/action/ability/xeno_action/apprehread/action_activate(atom/A)
+	owner.emote("roar")
+	owner.add_movespeed_modifier(MOVESPEED_ID_RAVAGER_BERSERKER_APPREHREAD, TRUE, 0, NONE, TRUE, speed_buff)
+	timer_id = addtimer(CALLBACK(src, PROC_REF(remove_effects)), duration, TIMER_STOPPABLE)
+	RegisterSignal(owner, COMSIG_XENOMORPH_POSTATTACK_LIVING, PROC_REF(on_postattack))
+
+	succeed_activate()
+	add_cooldown()
+
+/// Removes the movespeed modifier and various pass_flags that was given by the dodge ability.
+/datum/action/ability/xeno_action/apprehread/proc/remove_effects()
+	owner.remove_movespeed_modifier(MOVESPEED_ID_RAVAGER_BERSERKER_APPREHREAD)
+	if(timer_id)
+		deltimer(timer_id)
+	UnregisterSignal(owner, COMSIG_XENOMORPH_POSTATTACK_LIVING)
+
+/// Inflicts a heavy slowdown on the attacked target.
+/datum/action/ability/xeno_action/apprehread/proc/on_postattack(mob/living/source, mob/living/target, damage)
+	SIGNAL_HANDLER
+	if(target.stat == DEAD)
+		return
+
+	target.adjust_slowdown(slow_strength)
+	remove_effects()
 
 /datum/action/ability/activable/xeno/clothesline
 	name = "Clothesline"
