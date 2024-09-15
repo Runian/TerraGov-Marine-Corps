@@ -61,7 +61,7 @@
 	caste_base_type = /datum/xeno_caste/ravager/berserker
 	plasma_stored = 0
 	fiery_plasma = FALSE
-	var/rage_buffed = 0
+	var/datum/armor/additional_armor
 
 /mob/living/carbon/xenomorph/ravager/berserker/Initialize(mapload)
 	. = ..()
@@ -84,33 +84,31 @@
 /// Handle life stealing.
 /mob/living/carbon/xenomorph/ravager/berserker/proc/on_postattack(mob/living/source, mob/living/target, damage)
 	SIGNAL_HANDLER
-	var/rage_level = round(min(plasma_stored, 0)/100)
+	var/rage_level = round(max(plasma_stored, 0)/100)
 	var/lifesteal_percentage = 0.5 + (0.05 * rage_level)
 	var/damage_to_heal = damage * lifesteal_percentage
 	HEAL_XENO_DAMAGE(src, damage_to_heal, FALSE)
 
 /// Updates armor, movement speed, and attack speed changes based on current rage.
 /mob/living/carbon/xenomorph/ravager/berserker/proc/update_rage_stats()
-	var/rage_level = round(min(plasma_stored, 0)/100)
+	var/rage_level = round(max(plasma_stored, 0)/100)
 
 	// 2.5 armor per 100 plasma.
-	var/datum/armor/base_armor = getArmor(arglist(xeno_caste.soft_armor))
-	var/datum/armor/old_armor_diff = base_armor.scaleAllRatings(rage_level)
-	var/datum/armor/new_armor_diff = base_armor.scaleAllRatings(rage_level * 2.5)
+	if(additional_armor)
+		soft_armor = soft_armor.detachArmor(additional_armor)
+	if(rage_level)
+		var/datum/armor/base_armor = getArmor(arglist(xeno_caste.soft_armor))
+		additional_armor = base_armor.scaleAllRatings(rage_level * 2.5)
+		soft_armor = soft_armor.attachArmor(additional_armor)
 
-	if(rage_buffed)
-		soft_armor = soft_armor.detachArmor(old_armor_diff)
-	soft_armor = soft_armor.attachArmor(new_armor_diff)
-	rage_buffed = rage_level
+	// -0.25 attack delay per 100 plasma.
+	xeno_caste.attack_delay = initial(xeno_caste.attack_delay) - (rage_level * 0.25)
 
-	// -0.5 attack delay per 100 plasma.
-	xeno_caste.attack_delay = initial(xeno_caste.attack_delay) - (rage_level * 0.5)
-
-	// -0.15 speed per 100 plasma.
+	// -0.1 speed per 100 plasma.
 	if(!rage_level && has_movespeed_modifier(MOVESPEED_ID_RAVAGER_BERSERKER_RAGE))
 		remove_movespeed_modifier(MOVESPEED_ID_RAVAGER_BERSERKER_RAGE)
 		return
-	add_movespeed_modifier(MOVESPEED_ID_RAVAGER_BERSERKER_RAGE, TRUE, 0, NONE, TRUE, -0.15 * rage_level)
+	add_movespeed_modifier(MOVESPEED_ID_RAVAGER_BERSERKER_RAGE, TRUE, 0, NONE, TRUE, -0.1 * rage_level)
 
 /// Drains 50 plasma every tick if considered out-of-combat.
 /mob/living/carbon/xenomorph/ravager/berserker/Life()
