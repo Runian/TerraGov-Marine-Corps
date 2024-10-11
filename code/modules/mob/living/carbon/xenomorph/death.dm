@@ -46,6 +46,8 @@
 	hud_set_queen_overwatch() //updates the overwatch hud to remove the upgrade chevrons, gold star, etc
 
 	GLOB.round_statistics.total_xeno_deaths++
+	if(key)
+		GLOB.round_statistics.specific_xeno_deaths[key]++
 	SSblackbox.record_feedback("tally", "round_statistics", 1, "total_xeno_deaths")
 
 	switch (upgrade)

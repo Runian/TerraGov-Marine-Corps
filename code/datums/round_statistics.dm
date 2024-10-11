@@ -19,7 +19,10 @@ GLOBAL_DATUM_INIT(round_statistics, /datum/round_statistics, new)
 	var/points_from_research = 0
 	var/points_from_mining = 0
 	var/points_from_xenos = 0
+	/// How many xenomorphs died this round. This also includes minions like mantis/banelings and puppets/spiderlings.
 	var/total_xeno_deaths = 0
+	/// How many times particular players has died as an xenomorph.
+	var/list/specific_xeno_deaths = list()
 	///All human deaths during the round, listed by faction
 	var/list/total_human_deaths = list()
 	///All human revives during the round, listed by faction
