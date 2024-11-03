@@ -55,3 +55,8 @@
 
 /mob/living/carbon/xenomorph/dragon/death_cry()
 	playsound(loc, 'sound/voice/alien/king_died.ogg', 75, 0)
+
+
+/mob/living/carbon/xenomorph/dragon/can_receive_aura(aura_type, atom/source, datum/aura_bearer/bearer)
+	. = ..()
+	return FALSE
