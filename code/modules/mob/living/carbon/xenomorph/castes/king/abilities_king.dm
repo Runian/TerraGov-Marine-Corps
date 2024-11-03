@@ -515,12 +515,11 @@ GLOBAL_LIST_EMPTY(active_summons)
 	allxenos = xeno_owner.hive.get_all_xenos() //refresh the list to account for any changes during the channel
 	var/sisters_teleported = 0
 	for(var/mob/living/carbon/xenomorph/sister AS in allxenos)
+		sister.remove_filter("summonoutline")
 		if(sister.z != owner.z)
 			continue
-		sister.remove_filter("summonoutline")
-		if(sister.z == owner.z)
-			sister.forceMove(get_turf(xeno_owner))
-			sisters_teleported ++
+		sister.forceMove(get_turf(X))
+		sisters_teleported ++
 
 	log_game("[key_name(owner)] has summoned hive ([sisters_teleported] Xenos) in [AREACOORD(owner)]")
 	xeno_owner.emote("roar")
