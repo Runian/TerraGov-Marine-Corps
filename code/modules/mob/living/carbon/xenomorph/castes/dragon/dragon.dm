@@ -20,6 +20,7 @@
 	inherent_verbs = list(
 		/mob/living/carbon/xenomorph/proc/hijack,
 	)
+	xeno_flags = XENO_ROUNY // Because my sprites are so trash.
 
 /mob/living/carbon/xenomorph/dragon/Initialize(mapload)
 	. = ..()

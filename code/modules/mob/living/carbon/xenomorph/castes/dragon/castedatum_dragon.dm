@@ -7,7 +7,7 @@ Speed ✔
 can speak english ✔
 stamina sprites :) ✔
 15 xeno limit ✔
-ms-paint level of Sprites
+ms-paint level of Sprites ✔
 cool descriptions!
 Immunity to CC: slow / stun / fling / stagger
 give caste_flag to prevent plasma/health regen on weeds
