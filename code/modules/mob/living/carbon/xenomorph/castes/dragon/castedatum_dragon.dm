@@ -142,7 +142,7 @@ Speed ✔
 >>>>>>> 36bd1ad143 (health/armor/speed)
 ms-paint level of Sprites
 cool descriptions!
-15 xeno limit
+15 xeno limit ✔
 Immunity to CC: slow / stun / fling / stagger
 give caste_flag to prevent plasma/health regen on weeds
 no pheromone given
@@ -190,6 +190,9 @@ REAL Sprites
 	// *** Evolution *** //
 	upgrade_threshold = TIER_THREE_THRESHOLD
 	maximum_active_caste = 1
+
+	evolve_min_xenos = 15
+	death_evolution_delay = 7 MINUTES
 
 	// *** Flags *** //
 	caste_flags = CASTE_NO_HEALING|CASTE_NO_PLASMA_REGEN|CASTE_IS_INTELLIGENT|CASTE_STAGGER_IMMUNE|CASTE_KNOCKBACK_IMMUNE|CASTE_SLOW_IMMUNE|CASTE_STUN_IMMUNE|CASTE_NO_PSYCHIC_SUMMON|CASTE_INSTANT_EVOLUTION|CASTE_LEADER_TYPE
