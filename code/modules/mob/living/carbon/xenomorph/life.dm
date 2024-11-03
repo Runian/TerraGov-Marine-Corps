@@ -54,7 +54,8 @@
 	var/ruler_healing_penalty = 0.5
 	if(hive?.living_xeno_ruler?.loc?.z == T.z || xeno_caste.can_flags & CASTE_CAN_HEAL_WITHOUT_QUEEN || (SSticker?.mode.round_type_flags & MODE_XENO_RULER)) //if the living queen's z-level is the same as ours.
 		ruler_healing_penalty = 1
-	if(loc_weeds_type || xeno_caste.caste_flags & CASTE_INNATE_HEALING) //We regenerate on weeds or can on our own.
+	// If allowed to heal, regenerate health while on weeds or on our own.
+	if(!(xeno_caste.caste_flags & CASTE_NO_HEALING) && (loc_weeds_type || xeno_caste.caste_flags & CASTE_INNATE_HEALING))
 		if(lying_angle || resting || xeno_caste.caste_flags & CASTE_QUICK_HEAL_STANDING)
 			heal_wounds(XENO_RESTING_HEAL * ruler_healing_penalty * loc_weeds_type ? initial(loc_weeds_type.resting_buff) : 1, TRUE, seconds_per_tick)
 		else
@@ -125,7 +126,7 @@
 		else
 			use_plasma(pheromone_cost * seconds_per_tick * XENO_PER_SECOND_LIFE_MOD, FALSE)
 
-	if(HAS_TRAIT(src, TRAIT_NOPLASMAREGEN) || !loc_weeds_type && !(xeno_caste.caste_flags & CASTE_INNATE_PLASMA_REGEN))
+	if(HAS_TRAIT(src, TRAIT_NOPLASMAREGEN) || (xeno_caste.caste_flags & CASTE_NO_PLASMA_REGEN) || !loc_weeds_type && !(xeno_caste.caste_flags & CASTE_INNATE_PLASMA_REGEN))
 		if(current_aura) //we only need to update if we actually used plasma from pheros
 			hud_set_plasma()
 		return
