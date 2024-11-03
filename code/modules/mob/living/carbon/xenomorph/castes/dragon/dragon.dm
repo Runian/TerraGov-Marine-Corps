@@ -1,7 +1,7 @@
 /mob/living/carbon/xenomorph/dragon
 	caste_base_type = /datum/xeno_caste/dragon
 	name = "Dragon"
-	desc = "A primordial creature, evolved to smash the hardiest of defences and hunt the hardiest of prey."
+	desc = "A massive, ancient beast with scales that shimmer like polished armor. The fiercest and most formidable creature."
 	icon = 'icons/Xeno/castes/dragon.dmi'
 	icon_state = "Dragon Walking"
 	attacktext = "bites"
@@ -14,7 +14,7 @@
 	mob_size = MOB_SIZE_BIG
 	drag_delay = 6
 	initial_language_holder = /datum/language_holder/xeno/dragon
-	tier = XENO_TIER_FOUR //King, like queen, doesn't count towards population limit.
+	tier = XENO_TIER_FOUR //Dragon, like queen, doesn't count towards population limit.
 	upgrade = XENO_UPGRADE_NORMAL
 	bubble_icon = "alienroyal"
 	inherent_verbs = list(
