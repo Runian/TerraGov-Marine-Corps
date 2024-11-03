@@ -1,7 +1,11 @@
 /mob/living/carbon/xenomorph/dragon
 	caste_base_type = /datum/xeno_caste/dragon
 	name = "Dragon"
+<<<<<<< HEAD
 	desc = "A massive, ancient beast with scales that shimmer like polished armor. The fiercest and most formidable creature."
+=======
+	desc = "A primordial creature, evolved to smash the hardiest of defences and hunt the hardiest of prey."
+>>>>>>> 3b691bcd4d (initial garbage)
 	icon = 'icons/Xeno/castes/dragon.dmi'
 	icon_state = "Dragon Walking"
 	attacktext = "bites"
@@ -13,19 +17,26 @@
 	pixel_x = -16
 	mob_size = MOB_SIZE_BIG
 	drag_delay = 6
+<<<<<<< HEAD
 	resistance_flags = BANISH_IMMUNE
 	initial_language_holder = /datum/language_holder/xeno/dragon
 	tier = XENO_TIER_FOUR //Dragon, like queen, doesn't count towards population limit.
+=======
+	tier = XENO_TIER_FOUR //King, like queen, doesn't count towards population limit.
+>>>>>>> 3b691bcd4d (initial garbage)
 	upgrade = XENO_UPGRADE_NORMAL
 	bubble_icon = "alienroyal"
 	inherent_verbs = list(
 		/mob/living/carbon/xenomorph/proc/hijack,
 	)
+<<<<<<< HEAD
 	xeno_flags = XENO_ROUNY // Because my sprites are so trash.
 	/// Whether we are attacking.
 	var/is_attacking = FALSE
 	/// Whether we are currently in flight.
 	var/is_flying = FALSE
+=======
+>>>>>>> 3b691bcd4d (initial garbage)
 
 /mob/living/carbon/xenomorph/dragon/Initialize(mapload)
 	. = ..()
@@ -60,6 +71,7 @@
 
 /mob/living/carbon/xenomorph/dragon/death_cry()
 	playsound(loc, 'sound/voice/alien/king_died.ogg', 75, 0)
+<<<<<<< HEAD
 
 
 /mob/living/carbon/xenomorph/dragon/can_receive_aura(aura_type, atom/source, datum/aura_bearer/bearer)
@@ -166,3 +178,5 @@
 	src.resistance_flags &= ~RESIST_ALL
 	src.allow_pass_flags = initial(src.allow_pass_flags)
 	src.pass_flags = initial(src.pass_flags)
+=======
+>>>>>>> 3b691bcd4d (initial garbage)
