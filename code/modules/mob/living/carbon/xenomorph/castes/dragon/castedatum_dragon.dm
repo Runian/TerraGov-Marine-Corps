@@ -145,8 +145,12 @@ Speed ✔
 can speak english ✔
 stamina sprites :) ✔
 15 xeno limit ✔
+<<<<<<< HEAD
 >>>>>>> 33b3744639 (stamina (plasma) sprites)
 ms-paint level of Sprites
+=======
+ms-paint level of Sprites ✔
+>>>>>>> 94544a2828 (ms level sprites)
 cool descriptions!
 Immunity to CC: slow / stun / fling / stagger
 give caste_flag to prevent plasma/health regen on weeds
