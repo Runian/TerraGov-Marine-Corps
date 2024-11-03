@@ -9,10 +9,11 @@ stamina sprites :) ✔
 15 xeno limit ✔
 ms-paint level of Sprites ✔
 cool descriptions! ✔
-Immunity to CC: slow / stun / fling / stagger
+Immunity to CC: slow / stun / fling / stagger ✔
 give caste_flag to prevent plasma/health regen on weeds ✔
 no pheromone given ✔
 no king summon allowed ✔
+randomly sort the fuck out of caste_flag defines ✔
 no slash like Hivemind
 no benefit from friendly xeno skills (like deathwing in HoTS!) :)
 EVERYTHING ELSE WAHHHH
@@ -50,7 +51,7 @@ REAL Sprites
 	death_evolution_delay = 10 MINUTES
 
 	// *** Flags *** //
-	caste_flags = CASTE_IS_INTELLIGENT|CASTE_NO_HEALING|CASTE_NO_PLASMA_REGEN|CASTE_NO_PSYCHIC_SUMMON|CASTE_LEADER_TYPE|CASTE_INSTANT_EVOLUTION
+	caste_flags = CASTE_NO_HEALING|CASTE_NO_PLASMA_REGEN|CASTE_IS_INTELLIGENT|CASTE_STAGGER_IMMUNE|CASTE_KNOCKBACK_IMMUNE|CASTE_SLOW_IMMUNE|CASTE_STUN_IMMUNE|CASTE_NO_PSYCHIC_SUMMON|CASTE_INSTANT_EVOLUTION|CASTE_LEADER_TYPE
 	can_flags = CASTE_CAN_CORRUPT_GENERATOR
 	caste_traits = null
 
