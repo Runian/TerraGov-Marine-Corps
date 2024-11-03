@@ -591,13 +591,13 @@ GLOBAL_LIST_INIT(layers_to_offset, list(
 #define CASTE_EXCLUDE_STRAINS (1<<17) // denotes castes/basetypes that should be excluded from being evoable as a strain
 #define CASTE_NO_HEALING (1<<18) // No natural healing from being on weeds or innately.
 #define CASTE_NO_PLASMA_REGEN (1<<19) // No natural plasma regeneration from being on weeds or innately.
-
+#define CASTE_NO_PSYCHIC_SUMMON (1<<20) // Immunity from getting psychic summoned.
 
 // Xeno defines that affect evolution, considering making a new var for these
-#define CASTE_LEADER_TYPE (1<<20) //Whether we are a leader type caste, such as the queen, shrike or ?king?, and is affected by queen ban and playtime restrictions
-#define CASTE_CANNOT_EVOLVE_IN_CAPTIVITY (1<<21) //Whether we cannot evolve in the research lab
-#define CASTE_REQUIRES_FREE_TILE (1<<22) //Whether we require a free tile to evolve
-#define CASTE_INSTANT_EVOLUTION (1<<23) //Whether we require no evolution progress to evolve to this caste
+#define CASTE_LEADER_TYPE (1<<21) //Whether we are a leader type caste, such as the queen, shrike or ?king?, and is affected by queen ban and playtime restrictions
+#define CASTE_CANNOT_EVOLVE_IN_CAPTIVITY (1<<22) //Whether we cannot evolve in the research lab
+#define CASTE_REQUIRES_FREE_TILE (1<<23) //Whether we require a free tile to evolve
+#define CASTE_INSTANT_EVOLUTION (1<<24) //Whether we require no evolution progress to evolve to this caste
 
 #define CASTE_CAN_HOLD_FACEHUGGERS (1<<0)
 #define CASTE_CAN_BE_QUEEN_HEALED (1<<1)
