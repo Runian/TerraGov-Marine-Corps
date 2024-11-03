@@ -583,6 +583,9 @@ GLOBAL_LIST_INIT(layers_to_offset, list(
 #define CASTE_STAGGER_RESISTANT (1<<15) //Resistant to some forms of stagger, such as projectiles
 #define CASTE_HAS_WOUND_MASK (1<<16) //uses an alpha mask for wounded states
 #define CASTE_EXCLUDE_STRAINS (1<<17) // denotes castes/basetypes that should be excluded from being evoable as a strain
+#define CASTE_NO_HEALING (1<<18) // No natural healing from being on weeds or innately.
+#define CASTE_NO_PLASMA_REGEN (1<<19) // No natural plasma regeneration from being on weeds or innately.
+
 
 // Xeno defines that affect evolution, considering making a new var for these
 #define CASTE_LEADER_TYPE (1<<16) //Whether we are a leader type caste, such as the queen, shrike or ?king?, and is affected by queen ban and playtime restrictions
