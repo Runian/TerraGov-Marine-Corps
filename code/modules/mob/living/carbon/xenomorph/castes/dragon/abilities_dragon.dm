@@ -547,7 +547,7 @@
 				playsound(attacked_carbon, 'sound/weapons/alien_claw_block.ogg', 50, 1)
 				attacked_carbon.Knockdown(TAIL_SWIPE_KNOCKDOWN)
 				attacked_carbon.adjust_stagger(TAIL_SWIPE_STAGGER)
-				attacked_carbon.adjust_slowdown(TAIL_SWIPE_SLOWDOWN/2)
+				attacked_carbon.adjust_slowdown(TAIL_SWIPE_SLOWDOWN)
 				attacked_carbon.apply_damage(TAIL_SWIPE_DAMAGE * xeno_owner.xeno_melee_damage_modifier, BRUTE, blocked = MELEE, updating_health = TRUE)
 >>>>>>> 69bd3761e7 (tail swipe)
 				anyone_hit = TRUE
@@ -596,7 +596,7 @@
 				playsound(attacked_carbon, 'sound/weapons/alien_claw_block.ogg', 50, 1)
 				attacked_carbon.Knockdown(TAIL_SWIPE_KNOCKDOWN/2)
 				attacked_carbon.adjust_stagger(TAIL_SWIPE_STAGGER/2)
-				attacked_carbon.adjust_slowdown(TAIL_SWIPE_SLOWDOWN)
+				attacked_carbon.adjust_slowdown(TAIL_SWIPE_SLOWDOWN/2)
 				attacked_carbon.apply_damage(TAIL_SWIPE_DAMAGE * xeno_owner.xeno_melee_damage_modifier/2, BRUTE, blocked = MELEE, updating_health = TRUE)
 				anyone_hit = TRUE
 
