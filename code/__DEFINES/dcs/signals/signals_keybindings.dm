@@ -348,3 +348,5 @@
 #define COMSIG_XENOABILITY_TAIL_LASH "xenoability_tail_lash"
 #define COMSIG_XENOABILITY_TAIL_LASH_SELECT "xenoability_tail_lash_select"
 #define COMSIG_XENOABILITY_ADVANCE_OPPRESSOR "xenoability_advance_oppressor"
+
+#define COMSIG_XENOABILITY_DRAGON_BREATH "xenoability_dragon_breath"
