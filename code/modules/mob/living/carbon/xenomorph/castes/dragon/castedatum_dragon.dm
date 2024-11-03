@@ -71,6 +71,7 @@ REAL Sprites
 		/datum/action/ability/activable/xeno/psydrain,
 		// Dragon-specific actions:
 		/datum/action/ability/activable/xeno/dragon_breath,
+		/datum/action/ability/activable/xeno/tail_swipe,
 		// Actions given to all T4s:
 		/datum/action/ability/xeno_action/call_of_the_burrowed,
 		/datum/action/ability/xeno_action/hive_message,
@@ -95,6 +96,7 @@ REAL Sprites
 		/datum/action/ability/activable/xeno/psydrain,
 		// Dragon-specific actions:
 		/datum/action/ability/activable/xeno/dragon_breath,
+		/datum/action/ability/activable/xeno/tail_swipe,
 		// Actions given to all T4s:
 		/datum/action/ability/xeno_action/call_of_the_burrowed,
 		/datum/action/ability/xeno_action/hive_message,

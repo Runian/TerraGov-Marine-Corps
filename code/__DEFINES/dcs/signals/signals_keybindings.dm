@@ -330,5 +330,5 @@
 #define COMSIG_XENOABILITY_SEISMIC_FRACTURE "xenoability_seismic_fracture"
 #define COMSIG_XENOABILITY_PRIMAL_WRATH "xenoability_primal_wrath"
 
-
 #define COMSIG_XENOABILITY_DRAGON_BREATH "xenoability_dragon_breath"
+#define COMSIG_XENOABILITY_TAIL_SWIPE "xenoability_tail_swipe"
