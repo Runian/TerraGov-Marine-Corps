@@ -1,5 +1,6 @@
 /* The TODO list in order: https://hackmd.io/@wlLEbadtQoCyE4iytTkonw/S10wubC1A
 <<<<<<< HEAD
+<<<<<<< HEAD
 The Less Brain-Dead List:
 ✔️ Can Speak Common
 ✔️ Stamina Bar
@@ -132,7 +133,15 @@ Health (calm)
 Soft Armor (calm)
 Hard Armor (calm)
 Speed (calm)
+=======
+base xeno_caste, xeno, etc ✔
+Health ✔
+Soft Armor ✔
+Hard Armor ✔
+Speed ✔
+>>>>>>> 36bd1ad143 (health/armor/speed)
 ms-paint level of Sprites
+cool descriptions!
 15 xeno limit
 Immunity to CC: slow / stun / fling / stagger
 give caste_flag to prevent plasma/health regen on weeds
@@ -152,7 +161,6 @@ REAL Sprites
 	display_name = "Dragon"
 	upgrade_name = ""
 	caste_type_path = /mob/living/carbon/xenomorph/dragon
-<<<<<<< HEAD
 	caste_desc = "A big scary monster with wings!"
 
 	tier = XENO_TIER_FOUR
@@ -171,36 +179,17 @@ REAL Sprites
 
 	// *** Health *** //
 	max_health = 1650 // Calm (750) + Enraged (900)
-=======
-	caste_desc = "A dwagon! Wowza! Just imagine something cool was here and be amazed!"
 
 	tier = XENO_TIER_FOUR
 	upgrade = XENO_UPGRADE_BASETYPE
 	wound_type = "dragon" //used to match appropriate wound overlays
 
-	// *** Melee Attacks *** //
-	melee_damage = 33
-
-	// *** Speed *** //
-	speed = -0.1
-
-	// *** Plasma *** //
-	plasma_max = 1200
-	plasma_gain = 90
-
-	// *** Health *** //
-	max_health = 700
-
 	// *** Sunder *** //
 	sunder_multiplier = 0.8
->>>>>>> 3b691bcd4d (initial garbage)
 
 	// *** Evolution *** //
 	upgrade_threshold = TIER_THREE_THRESHOLD
 	maximum_active_caste = 1
-<<<<<<< HEAD
-	evolve_min_xenos = 15
-	death_evolution_delay = 10 MINUTES
 
 	// *** Flags *** //
 	caste_flags = CASTE_NO_HEALING|CASTE_NO_PLASMA_REGEN|CASTE_IS_INTELLIGENT|CASTE_STAGGER_IMMUNE|CASTE_KNOCKBACK_IMMUNE|CASTE_SLOW_IMMUNE|CASTE_STUN_IMMUNE|CASTE_NO_PSYCHIC_SUMMON|CASTE_INSTANT_EVOLUTION|CASTE_LEADER_TYPE
@@ -210,26 +199,10 @@ REAL Sprites
 	// *** Defense *** //
 	soft_armor = list(MELEE = 75, BULLET = 75, LASER = 75, ENERGY = 75, BOMB = 50, BIO = 75, FIRE = 200, ACID = 75)
 	hard_armor = list(MELEE = 10, BULLET = 10, LASER = 10, ENERGY = 10, BOMB = 10, BIO = 10, FIRE = 10, ACID = 10)
-=======
-	evolve_min_xenos = 12
-	death_evolution_delay = 7 MINUTES
-
-	// *** Flags *** //
-	caste_flags = CASTE_IS_INTELLIGENT|CASTE_STAGGER_RESISTANT|CASTE_LEADER_TYPE|CASTE_INSTANT_EVOLUTION|CASTE_HAS_WOUND_MASK
-	can_flags = CASTE_CAN_BE_QUEEN_HEALED|CASTE_CAN_BE_GIVEN_PLASMA|CASTE_CAN_BE_LEADER|CASTE_CAN_CORRUPT_GENERATOR
-	caste_traits = null
-
-	// *** Defense *** //
-	soft_armor = list(MELEE = 65, BULLET = 65, LASER = 65, ENERGY = 65, BOMB = 100, BIO = 60, FIRE = 100, ACID = 60)
-
-	// *** Pheromones *** //
-	aura_strength = 4.5
->>>>>>> 3b691bcd4d (initial garbage)
 
 	minimap_icon = "xenoking"
 
 	actions = list(
-<<<<<<< HEAD
 		// Actions given to all T0s:
 		/datum/action/ability/xeno_action/xeno_resting,
 		/datum/action/ability/xeno_action/watch_xeno,
@@ -240,40 +213,17 @@ REAL Sprites
 		/datum/action/ability/activable/xeno/tail_swipe,
 		// Actions given to all T4s:
 		/datum/action/ability/xeno_action/call_of_the_burrowed,
-=======
-		/datum/action/ability/xeno_action/xeno_resting,
-		/datum/action/ability/xeno_action/watch_xeno,
-		/datum/action/ability/activable/xeno/psydrain,
-		/datum/action/ability/activable/xeno/cocoon,
-		/datum/action/ability/activable/xeno/plant_weeds,
-		/datum/action/ability/xeno_action/call_of_the_burrowed,
-		/datum/action/ability/activable/xeno/corrosive_acid/strong,
-		/datum/action/ability/activable/xeno/nightfall,
-		/datum/action/ability/xeno_action/petrify,
-		/datum/action/ability/activable/xeno/off_guard,
-		/datum/action/ability/activable/xeno/shattering_roar,
-		/datum/action/ability/xeno_action/psychic_summon,
-		/datum/action/ability/xeno_action/pheromones,
-		/datum/action/ability/xeno_action/pheromones/emit_recovery,
-		/datum/action/ability/xeno_action/pheromones/emit_warding,
-		/datum/action/ability/xeno_action/pheromones/emit_frenzy,
->>>>>>> 3b691bcd4d (initial garbage)
 		/datum/action/ability/xeno_action/hive_message,
 		/datum/action/ability/xeno_action/rally_hive,
 		/datum/action/ability/xeno_action/rally_minion,
 		/datum/action/ability/xeno_action/blessing_menu,
 	)
 
-<<<<<<< HEAD
-=======
-
->>>>>>> 3b691bcd4d (initial garbage)
 /datum/xeno_caste/dragon/normal
 	upgrade = XENO_UPGRADE_NORMAL
 
 /datum/xeno_caste/dragon/primordial
 	upgrade_name = "Primordial"
-<<<<<<< HEAD
 	caste_desc = "Ancient terror. Your end has come, and it bears my wings."
 	primordial_message = "Destruction is my creed; none shall withstand my fury."
 	upgrade = XENO_UPGRADE_PRIMO
@@ -289,30 +239,6 @@ REAL Sprites
 		/datum/action/ability/activable/xeno/tail_swipe,
 		// Actions given to all T4s:
 		/datum/action/ability/xeno_action/call_of_the_burrowed,
-=======
-	caste_desc = "An avatar of death. Running won't help you now."
-	primordial_message = "Death cannot create, but you definitely know how to destroy."
-	upgrade = XENO_UPGRADE_PRIMO
-
-	actions = list(
-		/datum/action/ability/xeno_action/xeno_resting,
-		/datum/action/ability/xeno_action/watch_xeno,
-		/datum/action/ability/activable/xeno/psydrain,
-		/datum/action/ability/activable/xeno/cocoon,
-		/datum/action/ability/activable/xeno/plant_weeds,
-		/datum/action/ability/xeno_action/call_of_the_burrowed,
-		/datum/action/ability/activable/xeno/corrosive_acid/strong,
-		/datum/action/ability/activable/xeno/nightfall,
-		/datum/action/ability/xeno_action/petrify,
-		/datum/action/ability/activable/xeno/off_guard,
-		/datum/action/ability/activable/xeno/shattering_roar,
-		/datum/action/ability/xeno_action/zero_form_beam,
-		/datum/action/ability/xeno_action/psychic_summon,
-		/datum/action/ability/xeno_action/pheromones,
-		/datum/action/ability/xeno_action/pheromones/emit_recovery,
-		/datum/action/ability/xeno_action/pheromones/emit_warding,
-		/datum/action/ability/xeno_action/pheromones/emit_frenzy,
->>>>>>> 3b691bcd4d (initial garbage)
 		/datum/action/ability/xeno_action/hive_message,
 		/datum/action/ability/xeno_action/rally_hive,
 		/datum/action/ability/xeno_action/rally_minion,
