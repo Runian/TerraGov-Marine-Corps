@@ -10,8 +10,8 @@ stamina sprites :) ✔
 ms-paint level of Sprites ✔
 cool descriptions! ✔
 Immunity to CC: slow / stun / fling / stagger
-give caste_flag to prevent plasma/health regen on weeds
-no pheromone given
+give caste_flag to prevent plasma/health regen on weeds ✔
+no pheromone given ✔
 no king summon allowed
 no slash like Hivemind
 no benefit from friendly xeno skills (like deathwing in HoTS!) :)
