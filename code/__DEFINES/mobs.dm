@@ -645,11 +645,15 @@ GLOBAL_LIST_INIT(layers_to_offset, list(
 #define CASTE_ACID_BLOOD (1<<11) // Randomly inflicts burn damage to nearby humans when taking damage.
 #define CASTE_STAGGER_RESISTANT (1<<12) // Resistant to getting staggered from projectiles.
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> 5d4f9851fc (all kinds of immunity)
 #define CASTE_STAGGER_IMMUNE (1<<13) // Immunity to all forms of stagger.
 #define CASTE_KNOCKBACK_IMMUNE (1<<14) // Immunity to all forms of knockback / throwing.
 #define CASTE_SLOW_IMMUNE (1<<15) // Immunity to all forms of slow.
 #define CASTE_STUN_IMMUNE (1<<16) // Immunity to all forms of stun.
 #define CASTE_NO_PSYCHIC_SUMMON (1<<17) // Excluded from the King's psychic summon.
+<<<<<<< HEAD
 
 #define CASTE_DO_NOT_ALERT_LOW_LIFE (1<<19) // When at low life, does not alerts other Xenomorphs (who opt into these low-life alerts). Decreases the font size for the death announcement message.
 #define CASTE_DO_NOT_ANNOUNCE_DEATH (1<<20) // Do not announce to Hive if this Xenomorph died.
@@ -667,15 +671,18 @@ GLOBAL_LIST_INIT(layers_to_offset, list(
 #define CASTE_EXCLUDE_STRAINS (1<<29) // Excludes this caste/basetype from strain selection.
 =======
 #define CASTE_NO_PSYCHIC_SUMMON (1<<13) // Excluded from the King's psychic summon.
+=======
+>>>>>>> 5d4f9851fc (all kinds of immunity)
 
-#define CASTE_DO_NOT_ALERT_LOW_LIFE (1<<14) // When at low life, does not alerts other Xenomorphs (who opt into these low-life alerts). Decreases the font size for the death announcement message.
-#define CASTE_DO_NOT_ANNOUNCE_DEATH (1<<15) // Do not announce to Hive if this Xenomorph died.
-#define CASTE_HIDE_IN_STATUS (1<<16) // Do not count them in the hive status TGUI.
-#define CASTE_NOT_IN_BIOSCAN (1<<17) // Do not count them toward the xenomorph count for the bioscan. Typically given to summoned minions (puppet/spiderling).
-#define CASTE_HAS_WOUND_MASK (1<<18) // Uses an alpha mask for wounded states.
+#define CASTE_DO_NOT_ALERT_LOW_LIFE (1<<19) // When at low life, does not alerts other Xenomorphs (who opt into these low-life alerts). Decreases the font size for the death announcement message.
+#define CASTE_DO_NOT_ANNOUNCE_DEATH (1<<20) // Do not announce to Hive if this Xenomorph died.
+#define CASTE_HIDE_IN_STATUS (1<<21) // Do not count them in the hive status TGUI.
+#define CASTE_NOT_IN_BIOSCAN (1<<22) // Do not count them toward the xenomorph count for the bioscan. Typically given to summoned minions (puppet/spiderling).
+#define CASTE_HAS_WOUND_MASK (1<<23) // Uses an alpha mask for wounded states.
 
 // Xenomorph caste_flags (evolution):
 // NOTE: Consider making a new variable for these.
+<<<<<<< HEAD
 #define CASTE_EVOLUTION_ALLOWED (1<<19) // Are we allowed to evolve & do we gain any evolution points?
 #define CASTE_INSTANT_EVOLUTION (1<<20) // Whether we require no evolution progress to evolve to this caste.
 #define CASTE_CANNOT_EVOLVE_IN_CAPTIVITY (1<<21) // Whether we cannot evolve in the research lab.
@@ -683,6 +690,14 @@ GLOBAL_LIST_INIT(layers_to_offset, list(
 #define CASTE_LEADER_TYPE (1<<23) // Whether this is a leader type caste (e.g. Queen/Shrike/King/Dragon). Restricts who can play these castes based on: playtime & if banned from Queen.
 #define CASTE_EXCLUDE_STRAINS (1<<24) // Excludes this caste/basetype from strain selection.
 >>>>>>> 3239c98487 (autism up caste_flag defines (by docing it better(?) and sorting it))
+=======
+#define CASTE_EVOLUTION_ALLOWED (1<<24) // Are we allowed to evolve & do we gain any evolution points?
+#define CASTE_INSTANT_EVOLUTION (1<<25) // Whether we require no evolution progress to evolve to this caste.
+#define CASTE_CANNOT_EVOLVE_IN_CAPTIVITY (1<<26) // Whether we cannot evolve in the research lab.
+#define CASTE_REQUIRES_FREE_TILE (1<<27) // Whether we require a free tile to evolve.
+#define CASTE_LEADER_TYPE (1<<28) // Whether this is a leader type caste (e.g. Queen/Shrike/King/Dragon). Restricts who can play these castes based on: playtime & if banned from Queen.
+#define CASTE_EXCLUDE_STRAINS (1<<29) // Excludes this caste/basetype from strain selection.
+>>>>>>> 5d4f9851fc (all kinds of immunity)
 
 // Xenomorph can_flags:
 #define CASTE_CAN_HOLD_FACEHUGGERS (1<<0)
