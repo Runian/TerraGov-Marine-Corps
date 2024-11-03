@@ -133,14 +133,10 @@
 	if(!.)
 		return
 	update_fire()
-	var/obj/item/clothing/mask/facehugger/F = get_active_held_item()
-	var/obj/item/clothing/mask/facehugger/G = get_inactive_held_item()
-	if(istype(F))
-		F.kill_hugger()
-		dropItemToGround(F)
-	if(istype(G))
-		G.kill_hugger()
-		dropItemToGround(G)
+
+	for(var/obj/item/clothing/mask/facehugger/hugger in get_held_items())
+		hugger.kill_hugger()
+		dropItemToGround(hugger)
 
 ///Puts out any fire on the mob
 /mob/living/proc/ExtinguishMob()
@@ -204,7 +200,7 @@
 		return
 	if(status_flags & (INCORPOREAL|GODMODE)) //Ignore incorporeal/invul targets
 		return FALSE
-	if(hard_armor.getRating(FIRE) >= 100)
+	if(soft_armor.getRating(FIRE) >= 100)
 		to_chat(src, span_warning("You are untouched by the flames."))
 		return FALSE
 	if(pass_flags & PASS_FIRE) //Pass fire allow to cross fire without being affected.
