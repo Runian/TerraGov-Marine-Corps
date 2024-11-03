@@ -582,7 +582,7 @@ GLOBAL_LIST_INIT(layers_to_offset, list(
 
 #define CASTE_IS_INTELLIGENT (1<<6) // Can we use human controls? Typically given to hive leaders for purposes of touching alamo/dropship controls.
 #define CASTE_IS_STRONG (1<<7) // Can tear open acidded walls or reinforced miners without being MOB_SIZE_BIG.
-#define CASTE_IS_BUILDER (1<<8) // Whether we are classified as a builder caste. Allows specific construction options (like removing acid wells)
+#define CASTE_IS_BUILDER (1<<8) // Whether we are classified as a builder caste. Allows specific construction options (like removing acid wells).
 #define CASTE_IS_A_MINION (1<<9) // Whether we are classified as a minion caste. Minions are not counted toward silo spawn count ratio.
 
 #define CASTE_FIRE_IMMUNE (1<<10) // Are we immune to fire? This includes immunity from getting set on fire and effects of it.
