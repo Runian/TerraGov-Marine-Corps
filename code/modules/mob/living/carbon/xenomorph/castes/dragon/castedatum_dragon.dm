@@ -1,10 +1,11 @@
 /* The TODO list in order: https://hackmd.io/@wlLEbadtQoCyE4iytTkonw/S10wubC1A
-base xeno_caste, xeno, etc
-Health (calm)
-Soft Armor (calm)
-Hard Armor (calm)
-Speed (calm)
+base xeno_caste, xeno, etc ✔
+Health ✔
+Soft Armor ✔
+Hard Armor ✔
+Speed ✔
 ms-paint level of Sprites
+cool descriptions!
 15 xeno limit
 Immunity to CC: slow / stun / fling / stagger
 give caste_flag to prevent plasma/health regen on weeds
@@ -33,14 +34,14 @@ REAL Sprites
 	melee_damage = 33
 
 	// *** Speed *** //
-	speed = -0.1
+	speed = -0.6
 
 	// *** Plasma *** //
 	plasma_max = 1200
 	plasma_gain = 90
 
 	// *** Health *** //
-	max_health = 700
+	max_health = 1650 // Calm (750) + Enraged (900)
 
 	// *** Sunder *** //
 	sunder_multiplier = 0.8
@@ -57,10 +58,8 @@ REAL Sprites
 	caste_traits = null
 
 	// *** Defense *** //
-	soft_armor = list(MELEE = 65, BULLET = 65, LASER = 65, ENERGY = 65, BOMB = 100, BIO = 60, FIRE = 100, ACID = 60)
-
-	// *** Pheromones *** //
-	aura_strength = 4.5
+	soft_armor = list(MELEE = 75, BULLET = 75, LASER = 75, ENERGY = 75, BOMB = 50, BIO = 75, FIRE = 200, ACID = 75)
+	hard_armor = list(MELEE = 10, BULLET = 10, LASER = 10, ENERGY = 10, BOMB = 10, BIO = 10, FIRE = 10, ACID = 10)
 
 	minimap_icon = "xenoking"
 
