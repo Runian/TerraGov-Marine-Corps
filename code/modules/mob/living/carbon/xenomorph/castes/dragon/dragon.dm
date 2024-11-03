@@ -12,6 +12,10 @@
 	plasma_stored = 300
 	pixel_x = -16
 	mob_size = MOB_SIZE_BIG
+<<<<<<< HEAD
+=======
+	drag_delay = 6
+>>>>>>> 994a30ec14 (half of dragon flight)
 	resistance_flags = BANISH_IMMUNE
 	initial_language_holder = /datum/language_holder/xeno/dragon
 <<<<<<< HEAD
