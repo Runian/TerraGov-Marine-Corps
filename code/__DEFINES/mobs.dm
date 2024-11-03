@@ -595,9 +595,17 @@ GLOBAL_LIST_INIT(layers_to_offset, list(
 
 >>>>>>> 7dd7d57848 (health/plasma regen + casteflags)
 
+<<<<<<< HEAD
 #define CASTE_INNATE_PLASMA_REGEN (1<<3) // Xenomorphs that regenerate plasma outside of weeds.
 #define CASTE_PLASMADRAIN_IMMUNE (1<<4) // Are we immune to plasma drain?
 #define CASTE_NO_PLASMA_REGEN (1<<5) // Xenomorphs that cannot regenerate plasma by being on weeds or innately.
+=======
+// Xeno defines that affect evolution, considering making a new var for these
+#define CASTE_LEADER_TYPE (1<<20) //Whether we are a leader type caste, such as the queen, shrike or ?king?, and is affected by queen ban and playtime restrictions
+#define CASTE_CANNOT_EVOLVE_IN_CAPTIVITY (1<<21) //Whether we cannot evolve in the research lab
+#define CASTE_REQUIRES_FREE_TILE (1<<22) //Whether we require a free tile to evolve
+#define CASTE_INSTANT_EVOLUTION (1<<23) //Whether we require no evolution progress to evolve to this caste
+>>>>>>> ff9dabc359 (change common bitflags)
 
 #define CASTE_IS_INTELLIGENT (1<<6) // Can we use human controls? Typically given to hive leaders for purposes of touching alamo/dropship controls.
 #define CASTE_IS_STRONG (1<<7) // Can tear open acidded walls or reinforced miners without being MOB_SIZE_BIG.
