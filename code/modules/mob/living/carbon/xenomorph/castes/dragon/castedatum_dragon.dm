@@ -252,7 +252,11 @@ REAL Sprites
 =======
 		// Dragon-specific actions:
 		/datum/action/ability/activable/xeno/dragon_breath,
+<<<<<<< HEAD
 >>>>>>> f5bda68175 (dragon breath)
+=======
+		/datum/action/ability/activable/xeno/tail_swipe,
+>>>>>>> 69bd3761e7 (tail swipe)
 		// Actions given to all T4s:
 		/datum/action/ability/xeno_action/call_of_the_burrowed,
 		/datum/action/ability/xeno_action/hive_message,
@@ -286,7 +290,11 @@ REAL Sprites
 =======
 		// Dragon-specific actions:
 		/datum/action/ability/activable/xeno/dragon_breath,
+<<<<<<< HEAD
 >>>>>>> f5bda68175 (dragon breath)
+=======
+		/datum/action/ability/activable/xeno/tail_swipe,
+>>>>>>> 69bd3761e7 (tail swipe)
 		// Actions given to all T4s:
 		/datum/action/ability/xeno_action/call_of_the_burrowed,
 		/datum/action/ability/xeno_action/hive_message,
