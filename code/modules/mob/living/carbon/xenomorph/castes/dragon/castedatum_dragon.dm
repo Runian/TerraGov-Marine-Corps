@@ -165,7 +165,9 @@ give caste_flag to prevent plasma/health regen on weeds ✔
 no pheromone given ✔
 no king summon allowed ✔
 randomly sort the fuck out of caste_flag defines ✔
-no slash like Hivemind
+basic slash set up ✔
+let slash hit machinery e.g. apc/light frames
+
 no benefit from friendly xeno skills (like deathwing in HoTS!) :)
 EVERYTHING ELSE WAHHHH
 REAL Sprites
