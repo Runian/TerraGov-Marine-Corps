@@ -139,16 +139,20 @@ Health ✔
 Soft Armor ✔
 Hard Armor ✔
 Speed ✔
+<<<<<<< HEAD
 >>>>>>> 36bd1ad143 (health/armor/speed)
+=======
+can speak english ✔
+stamina sprites :) ✔
+15 xeno limit ✔
+>>>>>>> 33b3744639 (stamina (plasma) sprites)
 ms-paint level of Sprites
 cool descriptions!
-15 xeno limit ✔
 Immunity to CC: slow / stun / fling / stagger
 give caste_flag to prevent plasma/health regen on weeds
 no pheromone given
 no king summon allowed
 no slash like Hivemind
-can speak english ✔
 unique resource (kind of like blood/rage) except its yellow
 no benefit from friendly xeno skills (like deathwing in HoTS!) :)
 EVERYTHING ELSE WAHHHH
