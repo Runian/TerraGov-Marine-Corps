@@ -167,7 +167,8 @@ no king summon allowed ✔
 randomly sort the fuck out of caste_flag defines ✔
 basic slash set up ✔
 let slash hit machinery e.g. apc/light frames
-
+dragon breath set up ✔
+make dragon breath cooler???
 no benefit from friendly xeno skills (like deathwing in HoTS!) :)
 EVERYTHING ELSE WAHHHH
 REAL Sprites
@@ -241,12 +242,17 @@ REAL Sprites
 		/datum/action/ability/xeno_action/watch_xeno,
 		/datum/action/ability/activable/xeno/psydrain,
 <<<<<<< HEAD
+<<<<<<< HEAD
 		// Dragon-specific actions:
 		/datum/action/ability/xeno_action/dragon_flight,
 		/datum/action/ability/activable/xeno/dragon_breath,
 		/datum/action/ability/activable/xeno/tail_swipe,
 =======
 >>>>>>> 1fd1fae70e (descs)
+=======
+		// Dragon-specific actions:
+		/datum/action/ability/activable/xeno/dragon_breath,
+>>>>>>> f5bda68175 (dragon breath)
 		// Actions given to all T4s:
 		/datum/action/ability/xeno_action/call_of_the_burrowed,
 		/datum/action/ability/xeno_action/hive_message,
@@ -270,12 +276,17 @@ REAL Sprites
 		/datum/action/ability/xeno_action/watch_xeno,
 		/datum/action/ability/activable/xeno/psydrain,
 <<<<<<< HEAD
+<<<<<<< HEAD
 		// Dragon-specific actions:
 		/datum/action/ability/xeno_action/dragon_flight,
 		/datum/action/ability/activable/xeno/dragon_breath,
 		/datum/action/ability/activable/xeno/tail_swipe,
 =======
 >>>>>>> 1fd1fae70e (descs)
+=======
+		// Dragon-specific actions:
+		/datum/action/ability/activable/xeno/dragon_breath,
+>>>>>>> f5bda68175 (dragon breath)
 		// Actions given to all T4s:
 		/datum/action/ability/xeno_action/call_of_the_burrowed,
 		/datum/action/ability/xeno_action/hive_message,

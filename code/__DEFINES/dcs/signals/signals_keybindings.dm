@@ -342,6 +342,7 @@
 #define COMSIG_XENOABILITY_SEISMIC_FRACTURE "xenoability_seismic_fracture"
 #define COMSIG_XENOABILITY_PRIMAL_WRATH "xenoability_primal_wrath"
 
+<<<<<<< HEAD
 #define COMSIG_XENOABILITY_ABDUCT "xenoability_abduct"
 #define COMSIG_XENOABILITY_DISLOCATE "xenoability_dislocate"
 #define COMSIG_XENOABILITY_ITEM_THROW "xenoability_item_throw"
@@ -351,3 +352,7 @@
 
 #define COMSIG_XENOABILITY_DRAGON_BREATH "xenoability_dragon_breath"
 #define COMSIG_XENOABILITY_TAIL_SWIPE "xenoability_tail_swipe"
+=======
+
+#define COMSIG_XENOABILITY_DRAGON_BREATH "xenoability_dragon_breath"
+>>>>>>> f5bda68175 (dragon breath)

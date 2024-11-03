@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 /// The radius/range to check for landing turfs.
 #define DRAGON_FLIGHT_FLIGHT_RANGE 2
 /// The amount of time it takes to begin flight.
@@ -235,6 +236,21 @@
 	name = "Dragon Breath"
 	action_icon_state = "shattering_roar"
 	action_icon = 'icons/Xeno/actions/king.dmi'
+=======
+#define DRAGON_BREATH_RANGE 4
+#define DRAGON_BREATH_ANGLE 60
+#define DRAGON_BREATH_SPEED 4
+#define DRAGON_BREATH_DAMAGE 20
+#define DRAGON_BREATH_VEHICLE_DAMAGE 10
+#define DRAGON_BREATH_STACKS 10
+#define DRAGON_BREATH_CHARGE_TIME 2.5 SECONDS
+
+// This acts similar to the King's Shattering Roar, except it is fire-themed!
+/datum/action/ability/activable/xeno/dragon_breath
+	name = "Dragon Breath"
+	action_icon_state = "shattering_roar"
+	action_icon = 'icons/Xeno/actions/king.dmi'
+>>>>>>> f5bda68175 (dragon breath)
 	desc = "Unleash a massive cone of fire in front of you after a wind-up."
 	ability_cost = 1
 	cooldown_duration = 12 SECONDS
@@ -246,6 +262,7 @@
 	var/list/victims_hit = list()
 
 
+<<<<<<< HEAD
 /datum/action/ability/activable/xeno/dragon_breath/can_use_action(silent = FALSE, override_flags)
 	. = ..()
 	var/mob/living/carbon/xenomorph/dragon/dragon_owner = owner
@@ -258,18 +275,29 @@
 
 /datum/action/ability/activable/xeno/dragon_breath/use_ability(atom/target)
 	var/mob/living/carbon/xenomorph/dragon/dragon_owner = owner
+=======
+/datum/action/ability/activable/xeno/dragon_breath/use_ability(atom/target)
+>>>>>>> f5bda68175 (dragon breath)
 	if(!target)
 		return
 
+<<<<<<< HEAD
 	dragon_owner.face_atom(target)
 	playsound(dragon_owner, 'sound/voice/alien/king_roar.ogg', 70, sound_range = 20)
 
 	ADD_TRAIT(dragon_owner, TRAIT_IMMOBILE, DRAGON_BREATH_ABILITY_TRAIT)
 	var/successful = do_after(dragon_owner, DRAGON_BREATH_CHARGE_TIME, NONE, dragon_owner, BUSY_ICON_DANGER, extra_checks = CALLBACK(src, PROC_REF(can_use_action), FALSE))
+=======
+	playsound(owner, 'sound/voice/alien/king_roar.ogg', 70, sound_range = 20)
+	ADD_TRAIT(owner, TRAIT_IMMOBILE, DRAGON_BREATH_ABILITY_TRAIT)
+
+	var/successful = do_after(owner, DRAGON_BREATH_CHARGE_TIME, NONE, owner, BUSY_ICON_DANGER, extra_checks = CALLBACK(src, PROC_REF(can_use_action), FALSE, ABILITY_USE_BUSY))
+>>>>>>> f5bda68175 (dragon breath)
 	REMOVE_TRAIT(owner, TRAIT_IMMOBILE, DRAGON_BREATH_ABILITY_TRAIT)
 
 	// They generally shouldn't be interrupted given that they are immune to stun and stagger, but if they are interrupted:
 	if(!successful)
+<<<<<<< HEAD
 		dragon_owner.balloon_alert(dragon_owner, "interrupted!")
 		add_cooldown(cooldown_duration/2)
 		return fail_activate()
@@ -277,6 +305,15 @@
 	playsound(dragon_owner, 'sound/voice/alien/xenos_roaring.ogg', 90, sound_range = 30)
 	for(var/mob/living/carbon/human/human_victim AS in GLOB.humans_by_zlevel["[dragon_owner.z]"])
 		if(get_dist(human_victim, dragon_owner) > 9)
+=======
+		owner.balloon_alert(owner, "interrupted!")
+		add_cooldown(cooldown_duration/2)
+		return fail_activate()
+
+	playsound(owner, 'sound/voice/alien/xenos_roaring.ogg', 90, sound_range = 30)
+	for(var/mob/living/carbon/human/human_victim AS in GLOB.humans_by_zlevel["[owner.z]"])
+		if(get_dist(human_victim, owner) > 9)
+>>>>>>> f5bda68175 (dragon breath)
 			continue
 		shake_camera(human_victim, 2 SECONDS, 1)
 
@@ -306,6 +343,7 @@
 	new /obj/fire/melting_fire(attacked_turf)
 	for(var/atom/movable/attacked_atom AS in attacked_turf)
 		if(isxeno(attacked_atom))
+<<<<<<< HEAD
 			continue
 		if(iscarbon(attacked_atom))
 			var/mob/living/carbon/attacked_carbon = attacked_atom
@@ -460,3 +498,19 @@
 
 	succeed_activate()
 	add_cooldown()
+=======
+			continue
+		if(iscarbon(attacked_atom))
+			var/mob/living/carbon/attacked_carbon = attacked_atom
+			attacked_carbon.take_overall_damage(DRAGON_BREATH_DAMAGE, BURN, FIRE, FALSE, FALSE, TRUE, 0, 2)
+			var/datum/status_effect/stacking/melting_fire/debuff = attacked_carbon.has_status_effect(STATUS_EFFECT_MELTING_FIRE)
+			if(debuff)
+				debuff.add_stacks(DRAGON_BREATH_STACKS)
+			else
+				attacked_carbon.apply_status_effect(STATUS_EFFECT_MELTING_FIRE, DRAGON_BREATH_STACKS)
+			continue
+		if(ishitbox(attacked_atom))
+			var/obj/attacked_obj = attacked_atom
+			attacked_obj.take_damage(DRAGON_BREATH_VEHICLE_DAMAGE, BURN, FIRE)
+			continue
+>>>>>>> f5bda68175 (dragon breath)
