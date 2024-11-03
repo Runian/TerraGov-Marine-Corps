@@ -193,7 +193,6 @@
 				if(attacked_carbon.stat == DEAD)
 					continue
 				shake_camera(attacked_carbon, 2, 1)
-				playsound(attacked_carbon, 'sound/weapons/alien_claw_block.ogg', 50, 1)
 				attacked_carbon.Knockdown(TAIL_SWIPE_KNOCKDOWN)
 				attacked_carbon.adjust_stagger(TAIL_SWIPE_STAGGER)
 				attacked_carbon.adjust_slowdown(TAIL_SWIPE_SLOWDOWN)
@@ -209,7 +208,6 @@
 				if(attacked_carbon.stat == DEAD)
 					continue
 				shake_camera(attacked_carbon, 2, 1)
-				playsound(attacked_carbon, 'sound/weapons/alien_claw_block.ogg', 50, 1)
 				attacked_carbon.Knockdown(TAIL_SWIPE_KNOCKDOWN/2)
 				attacked_carbon.adjust_stagger(TAIL_SWIPE_STAGGER/2)
 				attacked_carbon.adjust_slowdown(TAIL_SWIPE_SLOWDOWN/2)
