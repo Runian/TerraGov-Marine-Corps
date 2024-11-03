@@ -539,12 +539,15 @@
 					continue
 				shake_camera(attacked_carbon, 2, 1)
 <<<<<<< HEAD
+<<<<<<< HEAD
 				attacked_carbon.Knockdown(TAIL_SWIPE_KNOCKDOWN)
 				attacked_carbon.adjust_stagger(TAIL_SWIPE_STAGGER)
 				attacked_carbon.adjust_slowdown(TAIL_SWIPE_SLOWDOWN)
 				attacked_carbon.apply_damage(TAIL_SWIPE_DAMAGE * dragon_owner.xeno_melee_damage_modifier, BRUTE, blocked = MELEE, updating_health = TRUE)
 =======
 				playsound(attacked_carbon, 'sound/weapons/alien_claw_block.ogg', 50, 1)
+=======
+>>>>>>> 5d82b81846 (no double sound)
 				attacked_carbon.Knockdown(TAIL_SWIPE_KNOCKDOWN)
 				attacked_carbon.adjust_stagger(TAIL_SWIPE_STAGGER)
 				attacked_carbon.adjust_slowdown(TAIL_SWIPE_SLOWDOWN)
@@ -561,6 +564,7 @@
 				if(attacked_carbon.stat == DEAD)
 					continue
 				shake_camera(attacked_carbon, 2, 1)
+<<<<<<< HEAD
 <<<<<<< HEAD
 				attacked_carbon.Knockdown(TAIL_SWIPE_KNOCKDOWN/2)
 				attacked_carbon.adjust_stagger(TAIL_SWIPE_STAGGER/2)
@@ -594,6 +598,8 @@
 >>>>>>> f5bda68175 (dragon breath)
 =======
 				playsound(attacked_carbon, 'sound/weapons/alien_claw_block.ogg', 50, 1)
+=======
+>>>>>>> 5d82b81846 (no double sound)
 				attacked_carbon.Knockdown(TAIL_SWIPE_KNOCKDOWN/2)
 				attacked_carbon.adjust_stagger(TAIL_SWIPE_STAGGER/2)
 				attacked_carbon.adjust_slowdown(TAIL_SWIPE_SLOWDOWN/2)
