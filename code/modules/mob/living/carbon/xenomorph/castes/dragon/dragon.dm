@@ -14,7 +14,11 @@
 	mob_size = MOB_SIZE_BIG
 	resistance_flags = BANISH_IMMUNE
 	initial_language_holder = /datum/language_holder/xeno/dragon
+<<<<<<< HEAD
 	tier = XENO_TIER_FOUR // Dragon, like queen, doesn't count towards population limit.
+=======
+	tier = XENO_TIER_FOUR //Dragon, like queen, doesn't count towards population limit.
+>>>>>>> 8fe40bfdb9 (desc pt. 2)
 	upgrade = XENO_UPGRADE_NORMAL
 	bubble_icon = "alienroyal"
 	inherent_verbs = list(
