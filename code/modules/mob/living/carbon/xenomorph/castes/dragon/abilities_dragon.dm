@@ -1,10 +1,14 @@
-#define DRAGON_BREATH_RANGE 4
-#define DRAGON_BREATH_ANGLE 60
-#define DRAGON_BREATH_SPEED 4
+#define DRAGON_BREATH_RANGE 5
+#define DRAGON_BREATH_ANGLE 90
+#define DRAGON_BREATH_SPEED 2
 #define DRAGON_BREATH_DAMAGE 20
 #define DRAGON_BREATH_VEHICLE_DAMAGE 10
 #define DRAGON_BREATH_STACKS 10
-#define DRAGON_BREATH_CHARGE_TIME 2.5 SECONDS
+#define DRAGON_BREATH_CHARGE_TIME 2 SECONDS
+
+// ***************************************
+// *********** Dragon's Breath
+// ***************************************
 
 // This acts similar to the King's Shattering Roar, except it is fire-themed!
 /datum/action/ability/activable/xeno/dragon_breath
@@ -85,3 +89,138 @@
 			var/obj/attacked_obj = attacked_atom
 			attacked_obj.take_damage(DRAGON_BREATH_VEHICLE_DAMAGE, BURN, FIRE)
 			continue
+
+// ***************************************
+// *********** Tail Swipe
+// ***************************************
+
+#define TAIL_SWIPE_DAMAGE 75
+#define TAIL_SWIPE_KNOCKDOWN 1 SECONDS
+#define TAIL_SWIPE_STAGGER 2 SECONDS
+#define TAIL_SWIPE_SLOWDOWN 0.6
+#define TAIL_SWIPE_CHARGE_TIME 1.5 SECONDS
+
+/datum/action/ability/activable/xeno/tail_swipe
+	name = "Tail Swipe"
+	action_icon_state = "shattering_roar"
+	action_icon = 'icons/Xeno/actions/king.dmi'
+	desc = "Swipes your tail behind you and knockdowns in a massive range."
+	ability_cost = 0 // 1
+	cooldown_duration = 1 SECONDS //12 SECONDS
+	target_flags = ABILITY_TURF_TARGET
+	keybinding_signals = list(
+		KEYBINDING_NORMAL = COMSIG_XENOABILITY_TAIL_SWIPE,
+	)
+
+/datum/action/ability/activable/xeno/tail_swipe/use_ability(atom/target)
+	if(!target)
+		return
+
+	// Turn to get the turfs in front of us.
+	owner.face_atom(target)
+
+	// Inner targetted turfs.
+	var/list/turf/inner_targetted_turfs = list()
+	var/list/turf/outer_targetted_turfs = list()
+
+	// Column 1
+	var/turf/inner_north_turf = get_step(owner, turn(owner.dir, -90))
+	var/turf/outer_north_turf = get_step(inner_north_turf, turn(owner.dir, -90))
+	var/turf/inner_south_turf = get_step(owner, turn(owner.dir, 90))
+	var/turf/outer_south_turf = get_step(inner_south_turf, turn(owner.dir, 90))
+	inner_targetted_turfs += inner_north_turf
+	outer_targetted_turfs += outer_north_turf
+	inner_targetted_turfs += inner_south_turf
+	outer_targetted_turfs += outer_south_turf
+
+	// Column 2
+	var/turf/outer_north_turf_1 = get_step(outer_north_turf, owner.dir)
+	var/turf/inner_north_corner_turf = get_step(inner_north_turf, owner.dir)
+	var/turf/inner_behind_turf = get_step(owner, owner.dir)
+	var/turf/inner_south_corner_turf = get_step(inner_south_turf, owner.dir)
+	var/turf/outer_south_turf_1 = get_step(outer_south_turf, owner.dir)
+	outer_targetted_turfs += outer_north_turf_1
+	inner_targetted_turfs += inner_north_corner_turf
+	inner_targetted_turfs += inner_behind_turf
+	inner_targetted_turfs += inner_south_corner_turf
+	outer_targetted_turfs += outer_south_turf_1
+
+	// Column 3
+	var/turf/outer_north_corner_turf = get_step(outer_north_turf_1, owner.dir)
+	var/turf/outer_behind_north_turf = get_step(inner_north_corner_turf, owner.dir)
+	var/turf/outer_behind_turf = get_step(inner_behind_turf, owner.dir)
+	var/turf/outer_behind_south_turf = get_step(inner_south_corner_turf, owner.dir)
+	var/turf/outer_south_corner_turf = get_step(outer_south_turf_1, owner.dir)
+	outer_targetted_turfs += outer_north_corner_turf
+	outer_targetted_turfs += outer_behind_north_turf
+	outer_targetted_turfs += outer_behind_turf
+	outer_targetted_turfs += outer_behind_south_turf
+	outer_targetted_turfs += outer_south_corner_turf
+
+	// Then turn us around so it looks like we're using our tail.
+	owner.setDir(turn(owner.dir, 180))
+
+	// Telegraph this attack.
+	var/list/obj/effect/dragon_telegraphed_warning/warnings = list()
+	for(var/turf/targetted_turf in inner_targetted_turfs)
+		warnings += new /obj/effect/dragon_telegraphed_warning(targetted_turf)
+	for(var/turf/targetted_turf in outer_targetted_turfs)
+		warnings += new /obj/effect/dragon_telegraphed_warning(targetted_turf)
+
+	ADD_TRAIT(owner, TRAIT_IMMOBILE, TAIL_SWIPE_ABILITY_TRAIT)
+
+	// Delete the warnings regardless of outcome.
+	var/successful = do_after(owner, TAIL_SWIPE_CHARGE_TIME, NONE, owner, BUSY_ICON_DANGER, extra_checks = CALLBACK(src, PROC_REF(can_use_action), FALSE, ABILITY_USE_BUSY))
+	for(var/obj/effect/warning in warnings)
+		qdel(warning)
+
+	REMOVE_TRAIT(owner, TRAIT_IMMOBILE, TAIL_SWIPE_ABILITY_TRAIT)
+
+	// They generally shouldn't be interrupted given that they are immune to stun and stagger, but if they are interrupted:
+	if(!successful)
+		owner.balloon_alert(owner, "interrupted!")
+		add_cooldown(cooldown_duration/2)
+		return fail_activate()
+
+	var/mob/living/carbon/xenomorph/xeno_owner = owner
+	var/anyone_hit = FALSE
+	for(var/turf/targetted_turf in inner_targetted_turfs)
+		for(var/atom/movable/attacked_atom AS in targetted_turf)
+			if(isxeno(attacked_atom))
+				continue
+			if(iscarbon(attacked_atom))
+				var/mob/living/carbon/attacked_carbon = attacked_atom
+				if(attacked_carbon.stat == DEAD)
+					continue
+				shake_camera(attacked_carbon, 2, 1)
+				playsound(attacked_carbon, 'sound/weapons/alien_claw_block.ogg', 50, 1)
+				attacked_carbon.Knockdown(TAIL_SWIPE_KNOCKDOWN)
+				attacked_carbon.adjust_stagger(TAIL_SWIPE_STAGGER)
+				attacked_carbon.adjust_slowdown(TAIL_SWIPE_SLOWDOWN/2)
+				attacked_carbon.apply_damage(TAIL_SWIPE_DAMAGE * xeno_owner.xeno_melee_damage_modifier, BRUTE, blocked = MELEE, updating_health = TRUE)
+				anyone_hit = TRUE
+
+	for(var/turf/targetted_turf in outer_targetted_turfs)
+		for(var/atom/movable/attacked_atom AS in targetted_turf)
+			if(isxeno(attacked_atom))
+				continue
+			if(iscarbon(attacked_atom))
+				var/mob/living/carbon/attacked_carbon = attacked_atom
+				if(attacked_carbon.stat == DEAD)
+					continue
+				shake_camera(attacked_carbon, 2, 1)
+				playsound(attacked_carbon, 'sound/weapons/alien_claw_block.ogg', 50, 1)
+				attacked_carbon.Knockdown(TAIL_SWIPE_KNOCKDOWN/2)
+				attacked_carbon.adjust_stagger(TAIL_SWIPE_STAGGER/2)
+				attacked_carbon.adjust_slowdown(TAIL_SWIPE_SLOWDOWN)
+				attacked_carbon.apply_damage(TAIL_SWIPE_DAMAGE * xeno_owner.xeno_melee_damage_modifier/2, BRUTE, blocked = MELEE, updating_health = TRUE)
+				anyone_hit = TRUE
+
+	// Miss or hit sound effect!
+	if(anyone_hit)
+		playsound(xeno_owner, 'sound/weapons/alien_claw_block.ogg', 50, 1)
+	else
+		xeno_owner.emote("tail2")
+
+	succeed_activate()
+	add_cooldown()

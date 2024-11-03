@@ -350,3 +350,4 @@
 #define COMSIG_XENOABILITY_ADVANCE_OPPRESSOR "xenoability_advance_oppressor"
 
 #define COMSIG_XENOABILITY_DRAGON_BREATH "xenoability_dragon_breath"
+#define COMSIG_XENOABILITY_TAIL_SWIPE "xenoability_tail_swipe"
