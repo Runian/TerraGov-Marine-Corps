@@ -1,3 +1,103 @@
+// ***************************************
+// *********** Dragon's Flight
+// ***************************************
+
+#define DRAGON_FLIGHT_CHARGE_TIME 5 SECONDS
+
+/datum/action/ability/xeno_action/dragon_flight
+	name = "Dragon's Flight"
+	action_icon_state = "shattering_roar"
+	action_icon = 'icons/Xeno/actions/king.dmi'
+	desc = "After a long wind-up, take flight to the skies. While flying, you slowly regenerate your health and choose where you'll land."
+	cooldown_duration = 1 SECONDS // TODO: set to 60 SECONDS
+	/// If we are currently in flight.
+	var/flying = FALSE
+
+/datum/action/ability/xeno_action/dragon_flight/can_use_action(silent = FALSE, override_flags)
+	. = ..()
+	var/area/current_area = get_area(owner)
+	// No landing in marine-friendly areas.
+	if(flying && (isdropshiparea(current_area) || current_area.area_flags & MARINE_BASE))
+		if(!silent)
+			owner.balloon_alert(owner, "No landing in marine base!")
+		return FALSE
+	// No flying or landing in caves.
+	if(current_area.ceiling > CEILING_OBSTRUCTED)
+		if(!silent)
+			owner.balloon_alert(owner, flying ? "Can't land in caves!" : "Can't fly in caves!")
+		return FALSE
+
+/datum/action/ability/xeno_action/dragon_flight/action_activate()
+	// We are landing!
+	if(flying)
+		playsound(owner, 'sound/effects/alien/behemoth/landslide_roar.ogg', 70, sound_range = 20)
+
+		var/list/turf/nearby_visible_turfs = list()
+		for(var/turf/nearby_turf in range(3, get_turf(owner)))
+			if(nearby_turf.density)
+				continue
+			if(!line_of_sight(owner, nearby_turf))
+				continue
+			nearby_visible_turfs += nearby_turf
+
+		// Telegraph this attack.
+		var/list/obj/effect/dragon_telegraphed_warning/warnings = list()
+		for(var/turf/targetted_turf in nearby_visible_turfs)
+			warnings += new /obj/effect/dragon_telegraphed_warning(targetted_turf)
+
+		// A long cast time for people to move away!
+		ADD_TRAIT(owner, TRAIT_IMMOBILE, DRAGON_FLIGHT_ABILITY_TRAIT)
+		var/successful = do_after(owner, DRAGON_FLIGHT_CHARGE_TIME, NONE, owner, BUSY_ICON_DANGER, extra_checks = CALLBACK(src, PROC_REF(can_use_action), FALSE, ABILITY_USE_BUSY))
+		for(var/obj/effect/warning in warnings)
+			qdel(warning)
+		REMOVE_TRAIT(owner, TRAIT_IMMOBILE, DRAGON_FLIGHT_ABILITY_TRAIT)
+
+		if(!successful)
+			owner.balloon_alert(owner, "interrupted!")
+			add_cooldown(cooldown_duration/2)
+			return fail_activate()
+
+		flying = FALSE
+		handle_flight_variables()
+		return
+
+	// We want to fly instead!
+	// TODO: Need better sounds!
+	playsound(owner, 'sound/effects/shieldbash.ogg', 70, sound_range = 20)
+
+	// A long cast time that must be committed to unless you're staggered.
+	ADD_TRAIT(owner, TRAIT_IMMOBILE, DRAGON_FLIGHT_ABILITY_TRAIT)
+	REMOVE_TRAIT(owner, TRAIT_STAGGERIMMUNE, XENO_TRAIT)
+	var/successful = do_after(owner, DRAGON_FLIGHT_CHARGE_TIME, NONE, owner, BUSY_ICON_DANGER, extra_checks = CALLBACK(src, PROC_REF(can_use_action), FALSE, ABILITY_USE_BUSY))
+	ADD_TRAIT(owner, TRAIT_STAGGERIMMUNE, XENO_TRAIT)
+	REMOVE_TRAIT(owner, TRAIT_IMMOBILE, DRAGON_FLIGHT_ABILITY_TRAIT)
+
+	if(!successful)
+		owner.balloon_alert(owner, "interrupted!")
+		add_cooldown(cooldown_duration/2)
+		return fail_activate()
+
+	flying = TRUE
+	handle_flight_variables()
+
+	add_cooldown()
+	succeed_activate()
+
+/// Handles all variables that need to be set upon landing or flight.
+/datum/action/ability/xeno_action/dragon_flight/proc/handle_flight_variables()
+	if(flying)
+		owner.status_flags |= (GODMODE|INCORPOREAL)
+		owner.resistance_flags |= RESIST_ALL
+		owner.pass_flags = HOVERING|PASSABLE|PASS_XENO
+		return
+	owner.status_flags &= (GODMODE|INCORPOREAL)
+	owner.resistance_flags &= RESIST_ALL
+	owner.pass_flags = initial(owner.pass_flags)
+
+// ***************************************
+// *********** Dragon's Breath
+// ***************************************
+
 #define DRAGON_BREATH_RANGE 5
 #define DRAGON_BREATH_ANGLE 90
 #define DRAGON_BREATH_SPEED 2
@@ -5,10 +105,6 @@
 #define DRAGON_BREATH_VEHICLE_DAMAGE 10
 #define DRAGON_BREATH_STACKS 10
 #define DRAGON_BREATH_CHARGE_TIME 2 SECONDS
-
-// ***************************************
-// *********** Dragon's Breath
-// ***************************************
 
 // This acts similar to the King's Shattering Roar, except it is fire-themed!
 /datum/action/ability/activable/xeno/dragon_breath
