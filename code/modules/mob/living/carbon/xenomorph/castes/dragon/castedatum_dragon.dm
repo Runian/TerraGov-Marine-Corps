@@ -6,7 +6,7 @@ Hard Armor ✔
 Speed ✔
 ms-paint level of Sprites
 cool descriptions!
-15 xeno limit
+15 xeno limit ✔
 Immunity to CC: slow / stun / fling / stagger
 give caste_flag to prevent plasma/health regen on weeds
 no pheromone given
@@ -46,7 +46,7 @@ REAL Sprites
 	// *** Evolution *** //
 	upgrade_threshold = TIER_THREE_THRESHOLD
 	maximum_active_caste = 1
-	evolve_min_xenos = 12
+	evolve_min_xenos = 15
 	death_evolution_delay = 7 MINUTES
 
 	// *** Flags *** //
