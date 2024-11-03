@@ -13,6 +13,7 @@
 	pixel_x = -16
 	mob_size = MOB_SIZE_BIG
 	drag_delay = 6
+	resistance_flags = BANISH_IMMUNE
 	initial_language_holder = /datum/language_holder/xeno/dragon
 	tier = XENO_TIER_FOUR //Dragon, like queen, doesn't count towards population limit.
 	upgrade = XENO_UPGRADE_NORMAL
