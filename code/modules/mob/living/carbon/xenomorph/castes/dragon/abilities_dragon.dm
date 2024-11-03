@@ -385,12 +385,17 @@
 	action_icon = 'icons/Xeno/actions/king.dmi'
 	desc = "Swipes your tail behind you and knockdowns in a massive range."
 <<<<<<< HEAD
+<<<<<<< HEAD
 	ability_cost = 1
 	cooldown_duration = 12 SECONDS
 =======
 	ability_cost = 0 // 1
 	cooldown_duration = 1 SECONDS //12 SECONDS
 >>>>>>> 69bd3761e7 (tail swipe)
+=======
+	ability_cost = 1
+	cooldown_duration = 12 SECONDS
+>>>>>>> 52d1bd1aa7 (non-dev cost/cooldown)
 	target_flags = ABILITY_TURF_TARGET
 	keybinding_signals = list(
 		KEYBINDING_NORMAL = COMSIG_XENOABILITY_TAIL_SWIPE,
