@@ -43,9 +43,6 @@ REAL Sprites
 	// *** Health *** //
 	max_health = 1650 // Calm (750) + Enraged (900)
 
-	// *** Sunder *** //
-	sunder_multiplier = 0.8
-
 	// *** Evolution *** //
 	upgrade_threshold = TIER_THREE_THRESHOLD
 	maximum_active_caste = 1
