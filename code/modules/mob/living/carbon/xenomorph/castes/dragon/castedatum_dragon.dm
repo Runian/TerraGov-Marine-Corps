@@ -150,8 +150,12 @@ stamina sprites :) ✔
 ms-paint level of Sprites
 =======
 ms-paint level of Sprites ✔
+<<<<<<< HEAD
 >>>>>>> 94544a2828 (ms level sprites)
 cool descriptions!
+=======
+cool descriptions! ✔
+>>>>>>> 1fd1fae70e (descs)
 Immunity to CC: slow / stun / fling / stagger
 give caste_flag to prevent plasma/health regen on weeds
 no pheromone given
@@ -199,7 +203,7 @@ REAL Sprites
 	maximum_active_caste = 1
 
 	evolve_min_xenos = 15
-	death_evolution_delay = 7 MINUTES
+	death_evolution_delay = 10 MINUTES
 
 	// *** Flags *** //
 	caste_flags = CASTE_NO_HEALING|CASTE_NO_PLASMA_REGEN|CASTE_IS_INTELLIGENT|CASTE_STAGGER_IMMUNE|CASTE_KNOCKBACK_IMMUNE|CASTE_SLOW_IMMUNE|CASTE_STUN_IMMUNE|CASTE_NO_PSYCHIC_SUMMON|CASTE_INSTANT_EVOLUTION|CASTE_LEADER_TYPE
@@ -217,10 +221,13 @@ REAL Sprites
 		/datum/action/ability/xeno_action/xeno_resting,
 		/datum/action/ability/xeno_action/watch_xeno,
 		/datum/action/ability/activable/xeno/psydrain,
+<<<<<<< HEAD
 		// Dragon-specific actions:
 		/datum/action/ability/xeno_action/dragon_flight,
 		/datum/action/ability/activable/xeno/dragon_breath,
 		/datum/action/ability/activable/xeno/tail_swipe,
+=======
+>>>>>>> 1fd1fae70e (descs)
 		// Actions given to all T4s:
 		/datum/action/ability/xeno_action/call_of_the_burrowed,
 		/datum/action/ability/xeno_action/hive_message,
@@ -243,10 +250,13 @@ REAL Sprites
 		/datum/action/ability/xeno_action/xeno_resting,
 		/datum/action/ability/xeno_action/watch_xeno,
 		/datum/action/ability/activable/xeno/psydrain,
+<<<<<<< HEAD
 		// Dragon-specific actions:
 		/datum/action/ability/xeno_action/dragon_flight,
 		/datum/action/ability/activable/xeno/dragon_breath,
 		/datum/action/ability/activable/xeno/tail_swipe,
+=======
+>>>>>>> 1fd1fae70e (descs)
 		// Actions given to all T4s:
 		/datum/action/ability/xeno_action/call_of_the_burrowed,
 		/datum/action/ability/xeno_action/hive_message,
