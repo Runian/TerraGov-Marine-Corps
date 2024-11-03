@@ -39,6 +39,7 @@ REAL Sprites
 	// *** Plasma *** //
 	plasma_max = 10
 	plasma_gain = 0
+	plasma_icon_state = "stamina"
 
 	// *** Health *** //
 	max_health = 1650 // Calm (750) + Enraged (900)
