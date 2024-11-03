@@ -148,7 +148,7 @@ give caste_flag to prevent plasma/health regen on weeds
 no pheromone given
 no king summon allowed
 no slash like Hivemind
-can speak english
+can speak english ✔
 unique resource (kind of like blood/rage) except its yellow
 no benefit from friendly xeno skills (like deathwing in HoTS!) :)
 EVERYTHING ELSE WAHHHH
