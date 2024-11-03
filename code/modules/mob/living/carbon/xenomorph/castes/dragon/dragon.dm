@@ -64,6 +64,7 @@
 /mob/living/carbon/xenomorph/dragon/death_cry()
 	playsound(loc, 'sound/voice/alien/king_died.ogg', 75, 0)
 
+<<<<<<< HEAD
 /mob/living/carbon/xenomorph/dragon/can_receive_aura(aura_type, atom/source, datum/aura_bearer/bearer)
 	. = ..()
 	return FALSE
@@ -168,3 +169,9 @@
 	src.resistance_flags &= ~RESIST_ALL
 	src.allow_pass_flags = initial(src.allow_pass_flags)
 	src.pass_flags = initial(src.pass_flags)
+=======
+
+/mob/living/carbon/xenomorph/dragon/can_receive_aura(aura_type, atom/source, datum/aura_bearer/bearer)
+	. = ..()
+	return FALSE
+>>>>>>> bde1171a30 (no phero received)
