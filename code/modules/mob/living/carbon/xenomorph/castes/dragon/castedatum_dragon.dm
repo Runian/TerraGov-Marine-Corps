@@ -4,15 +4,16 @@ Health ✔
 Soft Armor ✔
 Hard Armor ✔
 Speed ✔
+can speak english ✔
+stamina sprites :) ✔
+15 xeno limit ✔
 ms-paint level of Sprites
 cool descriptions!
-15 xeno limit ✔
 Immunity to CC: slow / stun / fling / stagger
 give caste_flag to prevent plasma/health regen on weeds
 no pheromone given
 no king summon allowed
 no slash like Hivemind
-can speak english ✔
 unique resource (kind of like blood/rage) except its yellow
 no benefit from friendly xeno skills (like deathwing in HoTS!) :)
 EVERYTHING ELSE WAHHHH
@@ -37,8 +38,8 @@ REAL Sprites
 	speed = -0.6
 
 	// *** Plasma *** //
-	plasma_max = 1200
-	plasma_gain = 90
+	plasma_max = 10
+	plasma_gain = 0
 
 	// *** Health *** //
 	max_health = 1650 // Calm (750) + Enraged (900)
