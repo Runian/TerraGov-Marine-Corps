@@ -70,6 +70,7 @@ REAL Sprites
 		/datum/action/ability/xeno_action/watch_xeno,
 		/datum/action/ability/activable/xeno/psydrain,
 		// Dragon-specific actions:
+		/datum/action/ability/xeno_action/dragon_flight,
 		/datum/action/ability/activable/xeno/dragon_breath,
 		/datum/action/ability/activable/xeno/tail_swipe,
 		// Actions given to all T4s:
@@ -95,6 +96,7 @@ REAL Sprites
 		/datum/action/ability/xeno_action/watch_xeno,
 		/datum/action/ability/activable/xeno/psydrain,
 		// Dragon-specific actions:
+		/datum/action/ability/xeno_action/dragon_flight,
 		/datum/action/ability/activable/xeno/dragon_breath,
 		/datum/action/ability/activable/xeno/tail_swipe,
 		// Actions given to all T4s:
