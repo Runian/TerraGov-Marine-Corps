@@ -17,7 +17,10 @@ randomly sort the fuck out of caste_flag defines ✔
 basic slash set up ✔
 let slash hit machinery e.g. apc/light frames
 dragon breath set up ✔
-make dragon breath cooler???
+make dragon breath cooler!!!
+dragon flight basics ✔
+cool dragon flight animations!!!!!
+being in dragon flight heals 1/60% health every tick (aka 1/120% per second)
 no benefit from friendly xeno skills (like deathwing in HoTS!) :)
 EVERYTHING ELSE WAHHHH
 REAL Sprites
