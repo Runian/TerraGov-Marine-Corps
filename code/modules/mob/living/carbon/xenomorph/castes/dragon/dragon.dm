@@ -31,12 +31,17 @@
 	xeno_flags = XENO_ROUNY // Because my sprites are so trash.
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 	/// Whether we are attacking.
 	var/is_attacking = FALSE
 =======
 	/// Whether we are doing something (in relation to our attacks/actions) and do not want to do anything else.
 	var/is_busy = FALSE
 >>>>>>> 1d39b17272 (7/8 of dragon flight)
+=======
+	/// Whether we are attacking.
+	var/is_attacking = FALSE
+>>>>>>> b0d4c5eb57 (dont actually need this)
 	/// Whether we are currently in flight.
 	var/is_flying = FALSE
 =======
@@ -204,7 +209,7 @@
 #define DRAGON_BASIC_THROW_SPEED 2
 
 /mob/living/carbon/xenomorph/dragon/UnarmedAttack(atom/clicked_atom, has_proximity, modifiers)
-	if(is_busy)
+	if(is_attacking)
 		return
 	if(is_flying)
 		src.balloon_alert(src, "Can't while flying!")
@@ -213,7 +218,6 @@
 		src.balloon_alert(src, "Not ready to attack again!")
 		return
 
-	is_busy = TRUE
 	src.face_atom(clicked_atom)
 
 	// Targetted turfs.
@@ -227,13 +231,15 @@
 	for(var/turf/targetted_turf in targetted_turfs)
 		warnings += new /obj/effect/dragon_telegraphed_warning(targetted_turf)
 
-	// Delete the warnings regardless of outcome.
+	is_attacking = TRUE
 	var/successful = do_after(src, 1 SECONDS, NONE, src, BUSY_ICON_DANGER)
+
+	// Delete the warnings regardless of outcome.
 	for(var/obj/effect/warning in warnings)
 		qdel(warning)
 
 	// No attacking if they do not follow through.
-	is_busy = FALSE
+	is_attacking = FALSE
 	if(!successful)
 		TIMER_COOLDOWN_START(src, COOLDOWN_DRAGON_BASIC_ATTACK, 1 SECONDS)
 		return

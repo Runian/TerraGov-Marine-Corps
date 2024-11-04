@@ -263,8 +263,6 @@
 
 /datum/action/ability/xeno_action/dragon_flight/action_activate()
 	var/mob/living/carbon/xenomorph/dragon/dragon_owner = owner
-	if(dragon_owner.is_busy)
-		return
 
 	// Landing!
 	if(dragon_owner.is_flying)
@@ -286,11 +284,7 @@
 
 		// A long cast time for people to move away!
 		ADD_TRAIT(dragon_owner, TRAIT_IMMOBILE, DRAGON_FLIGHT_ABILITY_TRAIT)
-
-		dragon_owner.is_busy = TRUE
-		var/successful = do_after(dragon_owner, DRAGON_FLIGHT_FLIGHT_TIME, NONE, dragon_owner, BUSY_ICON_DANGER, extra_checks = CALLBACK(src, PROC_REF(can_use_action), FALSE, ABILITY_USE_BUSY))
-		dragon_owner.is_busy = FALSE
-
+		var/successful = do_after(dragon_owner, DRAGON_FLIGHT_FLIGHT_TIME, NONE, dragon_owner, BUSY_ICON_DANGER, extra_checks = CALLBACK(src, PROC_REF(can_use_action), FALSE))
 		for(var/obj/effect/warning in warnings)
 			qdel(warning)
 		REMOVE_TRAIT(dragon_owner, TRAIT_IMMOBILE, DRAGON_FLIGHT_ABILITY_TRAIT)
@@ -332,9 +326,7 @@
 	// A long cast time that must be committed to unless you're staggered.
 	ADD_TRAIT(dragon_owner, TRAIT_IMMOBILE, DRAGON_FLIGHT_ABILITY_TRAIT)
 	REMOVE_TRAIT(dragon_owner, TRAIT_STAGGERIMMUNE, XENO_TRAIT)
-	dragon_owner.is_busy = TRUE
-	var/successful = do_after(dragon_owner, DRAGON_FLIGHT_LAND_TIME, NONE, dragon_owner, BUSY_ICON_DANGER, extra_checks = CALLBACK(src, PROC_REF(can_use_action), FALSE, ABILITY_USE_BUSY))
-	dragon_owner.is_busy = FALSE
+	var/successful = do_after(dragon_owner, DRAGON_FLIGHT_LAND_TIME, NONE, dragon_owner, BUSY_ICON_DANGER, extra_checks = CALLBACK(src, PROC_REF(can_use_action), FALSE))
 	ADD_TRAIT(dragon_owner, TRAIT_STAGGERIMMUNE, XENO_TRAIT)
 	REMOVE_TRAIT(dragon_owner, TRAIT_IMMOBILE, DRAGON_FLIGHT_ABILITY_TRAIT)
 
@@ -461,18 +453,21 @@
 =======
 /datum/action/ability/activable/xeno/dragon_breath/use_ability(atom/target)
 	var/mob/living/carbon/xenomorph/dragon/dragon_owner = owner
-	if(dragon_owner.is_busy || !target)
+	if(!target)
 		return
 
 	dragon_owner.face_atom(target)
-
 	playsound(dragon_owner, 'sound/voice/alien/king_roar.ogg', 70, sound_range = 20)
-	ADD_TRAIT(dragon_owner, TRAIT_IMMOBILE, DRAGON_BREATH_ABILITY_TRAIT)
 
+<<<<<<< HEAD
 	dragon_owner.is_busy = TRUE
 	var/successful = do_after(dragon_owner, DRAGON_BREATH_CHARGE_TIME, NONE, dragon_owner, BUSY_ICON_DANGER, extra_checks = CALLBACK(src, PROC_REF(can_use_action), FALSE, ABILITY_USE_BUSY))
 	dragon_owner.is_busy = FALSE
 >>>>>>> 1d39b17272 (7/8 of dragon flight)
+=======
+	ADD_TRAIT(dragon_owner, TRAIT_IMMOBILE, DRAGON_BREATH_ABILITY_TRAIT)
+	var/successful = do_after(dragon_owner, DRAGON_BREATH_CHARGE_TIME, NONE, dragon_owner, BUSY_ICON_DANGER, extra_checks = CALLBACK(src, PROC_REF(can_use_action), FALSE))
+>>>>>>> b0d4c5eb57 (dont actually need this)
 	REMOVE_TRAIT(owner, TRAIT_IMMOBILE, DRAGON_BREATH_ABILITY_TRAIT)
 
 	// They generally shouldn't be interrupted given that they are immune to stun and stagger, but if they are interrupted:
@@ -598,6 +593,7 @@
 /datum/action/ability/activable/xeno/tail_swipe/use_ability(atom/target)
 	var/mob/living/carbon/xenomorph/dragon/dragon_owner = owner
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
 /datum/action/ability/activable/xeno/tail_swipe/use_ability(atom/target)
 >>>>>>> 69bd3761e7 (tail swipe)
@@ -612,6 +608,9 @@
 >>>>>>> 69bd3761e7 (tail swipe)
 =======
 	if(dragon_owner.is_busy || !target)
+=======
+	if(!target)
+>>>>>>> b0d4c5eb57 (dont actually need this)
 		return
 
 	// Turn to get the turfs in front of us.
@@ -733,12 +732,16 @@
 	ADD_TRAIT(owner, TRAIT_IMMOBILE, TAIL_SWIPE_ABILITY_TRAIT)
 =======
 	ADD_TRAIT(dragon_owner, TRAIT_IMMOBILE, TAIL_SWIPE_ABILITY_TRAIT)
+<<<<<<< HEAD
 
 	dragon_owner.is_busy = TRUE
 	var/successful = do_after(dragon_owner, TAIL_SWIPE_CHARGE_TIME, NONE, dragon_owner, BUSY_ICON_DANGER, extra_checks = CALLBACK(src, PROC_REF(can_use_action), FALSE, ABILITY_USE_BUSY))
 	dragon_owner.is_busy = FALSE
 >>>>>>> 1d39b17272 (7/8 of dragon flight)
 
+=======
+	var/successful = do_after(dragon_owner, TAIL_SWIPE_CHARGE_TIME, NONE, dragon_owner, BUSY_ICON_DANGER, extra_checks = CALLBACK(src, PROC_REF(can_use_action), FALSE))
+>>>>>>> b0d4c5eb57 (dont actually need this)
 	for(var/obj/effect/warning in warnings)
 		qdel(warning)
 	REMOVE_TRAIT(dragon_owner, TRAIT_IMMOBILE, TAIL_SWIPE_ABILITY_TRAIT)
