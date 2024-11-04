@@ -11,31 +11,28 @@
 	name = "Dragon's Flight"
 	action_icon_state = "shattering_roar"
 	action_icon = 'icons/Xeno/actions/king.dmi'
-	desc = "After a long wind-up, take flight to the skies. While flying, you slowly regenerate your health and choose where you'll land."
+	desc = "After a long wind-up, take flight to the skies. While flying, you slowly regenerate your health and can choose where you'll land with a similar wind-up."
 	cooldown_duration = 1 SECONDS // TODO: set to 60 SECONDS
-	/// If we are currently in flight.
-	var/flying = FALSE
-	/// Last known transform for animating.
-	var/old_transform
 
 /datum/action/ability/xeno_action/dragon_flight/can_use_action(silent = FALSE, override_flags)
 	. = ..()
+	var/mob/living/carbon/xenomorph/dragon/dragon_owner = owner
+	if(!dragon_owner)
+		if(!silent)
+			// Dragon-exclusive ability. No other xenos can use it.
+			dragon_owner.balloon_alert(dragon_owner, "You don't have any wings!")
+		return FALSE
+
 	var/area/current_area = get_area(owner)
 	// No landing in marine-friendly areas.
-	if(flying && (isdropshiparea(current_area) || current_area.area_flags & MARINE_BASE))
+	if(dragon_owner.is_flying && (isdropshiparea(current_area) || current_area.area_flags & MARINE_BASE))
 		if(!silent)
 			owner.balloon_alert(owner, "No landing in marine base!")
 		return FALSE
 	// No flying or landing in caves.
 	if(current_area.ceiling > CEILING_OBSTRUCTED)
 		if(!silent)
-			owner.balloon_alert(owner, flying ? "Can't land in caves!" : "Can't fly in caves!")
-		return FALSE
-	var/mob/living/carbon/xenomorph/dragon/dragon_owner = owner
-	if(!dragon_owner)
-		if(!silent)
-			// Dragon-exclusive ability. No other xenos can use it.
-			dragon_owner.balloon_alert(dragon_owner, "You don't have any wings!")
+			owner.balloon_alert(owner, dragon_owner.is_flying ? "Can't land in caves!" : "Can't fly in caves!")
 		return FALSE
 
 /datum/action/ability/xeno_action/dragon_flight/action_activate()
