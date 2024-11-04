@@ -37,7 +37,12 @@
 =======
 	/// Whether we are currently attacking (aka in the progress of the do_after) or not.
 	var/is_attacking = FALSE
+<<<<<<< HEAD
 >>>>>>> 935f42018a (basic slash attack)
+=======
+	/// Whether we are currently in flight.
+	var/is_flying = FALSE
+>>>>>>> b1fc44b9df (3/4 of dragon flight)
 
 /mob/living/carbon/xenomorph/dragon/Initialize(mapload)
 	. = ..()
@@ -194,6 +199,9 @@
 #define DRAGON_BASIC_THROW_SPEED 2
 
 /mob/living/carbon/xenomorph/dragon/UnarmedAttack(atom/clicked_atom, has_proximity, modifiers)
+	if(is_flying)
+		src.balloon_alert(src, "Can't while flying!")
+		return
 	if(is_attacking || TIMER_COOLDOWN_CHECK(src, COOLDOWN_DRAGON_BASIC_ATTACK))
 		src.balloon_alert(src, "Not ready to attack again!")
 		return
@@ -257,4 +265,25 @@
 
 	// Other cool stuff!
 	src.emote("roar6")
+<<<<<<< HEAD
 >>>>>>> 935f42018a (basic slash attack)
+=======
+
+/// Handles all variables associated with flying (or landing).
+/mob/living/carbon/xenomorph/dragon/proc/switch_flight()
+	is_flying = !is_flying
+	if(is_flying)
+		// We don't get alpha here since the ability does it.
+		src.density = FALSE
+		src.status_flags |= (GODMODE|INCORPOREAL)
+		src.resistance_flags |= RESIST_ALL
+		src.allow_pass_flags = PASSABLE
+		src.pass_flags = HOVERING
+		return
+	src.alpha = initial(src.alpha)
+	src.density = initial(src.density)
+	src.status_flags &= ~(GODMODE|INCORPOREAL)
+	src.resistance_flags &= ~RESIST_ALL
+	src.allow_pass_flags = initial(src.allow_pass_flags)
+	src.pass_flags = initial(src.pass_flags)
+>>>>>>> b1fc44b9df (3/4 of dragon flight)

@@ -235,6 +235,8 @@
 	cooldown_duration = 1 SECONDS // TODO: set to 60 SECONDS
 	/// If we are currently in flight.
 	var/flying = FALSE
+	/// Last known transform for animating.
+	var/old_transform
 
 /datum/action/ability/xeno_action/dragon_flight/can_use_action(silent = FALSE, override_flags)
 	. = ..()
@@ -249,17 +251,25 @@
 		if(!silent)
 			owner.balloon_alert(owner, flying ? "Can't land in caves!" : "Can't fly in caves!")
 		return FALSE
+	var/mob/living/carbon/xenomorph/dragon/dragon_owner = owner
+	if(!dragon_owner)
+		if(!silent)
+			// Dragon-exclusive ability. No other xenos can use it.
+			dragon_owner.balloon_alert(dragon_owner, "You don't have any wings!")
+		return FALSE
 
 /datum/action/ability/xeno_action/dragon_flight/action_activate()
+	var/mob/living/carbon/xenomorph/dragon/dragon_owner = owner
+
 	// We are landing!
-	if(flying)
-		playsound(owner, 'sound/effects/alien/behemoth/landslide_roar.ogg', 70, sound_range = 20)
+	if(dragon_owner.is_flying)
+		playsound(dragon_owner, 'sound/effects/alien/behemoth/landslide_roar.ogg', 70, sound_range = 20)
 
 		var/list/turf/nearby_visible_turfs = list()
-		for(var/turf/nearby_turf in range(3, get_turf(owner)))
+		for(var/turf/nearby_turf in range(2, get_turf(dragon_owner)))
 			if(nearby_turf.density)
 				continue
-			if(!line_of_sight(owner, nearby_turf))
+			if(!line_of_sight(dragon_owner, nearby_turf))
 				continue
 			nearby_visible_turfs += nearby_turf
 
@@ -269,43 +279,55 @@
 			warnings += new /obj/effect/dragon_telegraphed_warning(targetted_turf)
 
 		// A long cast time for people to move away!
-		ADD_TRAIT(owner, TRAIT_IMMOBILE, DRAGON_FLIGHT_ABILITY_TRAIT)
-		var/successful = do_after(owner, DRAGON_FLIGHT_CHARGE_TIME, NONE, owner, BUSY_ICON_DANGER, extra_checks = CALLBACK(src, PROC_REF(can_use_action), FALSE, ABILITY_USE_BUSY))
+		ADD_TRAIT(dragon_owner, TRAIT_IMMOBILE, DRAGON_FLIGHT_ABILITY_TRAIT)
+		var/successful = do_after(dragon_owner, DRAGON_FLIGHT_CHARGE_TIME, NONE, dragon_owner, BUSY_ICON_DANGER, extra_checks = CALLBACK(src, PROC_REF(can_use_action), FALSE, ABILITY_USE_BUSY))
 		for(var/obj/effect/warning in warnings)
 			qdel(warning)
-		REMOVE_TRAIT(owner, TRAIT_IMMOBILE, DRAGON_FLIGHT_ABILITY_TRAIT)
+		REMOVE_TRAIT(dragon_owner, TRAIT_IMMOBILE, DRAGON_FLIGHT_ABILITY_TRAIT)
 
 		if(!successful)
-			owner.balloon_alert(owner, "interrupted!")
+			dragon_owner.balloon_alert(dragon_owner, "interrupted!")
 			add_cooldown(cooldown_duration/2)
 			return fail_activate()
 
-		flying = FALSE
-		handle_flight_variables()
+		animate(dragon_owner, alpha = 255, transform = old_transform, time = 0.5 SECONDS, flags = ANIMATION_END_NOW)
+		old_transform = null
+		sleep(0.5 SECONDS) // SHITCODE. FIX LATER
+
+		dragon_owner.switch_flight()
 		return
 
 	// We want to fly instead!
 	// TODO: Need better sounds!
-	playsound(owner, 'sound/effects/shieldbash.ogg', 70, sound_range = 20)
+	playsound(dragon_owner, 'sound/effects/shieldbash.ogg', 70, sound_range = 20)
 
 	// A long cast time that must be committed to unless you're staggered.
-	ADD_TRAIT(owner, TRAIT_IMMOBILE, DRAGON_FLIGHT_ABILITY_TRAIT)
-	REMOVE_TRAIT(owner, TRAIT_STAGGERIMMUNE, XENO_TRAIT)
-	var/successful = do_after(owner, DRAGON_FLIGHT_CHARGE_TIME, NONE, owner, BUSY_ICON_DANGER, extra_checks = CALLBACK(src, PROC_REF(can_use_action), FALSE, ABILITY_USE_BUSY))
-	ADD_TRAIT(owner, TRAIT_STAGGERIMMUNE, XENO_TRAIT)
-	REMOVE_TRAIT(owner, TRAIT_IMMOBILE, DRAGON_FLIGHT_ABILITY_TRAIT)
+	ADD_TRAIT(dragon_owner, TRAIT_IMMOBILE, DRAGON_FLIGHT_ABILITY_TRAIT)
+	REMOVE_TRAIT(dragon_owner, TRAIT_STAGGERIMMUNE, XENO_TRAIT)
+	var/successful = do_after(dragon_owner, DRAGON_FLIGHT_CHARGE_TIME, NONE, dragon_owner, BUSY_ICON_DANGER, extra_checks = CALLBACK(src, PROC_REF(can_use_action), FALSE, ABILITY_USE_BUSY))
+	ADD_TRAIT(dragon_owner, TRAIT_STAGGERIMMUNE, XENO_TRAIT)
+	REMOVE_TRAIT(dragon_owner, TRAIT_IMMOBILE, DRAGON_FLIGHT_ABILITY_TRAIT)
 
 	if(!successful)
-		owner.balloon_alert(owner, "interrupted!")
+		dragon_owner.balloon_alert(dragon_owner, "interrupted!")
 		add_cooldown(cooldown_duration/2)
 		return fail_activate()
 
-	flying = TRUE
-	handle_flight_variables()
+	old_transform = dragon_owner.transform
+	dragon_owner.alpha = 255 // Make sure we are visible for this.
+	animate(dragon_owner, alpha = 200, transform = matrix() * 0.9, time = 0.3 SECONDS, easing = BOUNCE_EASING)
+	for(var/i in 1 to 3)
+		sleep(0.1 SECONDS) // SHITCODE. FIX LATER
+		if(QDELETED(dragon_owner) || dragon_owner.stat == DEAD) // Died mid-animation.
+			animate(dragon_owner, alpha = 255, transform = old_transform, time = 0, flags = ANIMATION_END_NOW) // Reset immediately.
+			return
+	animate(src, alpha = 100, transform = matrix() * 0.7, time = 0.7 SECONDS)
+	dragon_owner.switch_flight()
 
 	add_cooldown()
 	succeed_activate()
 
+<<<<<<< HEAD
 /// Handles all variables that need to be set upon landing or flight.
 /datum/action/ability/xeno_action/dragon_flight/proc/handle_flight_variables()
 	if(flying)
@@ -318,6 +340,8 @@
 	owner.pass_flags = initial(owner.pass_flags)
 
 >>>>>>> 994a30ec14 (half of dragon flight)
+=======
+>>>>>>> b1fc44b9df (3/4 of dragon flight)
 // ***************************************
 // *********** Dragon's Breath
 // ***************************************
@@ -372,6 +396,7 @@
 	/// Tracks victims to avoid double-hits in case they flee backwards into the incoming fire.
 	var/list/victims_hit = list()
 
+<<<<<<< HEAD
 
 <<<<<<< HEAD
 /datum/action/ability/activable/xeno/dragon_breath/can_use_action(silent = FALSE, override_flags)
@@ -384,6 +409,8 @@
 			dragon_owner.balloon_alert(src, "Can't while flying!")
 		return FALSE
 
+=======
+>>>>>>> b1fc44b9df (3/4 of dragon flight)
 /datum/action/ability/activable/xeno/dragon_breath/use_ability(atom/target)
 	var/mob/living/carbon/xenomorph/dragon/dragon_owner = owner
 =======
