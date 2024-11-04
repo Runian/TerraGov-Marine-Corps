@@ -22,8 +22,8 @@
 		/mob/living/carbon/xenomorph/proc/hijack,
 	)
 	xeno_flags = XENO_ROUNY // Because my sprites are so trash.
-	/// Whether we are currently attacking (aka in the progress of the do_after) or not.
-	var/is_attacking = FALSE
+	/// Whether we are doing something (in relation to our attacks/actions) and do not want to do anything else.
+	var/is_busy = FALSE
 	/// Whether we are currently in flight.
 	var/is_flying = FALSE
 
@@ -73,14 +73,16 @@
 #define DRAGON_BASIC_THROW_SPEED 2
 
 /mob/living/carbon/xenomorph/dragon/UnarmedAttack(atom/clicked_atom, has_proximity, modifiers)
+	if(is_busy)
+		return
 	if(is_flying)
 		src.balloon_alert(src, "Can't while flying!")
 		return
-	if(is_attacking || TIMER_COOLDOWN_CHECK(src, COOLDOWN_DRAGON_BASIC_ATTACK))
+	if(TIMER_COOLDOWN_CHECK(src, COOLDOWN_DRAGON_BASIC_ATTACK))
 		src.balloon_alert(src, "Not ready to attack again!")
 		return
 
-	is_attacking = TRUE
+	is_busy = TRUE
 	src.face_atom(clicked_atom)
 
 	// Targetted turfs.
@@ -95,12 +97,12 @@
 		warnings += new /obj/effect/dragon_telegraphed_warning(targetted_turf)
 
 	// Delete the warnings regardless of outcome.
-	var/successful = do_after(src, 1 SECONDS, IGNORE_HELD_ITEM, src, BUSY_ICON_DANGER)
+	var/successful = do_after(src, 1 SECONDS, NONE, src, BUSY_ICON_DANGER)
 	for(var/obj/effect/warning in warnings)
 		qdel(warning)
 
 	// No attacking if they do not follow through.
-	is_attacking = FALSE
+	is_busy = FALSE
 	if(!successful)
 		TIMER_COOLDOWN_START(src, COOLDOWN_DRAGON_BASIC_ATTACK, 1 SECONDS)
 		return
@@ -140,11 +142,17 @@
 	// Other cool stuff!
 	src.emote("roar6")
 
+/mob/living/carbon/xenomorph/dragon/handle_special_state()
+	if(is_flying)
+		icon_state = "[xeno_caste.caste_name][(xeno_flags & XENO_ROUNY) ? " rouny" : ""] Flight"
+		return TRUE
+	return FALSE
+
 /// Handles all variables associated with flying (or landing).
 /mob/living/carbon/xenomorph/dragon/proc/switch_flight()
 	is_flying = !is_flying
 	if(is_flying)
-		// We don't get alpha here since the ability does it.
+		src.alpha = 50
 		src.density = FALSE
 		src.status_flags |= (GODMODE|INCORPOREAL)
 		src.resistance_flags |= RESIST_ALL
