@@ -1,6 +1,9 @@
 /* The TODO list in order: https://hackmd.io/@wlLEbadtQoCyE4iytTkonw/S10wubC1A
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> b5f196601e (my autism list (for calm dragon))
 The Less Brain-Dead List:
 ✔️ Can Speak Common
 ✔️ Stamina Bar
@@ -44,6 +47,7 @@ The Less Brain-Dead List:
 	- Sound effect / emote for hitting anyone
 	- Sound effect / emote for hitting nothing.
 ❌ Dragon's Flight / Landing (Ability)
+<<<<<<< HEAD
 	✔️ 60 second cooldown.
 	✔️ Costs 0 stamina to use.
 	❌ Flying:
@@ -63,6 +67,36 @@ The Less Brain-Dead List:
 		❌ If landing right ontop of a carbon, deal double damage and cause them to emote: scream.
 		❌ Restores sprite to normal (from shadow sprite).
 		❌ Successfully casting should display a landing animation of sorts.
+=======
+	- 60 second cooldown.
+	- Costs 0 stamina to use.
+	- Flying:
+		Takes 3 seconds to fully cast.
+		Cannot activate if inside of caves or not groundside.
+		If they change z-levels (e.g. Alamo/TAD) and it was not due to hijack, forcibly land / right-click this ability.
+		Loses stagger immunity during casting. Regain it back after they're done.
+		If staggered, cancels and adds 30 seconds of cooldown.
+		While flying, has godmode/immunity and can move anywhere they can.
+			Godmode similar to non-manifested Hivemind.
+			❓ Movement similar to non-manifested Hivemind; can only move ontop of weeds.
+				❓ This is questionable to add as it is somewhat janky or difficult to deal with.
+				❓ For example, if the weed was broken before them and right next to them was broken... what then?
+				❓ I suppose teleport them to the nearest weed node..?
+				❓ But what if all the weed nodes are in caves? Or none exist? (Extremely rare, but better safe than sorry.)
+				❓ How about letting them move in vision of or in range of an fellow xenomorph?
+				❓ That seems very laggy(?) as it would constantly have to check every xenomorph if they're in range every movement.
+				❓ So basically, let us just NOT do this movement quirk and let them free roam anywhere they want.
+			Shadow sprite beneath them to indicate that they are flying.
+		Successfully casting should display a take-flight animation of sorts.
+	- Landing:
+		Takes 3 seconds to fully cast.
+		Cannot activate if inside of caves, within MARINE_BASE, or non-groundside.
+		Telegraphed with a range of 2.
+		Deals 75 damage to everything in range and knockdown for 1 second.
+		If landing right ontop of a carbon, deal double damage and cause them to emote: scream.
+		Restores sprite to normal (from shadow sprite).
+		Successfully casting should display a landing animation of sorts.
+>>>>>>> b5f196601e (my autism list (for calm dragon))
 	- Right Click:
 		If flying:
 			If non-hijack:
@@ -127,6 +161,7 @@ The Less Brain-Dead List:
 	Looks like and is telegraphed like Behemoth's charge except it is 3 tiles wide and 7 tiles long.
 	After success, remove all gas and fling carbons 7 tiles as non-safe throw & knockdown of 1 second.
 ... TBA ...
+<<<<<<< HEAD
 =======
 base xeno_caste, xeno, etc
 Health (calm)
@@ -176,6 +211,8 @@ no benefit from friendly xeno skills (like deathwing in HoTS!) :)
 EVERYTHING ELSE WAHHHH
 REAL Sprites
 >>>>>>> 3b691bcd4d (initial garbage)
+=======
+>>>>>>> b5f196601e (my autism list (for calm dragon))
 */
 
 /datum/xeno_caste/dragon
