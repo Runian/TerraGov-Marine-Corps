@@ -1,18 +1,29 @@
-// ***************************************
-// *********** Dragon's Flight
-// ***************************************
-
 #define DRAGON_FLIGHT_FLIGHT_TIME 3 SECONDS
 #define DRAGON_FLIGHT_LAND_TIME 3 SECONDS
 #define DRAGON_FLIGHT_LAND_DAMAGE 75
 #define DRAGON_FLIGHT_KNOCKDOWN 2 SECONDS
 
+/* All dragon abilities must satisfy the following conditions unless there is a reasonable exception:
+ * Lengthy cooldown.
+ * Lengthy cast time.
+ * Telegraphed / must be plainly obviously that something is happening.
+ * More powerful the ability, more costly it is in terms of stamina.
+ * Not able to easily cancel it (e.g. moving to preventing the ability from completing).
+ * Offensive abilities temporarily either: remove stagger immunity or cancel upon taking a certain amount of damage.
+ * Self-contained code wise (e.g. does not refer to /mob/living/carbon/xenomorph/dragon or any types beyond itself).
+*/
+
+// ***************************************
+// *********** Dragon's Flight
+// ***************************************
 /datum/action/ability/xeno_action/dragon_flight
 	name = "Dragon's Flight"
 	action_icon_state = "shattering_roar"
 	action_icon = 'icons/Xeno/actions/king.dmi'
 	desc = "After a long wind-up, take flight to the skies. While flying, you slowly regenerate your health and can choose where you'll land with a similar wind-up."
-	cooldown_duration = 1 SECONDS // TODO: set to 60 SECONDS
+	cooldown_duration = 60 SECONDS
+	/// Is the owner currently flying?
+	var/is_in_flight = FALSE
 
 /datum/action/ability/xeno_action/dragon_flight/can_use_action(silent = FALSE, override_flags)
 	. = ..()
