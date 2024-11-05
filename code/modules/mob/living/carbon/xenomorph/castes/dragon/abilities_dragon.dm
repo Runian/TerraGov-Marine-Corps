@@ -1,6 +1,7 @@
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 /// The radius/range to check for landing turfs.
 #define DRAGON_FLIGHT_FLIGHT_RANGE 2
 /// The amount of time it takes to begin flight.
@@ -31,12 +32,30 @@
 // *********** Dragon's Flight
 // ***************************************
 
+=======
+>>>>>>> e51b8d9873 (thinking about revamping abilities so far made)
 #define DRAGON_FLIGHT_FLIGHT_TIME 3 SECONDS
 #define DRAGON_FLIGHT_LAND_TIME 3 SECONDS
 #define DRAGON_FLIGHT_LAND_DAMAGE 75
 #define DRAGON_FLIGHT_KNOCKDOWN 2 SECONDS
 
+<<<<<<< HEAD
 >>>>>>> 994a30ec14 (half of dragon flight)
+=======
+/* All dragon abilities must satisfy the following conditions unless there is a reasonable exception:
+ * Lengthy cooldown.
+ * Lengthy cast time.
+ * Telegraphed / must be plainly obviously that something is happening.
+ * More powerful the ability, more costly it is in terms of stamina.
+ * Not able to easily cancel it (e.g. moving to preventing the ability from completing).
+ * Offensive abilities temporarily either: remove stagger immunity or cancel upon taking a certain amount of damage.
+ * Self-contained code wise (e.g. does not refer to /mob/living/carbon/xenomorph/dragon or any types beyond itself).
+*/
+
+// ***************************************
+// *********** Dragon's Flight
+// ***************************************
+>>>>>>> e51b8d9873 (thinking about revamping abilities so far made)
 /datum/action/ability/xeno_action/dragon_flight
 	name = "Dragon's Flight"
 	action_icon_state = "shattering_roar"
@@ -47,6 +66,7 @@
 	cooldown_duration = 60 SECONDS
 	/// Is the owner currently flying?
 	var/is_in_flight = FALSE
+<<<<<<< HEAD
 	/// The timer id used to play the introduction sound (multiple times).
 	var/intro_sound_timer_id
 	/// The targeted turfs that is referenced for telegraphing and impact.
@@ -240,6 +260,8 @@
 	desc = "After a long wind-up, take flight to the skies. While flying, you slowly regenerate your health and can choose where you'll land with a similar wind-up."
 >>>>>>> 2c7050a773 (unneeded vars)
 	cooldown_duration = 1 SECONDS // TODO: set to 60 SECONDS
+=======
+>>>>>>> e51b8d9873 (thinking about revamping abilities so far made)
 
 /datum/action/ability/xeno_action/dragon_flight/can_use_action(silent = FALSE, override_flags)
 	. = ..()
