@@ -48,6 +48,9 @@ The Less Brain-Dead List:
 	- Sound effect / emote for hitting nothing.
 ❌ Dragon's Flight / Landing (Ability)
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> c80747b8b1 (ill get back to this)
 	✔️ 60 second cooldown.
 	✔️ Costs 0 stamina to use.
 	❌ Flying:
@@ -67,6 +70,7 @@ The Less Brain-Dead List:
 		❌ If landing right ontop of a carbon, deal double damage and cause them to emote: scream.
 		❌ Restores sprite to normal (from shadow sprite).
 		❌ Successfully casting should display a landing animation of sorts.
+<<<<<<< HEAD
 =======
 	- 60 second cooldown.
 	- Costs 0 stamina to use.
@@ -97,6 +101,8 @@ The Less Brain-Dead List:
 		Restores sprite to normal (from shadow sprite).
 		Successfully casting should display a landing animation of sorts.
 >>>>>>> b5f196601e (my autism list (for calm dragon))
+=======
+>>>>>>> c80747b8b1 (ill get back to this)
 	- Right Click:
 		If flying:
 			If non-hijack:

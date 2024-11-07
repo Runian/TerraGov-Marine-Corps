@@ -2,6 +2,9 @@
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> c80747b8b1 (ill get back to this)
 /// The radius/range to check for landing turfs.
 #define DRAGON_FLIGHT_FLIGHT_RANGE 2
 /// The amount of time it takes to begin flight.
@@ -10,6 +13,7 @@
 #define DRAGON_FLIGHT_LAND_TIME 4 SECONDS
 /// How much brute damage is dealt for being in the landing radius (non-epicenter + epicenter)
 // Note: Double damage for vehicles and directly stomped on (if carbon).
+<<<<<<< HEAD
 #define DRAGON_FLIGHT_LAND_DAMAGE 75
 /// How long the knockdown is for being in the landing radius (not-epicenter + epicenter)
 #define DRAGON_FLIGHT_KNOCKDOWN 2 SECONDS
@@ -36,13 +40,20 @@
 >>>>>>> e51b8d9873 (thinking about revamping abilities so far made)
 #define DRAGON_FLIGHT_FLIGHT_TIME 3 SECONDS
 #define DRAGON_FLIGHT_LAND_TIME 3 SECONDS
+=======
+>>>>>>> c80747b8b1 (ill get back to this)
 #define DRAGON_FLIGHT_LAND_DAMAGE 75
+/// How long the knockdown is for being in the landing radius (not-epicenter + epicenter)
 #define DRAGON_FLIGHT_KNOCKDOWN 2 SECONDS
 
+<<<<<<< HEAD
 <<<<<<< HEAD
 >>>>>>> 994a30ec14 (half of dragon flight)
 =======
 /* All dragon abilities must satisfy the following conditions unless there is a reasonable exception:
+=======
+/* All dragon abilities generally satisfy the following conditions unless there is a reasonable exception:
+>>>>>>> c80747b8b1 (ill get back to this)
  * Lengthy cooldown.
  * Lengthy cast time.
  * Telegraphed / must be plainly obviously that something is happening.
@@ -67,12 +78,16 @@
 	/// Is the owner currently flying?
 	var/is_in_flight = FALSE
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> c80747b8b1 (ill get back to this)
 	/// The timer id used to play the introduction sound (multiple times).
 	var/intro_sound_timer_id
 	/// The targeted turfs that is referenced for telegraphing and impact.
 	var/list/turf/targetted_turfs = list()
 	/// The effects that shows the telegraphed area to avoid getting hit (for marines).
 	var/list/obj/effect/dragon_telegraphed_warning/telegraph_effects = list()
+<<<<<<< HEAD
 
 /datum/action/ability/xeno_action/dragon_flight/can_use_action(silent = FALSE, override_flags)
 	silent = TRUE
@@ -262,108 +277,140 @@
 	cooldown_duration = 1 SECONDS // TODO: set to 60 SECONDS
 =======
 >>>>>>> e51b8d9873 (thinking about revamping abilities so far made)
+=======
+>>>>>>> c80747b8b1 (ill get back to this)
 
 /datum/action/ability/xeno_action/dragon_flight/can_use_action(silent = FALSE, override_flags)
+	silent = TRUE
 	. = ..()
-	var/mob/living/carbon/xenomorph/dragon/dragon_owner = owner
-	if(!dragon_owner)
-		if(!silent)
-			// Dragon-exclusive ability. No other xenos can use it.
-			dragon_owner.balloon_alert(dragon_owner, "You don't have any wings!")
-		return FALSE
-
+	silent = TRUE
 	var/area/current_area = get_area(owner)
-	// No landing in marine-friendly areas.
-	if(dragon_owner.is_flying && (isdropshiparea(current_area) || current_area.area_flags & MARINE_BASE))
-		if(!silent)
-			owner.balloon_alert(owner, "No landing in marine base!")
-		return FALSE
-	// No flying or landing in caves.
-	if(current_area.ceiling > CEILING_OBSTRUCTED)
-		if(!silent)
-			owner.balloon_alert(owner, dragon_owner.is_flying ? "Can't land in caves!" : "Can't fly in caves!")
-		return FALSE
+	if(!is_in_flight)
+		// Roofed areas.
+		if(current_area.ceiling > CEILING_OBSTRUCTED)
+			if(!silent)
+				owner.balloon_alert(owner, "Can't fly in caves!")
+			return FALSE
+		// Shipside (aka not groundside).
+		if(!is_groundside())
+			if(!silent)
+				owner.balloon_alert(owner, "Cannot fly shipside.")
+			return FALSE
+	else
+		// Marine-friendly areas.
+		if(isdropshiparea(current_area) || (current_area.area_flags & MARINE_BASE))
+			if(!silent)
+				owner.balloon_alert(owner, "No landing in marine base!")
+			return FALSE
+
+
+/datum/action/ability/xeno_action/dragon_flight/succeed_activate(ability_cost_override)
+	..()
+	owner.update_icons()
 
 /datum/action/ability/xeno_action/dragon_flight/action_activate()
-	var/mob/living/carbon/xenomorph/dragon/dragon_owner = owner
+	// Both: General Variables
+	var/area/current_area = get_area(owner)
+	var/is_outside = current_area.outside
+	var/cast_time = is_in_flight ? DRAGON_FLIGHT_LAND_TIME : DRAGON_FLIGHT_FLIGHT_TIME
+	if(!is_outside)
+		cast_time *= 1.5
 
-	// Landing!
-	if(dragon_owner.is_flying)
-		playsound(dragon_owner, 'sound/effects/alien/behemoth/landslide_roar.ogg', 70, sound_range = 20)
+	// Both: Introduction Sound
+	play_introduction_sound()
 
-		var/list/turf/nearby_visible_turfs = list()
-		var/turf/current_turf = get_turf(dragon_owner)
-		for(var/turf/nearby_turf in range(2, current_turf))
-			if(nearby_turf.density)
-				continue
-			if(!line_of_sight(dragon_owner, nearby_turf))
-				continue
-			nearby_visible_turfs += nearby_turf
+	// Landing: Preparation & Telegraphing
+	if(is_in_flight)
+		targetted_turfs = get_landing_turfs()
+		for(var/turf/targetted_turf in targetted_turfs)
+			telegraph_effects += new /obj/effect/dragon_telegraphed_warning(targetted_turf)
 
-		// Telegraph this attack.
-		var/list/obj/effect/dragon_telegraphed_warning/warnings = list()
-		for(var/turf/targetted_turf in nearby_visible_turfs)
-			warnings += new /obj/effect/dragon_telegraphed_warning(targetted_turf)
+	// Both: Casting
+	ADD_TRAIT(owner, TRAIT_IMMOBILE, DRAGON_FLIGHT_ABILITY_TRAIT)
+	if(!is_in_flight)
+		REMOVE_TRAIT(owner, TRAIT_STAGGERIMMUNE, XENO_TRAIT)
+	var/successfully_casted = do_after(owner, cast_time, NONE, owner, BUSY_ICON_DANGER, extra_checks = CALLBACK(src, PROC_REF(can_use_action), FALSE, ABILITY_USE_BUSY))
+	REMOVE_TRAIT(owner, TRAIT_IMMOBILE, DRAGON_FLIGHT_ABILITY_TRAIT)
+	if(!is_in_flight)
+		ADD_TRAIT(owner, TRAIT_STAGGERIMMUNE, XENO_TRAIT)
 
-		// A long cast time for people to move away!
-		ADD_TRAIT(dragon_owner, TRAIT_IMMOBILE, DRAGON_FLIGHT_ABILITY_TRAIT)
-		var/successful = do_after(dragon_owner, DRAGON_FLIGHT_FLIGHT_TIME, NONE, dragon_owner, BUSY_ICON_DANGER, extra_checks = CALLBACK(src, PROC_REF(can_use_action), FALSE))
-		for(var/obj/effect/warning in warnings)
-			qdel(warning)
-		REMOVE_TRAIT(dragon_owner, TRAIT_IMMOBILE, DRAGON_FLIGHT_ABILITY_TRAIT)
+	// Both: Casting Success/Fail
+	for(var/obj/effect/warning in telegraph_effects)
+		qdel(warning)
 
-		if(!successful)
-			dragon_owner.balloon_alert(dragon_owner, "interrupted!")
-			add_cooldown(cooldown_duration/2)
-			return fail_activate()
+	deltimer(intro_sound_timer_id)
+	intro_sound_timer_id = null
 
-		var/directly_stepped_on = FALSE
-		for(var/turf/targetted_turf in nearby_visible_turfs)
-			for(var/atom/movable/attacked_atom AS in targetted_turf)
-				if(isxeno(attacked_atom))
-					continue
-				if(iscarbon(attacked_atom))
-					var/mob/living/carbon/attacked_carbon = attacked_atom
-					if(attacked_carbon.stat == DEAD)
-						continue
-					shake_camera(attacked_carbon, 2, 1)
-					attacked_carbon.Knockdown(DRAGON_FLIGHT_KNOCKDOWN)
-					if(targetted_turf == current_turf)
-						attacked_carbon.emote("scream")
-						attacked_carbon.apply_damage(DRAGON_FLIGHT_LAND_DAMAGE * 2 * dragon_owner.xeno_melee_damage_modifier, BRUTE, blocked = MELEE, updating_health = TRUE)
-						directly_stepped_on = TRUE
-					else
-						attacked_carbon.apply_damage(DRAGON_FLIGHT_LAND_DAMAGE * dragon_owner.xeno_melee_damage_modifier, BRUTE, blocked = MELEE, updating_health = TRUE)
-
-		// NOTE: Not sure if to include both sounds, but we'll test it out.
-		playsound(dragon_owner, 'sound/effects/slam3.ogg', 70, sound_range = 20)
-		if(directly_stepped_on)
-			playsound(dragon_owner, 'sound/effects/splat.ogg', 70, sound_range = 20)
-		dragon_owner.switch_flight()
-		dragon_owner.update_icons()
-		return
-
-	// Flying!
-	playsound(dragon_owner, 'sound/effects/shieldbash.ogg', 70, sound_range = 20)
-
-	// A long cast time that must be committed to unless you're staggered.
-	ADD_TRAIT(dragon_owner, TRAIT_IMMOBILE, DRAGON_FLIGHT_ABILITY_TRAIT)
-	REMOVE_TRAIT(dragon_owner, TRAIT_STAGGERIMMUNE, XENO_TRAIT)
-	var/successful = do_after(dragon_owner, DRAGON_FLIGHT_LAND_TIME, NONE, dragon_owner, BUSY_ICON_DANGER, extra_checks = CALLBACK(src, PROC_REF(can_use_action), FALSE))
-	ADD_TRAIT(dragon_owner, TRAIT_STAGGERIMMUNE, XENO_TRAIT)
-	REMOVE_TRAIT(dragon_owner, TRAIT_IMMOBILE, DRAGON_FLIGHT_ABILITY_TRAIT)
-
-	if(!successful)
-		dragon_owner.balloon_alert(dragon_owner, "interrupted!")
+	if(!successfully_casted)
+		owner.balloon_alert(owner, "interrupted!")
 		add_cooldown(cooldown_duration/2)
 		return fail_activate()
+	else
+		is_in_flight = !is_in_flight
 
-	dragon_owner.switch_flight()
-	dragon_owner.update_icons()
+	// Flight: Now flying!
+	if(is_in_flight)
+		RegisterSignal(owner, COMSIG_MOVABLE_PRE_MOVE, PROC_REF(on_pre_move))
+		set_flight_variables()
+		add_cooldown()
+		succeed_activate()
+		return
 
+	// Landing: Now landing!
+	var/mob/living/carbon/xenomorph/xeno_owner = owner
+	var/turf/current_turf = get_turf(xeno_owner)
+	var/land_damage = DRAGON_FLIGHT_LAND_DAMAGE * xeno_owner.xeno_melee_damage_modifier
+	var/living_got_stomped = FALSE // To prevent multiple splat sounds.
+	for(var/turf/targetted_turf in targetted_turfs)
+		for(var/atom/movable/attacked_atom AS in targetted_turf)
+			if(!(attacked_atom.resistance_flags & XENO_DAMAGEABLE))
+				continue
+			if(isxeno(attacked_atom))
+				continue
+			if(isobj(attacked_atom))
+				var/obj/attacked_obj = attacked_atom
+				if(ishitbox(attacked_obj))
+					attacked_obj.take_damage(land_damage / 4.5, BRUTE, MELEE, blame_mob = xeno_owner)
+					continue
+				if(isarmoredvehicle(attacked_obj))
+					var/obj/vehicle/sealed/armored/attacked_apc = attacked_obj
+					attacked_apc.take_damage(land_damage / 4.5, BRUTE, MELEE, blame_mob = xeno_owner)
+					if(targetted_turf == current_turf) // Extra punishment for getting directly stomped on.
+						for(var/mob/living/living_passenger AS in attacked_apc.occupants)
+							living_passenger.Knockdown(DRAGON_FLIGHT_KNOCKDOWN)
+							to_chat(living_passenger, "You fall to the floor from an impact hitting the vehicle!")
+					continue
+				if(isvehicle(attacked_obj))
+					attacked_obj.take_damage(land_damage * 2, BRUTE, MELEE, blame_mob = xeno_owner)
+					continue
+			if(isliving(attacked_atom))
+				var/mob/living/attacked_living = attacked_atom
+				if(attacked_living.stat == DEAD)
+					continue
+				shake_camera(attacked_living, 2, 1)
+				attacked_living.Knockdown(DRAGON_FLIGHT_KNOCKDOWN)
+				if(targetted_turf != current_turf)
+					attacked_living.apply_damage(land_damage, BRUTE, blocked = MELEE, updating_health = TRUE)
+					continue
+				attacked_living.apply_damage(land_damage * 2, BRUTE, blocked = MELEE, updating_health = TRUE)
+				attacked_living.emote("scream")
+				living_got_stomped = TRUE
+
+	// Landing: Indoors ceiling loot.
+	if(!is_outside)
+		current_turf.ceiling_debris(1)
+
+	// Landing: Conclusion Sound
+	playsound(owner, 'sound/effects/slam3.ogg', 70, sound_range = 20)
+	if(living_got_stomped)
+		playsound(owner, 'sound/effects/splat.ogg', 70, sound_range = 20)
+
+	UnregisterSignal(owner, COMSIG_MOVABLE_PRE_MOVE)
+	set_flight_variables()
 	add_cooldown()
 	succeed_activate()
 
+<<<<<<< HEAD
 <<<<<<< HEAD
 /// Handles all variables that need to be set upon landing or flight.
 /datum/action/ability/xeno_action/dragon_flight/proc/handle_flight_variables()
@@ -379,6 +426,58 @@
 >>>>>>> 994a30ec14 (half of dragon flight)
 =======
 >>>>>>> b1fc44b9df (3/4 of dragon flight)
+=======
+/// Get nearby visible turfs of a certain range.
+/datum/action/ability/xeno_action/dragon_flight/proc/get_landing_turfs()
+	var/list/turf/nearby_visible_turfs = list()
+	for(var/turf/nearby_turf in range(DRAGON_FLIGHT_FLIGHT_RANGE, get_turf(owner)))
+		if(nearby_turf.density)
+			continue
+		if(!line_of_sight(owner, nearby_turf))
+			continue
+		nearby_visible_turfs += nearby_turf
+	return nearby_visible_turfs
+
+/// Plays the sound associated with beginning flight / landing and repeats until stopped.
+/datum/action/ability/xeno_action/dragon_flight/proc/play_introduction_sound()
+	SIGNAL_HANDLER
+	playsound(owner, is_in_flight ? 'sound/effects/alien/behemoth/landslide_roar.ogg' : 'sound/effects/shieldbash.ogg' , 70, sound_range = 20)
+	intro_sound_timer_id = addtimer(CALLBACK(src, PROC_REF(play_introduction_sound)), 2 SECONDS, TIMER_STOPPABLE)
+
+/// Sets various variables associated with being in flight or not.
+/datum/action/ability/xeno_action/dragon_flight/proc/set_flight_variables()
+	if(is_in_flight)
+		owner.alpha = 50
+		owner.density = FALSE
+		owner.status_flags |= (GODMODE|INCORPOREAL)
+		owner.resistance_flags |= RESIST_ALL
+		owner.allow_pass_flags = PASSABLE
+		owner.pass_flags = HOVERING
+		return
+	owner.alpha = initial(owner.alpha)
+	owner.density = initial(owner.density)
+	owner.status_flags &= ~(GODMODE|INCORPOREAL)
+	owner.resistance_flags &= ~RESIST_ALL
+	owner.allow_pass_flags = initial(owner.allow_pass_flags)
+	owner.pass_flags = initial(owner.pass_flags)
+
+/// Checks if the owner is groundside.
+/datum/action/ability/xeno_action/dragon_flight/proc/is_groundside()
+	var/list/ground_z_levels = SSmapping.levels_by_trait(ZTRAIT_GROUND)
+	for(var/ground_z in ground_z_levels)
+		if(owner.z == ground_z)
+			return TRUE
+	return FALSE
+
+/// Prevents movement in certain areas while flying.
+/datum/action/ability/xeno_action/dragon_flight/proc/on_pre_move(datum/source, atom/newloc, var/direction)
+	SIGNAL_HANDLER
+	var/area/new_area = get_area(newloc)
+	if(new_area.ceiling > CEILING_OBSTRUCTED)
+		return COMPONENT_MOVABLE_BLOCK_PRE_MOVE
+
+
+>>>>>>> c80747b8b1 (ill get back to this)
 // ***************************************
 // *********** Dragon's Breath
 // ***************************************
