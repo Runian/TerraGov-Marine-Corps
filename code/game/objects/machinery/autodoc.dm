@@ -1160,6 +1160,7 @@
 	surgery_loop_timer_id = addtimer(CALLBACK(src, PROC_REF(surgery_loop)), miliseconds, TIMER_STOPPABLE)
 
 /obj/machinery/autodoc/proc/try_incision_manager(mob/living/carbon/human/limb_owner, datum/limb/limb_ref)
+	// The 1st step of many surgeries.
 	if(limb_ref.surgery_open_stage < 2)
 		if(istype(limb_owner) && !(limb_owner.species.species_flags & NO_BLOOD))
 			limb_ref.add_limb_flags(LIMB_BLEEDING)
@@ -1169,31 +1170,62 @@
 		limb_ref.surgery_open_stage = 2
 		limb_owner.updatehealth()
 		return TRUE
+	// The 2nd step for necro removal surgery.
+	if(!limb_ref.necro_surgery_stage)
+		limb_ref.necro_surgery_stage = 1
+		return TRUE
 	return FALSE
 
 /obj/machinery/autodoc/proc/try_circular_saw(mob/living/carbon/human/limb_owner, datum/limb/limb_ref)
+	// The 2nd step of larva removal / organ damage repair.
 	if(limb_ref.surgery_open_stage == 2)
 		limb_ref.surgery_open_stage = 2.5
 		return TRUE
 	return FALSE
 
 /obj/machinery/autodoc/proc/try_retractor(mob/living/carbon/human/limb_owner, datum/limb/limb_ref)
-	if(limb_ref.surgery_open_stage == 2.5) // Opening
-		limb_ref.surgery_open_stage = 3
-		return TRUE
-	if(limb_ref.surgery_open_stage == 3) // Closing
-		limb_ref.surgery_open_stage = 2.5
-		return TRUE
+	switch(limb_ref.surgery_open_stage)
+		// The 3rd step of larva removal / organ damage repair.
+		if(2.5)
+			limb_ref.surgery_open_stage = 3
+			return TRUE
+		// The 5th step of larva removal / organ damage repair.
+		if(3)
+			limb_ref.surgery_open_stage = 2.5
+			return TRUE
 	return FALSE
 
 /obj/machinery/autodoc/proc/try_bonegel(mob/living/carbon/human/limb_owner, datum/limb/limb_ref)
-	if(limb_ref.surgery_open_stage == 2.5)
-		limb_ref.surgery_open_stage = 2
+	switch(limb_ref.surgery_open_stage)
+		// The 2nd step of fracture repair.
+		if(2)
+			if(!limb_ref.bone_repair_stage)
+				limb_ref.bone_repair_stage = 1
+				return TRUE
+		// The 6th step of larva removal / organ damage repair.
+		if(2.5)
+			limb_ref.surgery_open_stage = 2
+			return TRUE
+	return FALSE
+
+/obj/machinery/autodoc/proc/try_bonesetter(mob/living/carbon/human/limb_owner, datum/limb/limb_ref)
+	// The 3rd step of fracture repair.
+	if(limb_ref.surgery_open_stage == 2 && limb_ref.bone_repair_stage)
+		// We do not want it to fracture immediately after it is fixed.
+		if(limb_ref.brute_dam > 20)
+			limb_ref.heal_limb_damage(limb_ref.brute_dam - 20)
+			limb_owner.updatehealth()
+		limb_ref.remove_limb_flags(LIMB_BROKEN | LIMB_SPLINTED | LIMB_STABILIZED)
+		limb_ref.add_limb_flags(LIMB_REPAIRED)
+		limb_ref.bone_repair_stage = 0
 		return TRUE
 	return FALSE
 
 /obj/machinery/autodoc/proc/try_cautery(mob/living/carbon/human/limb_owner, datum/limb/limb_ref)
-	if(limb_ref.surgery_open_stage > 0 && limb_ref.surgery_open_stage <= 2)
+	if(!limb_ref.surgery_open_stage)
+		return FALSE
+	// The last step of many surgeries.
+	if(limb_ref.surgery_open_stage <= 2)
 		limb_ref.germ_level = 0
 		limb_ref.remove_limb_flags(LIMB_BLEEDING)
 		limb_ref.surgery_open_stage = 0
@@ -1201,6 +1233,13 @@
 		return TRUE
 	return FALSE
 
+/obj/machinery/autodoc/proc/try_surgical_membrane(mob/living/carbon/human/limb_owner, datum/limb/limb_ref, datum/internal_organ/organ_ref)
+	if(limb_ref.body_part != GROIN && limb_ref.surgery_open_stage == 3 && organ_ref)
+		organ_ref.heal_organ_damage(organ_ref.damage)
+		return TRUE
+	return FALSE
+
+surgical_membrane
 /// Goes through the next surgery step infinitely (by calling itself with a timer) until there is nothing else to do.
 /obj/machinery/autodoc/proc/surgery_loop()
 	if(surgery_loop_timer_id)
@@ -1246,28 +1285,32 @@
 		surgery_loop()
 		return
 
+	var/datum/limb/surgeried_limb = current_surgery.limb_ref
+	var/datum/internal_organ/surgeried_organ = current_surgery.organ_ref
+
+	// Disinfecting limbs & organs
+	if(current_surgery.surgery_procedure == AUTODOC_SURGERY_PROCEDURE_INFECTED_GERMS)
+		say(current_surgery.surgery_type == AUTODOC_SURGERY_TYPE_ORGAN ? "Beginning organ disinfection." : "Beginning limb disinfection.")
+		if(current_surgery.surgery_unnecessary)
+			say("Procedure has been deemed unnecessary.")
+			current_surgery = null
+			set_surgery_loop_timer(AUTODOC_SURGERY_UNNEEDED_DELAY)
+			return
+		var/datum/reagent/spaceacillin_reagent = GLOB.chemical_reagents_list[/datum/reagent/medicine/spaceacillin]
+		var/amount_remaining = (spaceacillin_reagent.overdose_threshold * 0.5) - occupant.reagents.get_reagent_amount(/datum/reagent/medicine/spaceacillin)
+		var/inject_per_second = 3
+		if(amount_remaining > inject_per_second)
+			occupant.reagents.add_reagent(/datum/reagent/medicine/spaceacillin, inject_per_second)
+			set_surgery_loop_timer(1 SECONDS)
+			return
+		occupant.reagents.add_reagent(/datum/reagent/medicine/spaceacillin, amount_remaining)
+		current_surgery = null
+		set_surgery_loop_timer(1 SECONDS)
+		return
+
+	// Organ surgeries
 	if(current_surgery.surgery_type == AUTODOC_SURGERY_TYPE_ORGAN)
-		var/datum/limb/surgeried_limb = current_surgery.limb_ref
-		var/datum/internal_organ/surgeried_organ = current_surgery.organ_ref
 		switch(current_surgery.surgery_procedure)
-			if(AUTODOC_SURGERY_PROCEDURE_INFECTED_GERMS)
-				say("Beginning organ disinfection.")
-				if(current_surgery.surgery_unnecessary)
-					say("Procedure has been deemed unnecessary.")
-					current_surgery = null
-					set_surgery_loop_timer(AUTODOC_SURGERY_UNNEEDED_DELAY)
-					return
-				var/datum/reagent/spaceacillin_reagent = GLOB.chemical_reagents_list[/datum/reagent/medicine/spaceacillin]
-				var/amount_remaining = spaceacillin_reagent.overdose_threshold - occupant.reagents.get_reagent_amount(/datum/reagent/medicine/spaceacillin)
-				var/inject_per_second = 3
-				if(amount_remaining > inject_per_second)
-					occupant.reagents.add_reagent(/datum/reagent/medicine/spaceacillin, inject_per_second)
-					set_surgery_loop_timer(1 SECONDS)
-					return
-				occupant.reagents.add_reagent(/datum/reagent/medicine/spaceacillin, amount_remaining)
-				current_surgery = null
-				set_surgery_loop_timer(1 SECONDS)
-				return
 			if(AUTODOC_SURGERY_PROCEDURE_EYE_DAMAGE)
 				say("Beginning corrective eye surgery.")
 				if(current_surgery.surgery_unnecessary)
@@ -1279,33 +1322,33 @@
 					current_surgery = null
 					set_surgery_loop_timer(1 SECONDS)
 					return
-				if(surgeried_organ.damage)
-					// This is the only surgery that doesn't use incision manager. Snowflake time.
-					var/datum/internal_organ/eyes/surgeried_eyes = surgeried_organ
-					switch(surgeried_eyes.eye_surgery_stage)
-						if(0)
-							surgeried_eyes.eye_surgery_stage = 1
-							occupant.disabilities |= NEARSIGHTED
-							set_surgery_loop_timer(EYE_CUT_MAX_DURATION)
+				// This is the only surgery that doesn't use incision manager.
+				var/datum/internal_organ/eyes/surgeried_eyes = surgeried_organ
+				switch(surgeried_eyes.eye_surgery_stage)
+					if(0)
+						if(!surgeried_organ.damage)
+							current_surgery = null
+							set_surgery_loop_timer(1 SECONDS)
 							return
-						if(1)
-							surgeried_eyes.eye_surgery_stage = 2
-							set_surgery_loop_timer(EYE_LIFT_MAX_DURATION)
-							return
-						if(2)
-							surgeried_eyes.eye_surgery_stage = 3
-							set_surgery_loop_timer(EYE_MEND_MAX_DURATION)
-							return
-						if(3)
-							occupant.disabilities &= ~NEARSIGHTED
-							occupant.disabilities &= ~BLIND
-							surgeried_eyes.heal_organ_damage(surgeried_eyes.damage)
-							surgeried_eyes.eye_surgery_stage = 0
-							set_surgery_loop_timer(EYE_CAUTERISE_MAX_DURATION)
-							return
-				current_surgery = null
-				set_surgery_loop_timer(1 SECONDS)
-				return
+						surgeried_eyes.eye_surgery_stage = 1
+						occupant.disabilities |= NEARSIGHTED
+						set_surgery_loop_timer(EYE_CUT_MAX_DURATION)
+						return
+					if(1)
+						surgeried_eyes.eye_surgery_stage = 2
+						set_surgery_loop_timer(EYE_LIFT_MAX_DURATION)
+						return
+					if(2)
+						surgeried_eyes.eye_surgery_stage = 3
+						set_surgery_loop_timer(EYE_MEND_MAX_DURATION)
+						return
+					if(3)
+						occupant.disabilities &= ~NEARSIGHTED
+						occupant.disabilities &= ~BLIND
+						surgeried_eyes.heal_organ_damage(surgeried_eyes.damage)
+						surgeried_eyes.eye_surgery_stage = 0
+						set_surgery_loop_timer(EYE_CAUTERISE_MAX_DURATION)
+						return
 			if(AUTODOC_SURGERY_PROCEDURE_ORGAN_REPAIR)
 				say("Beginning organ restoration.")
 				if(current_surgery.surgery_unnecessary)
@@ -1329,10 +1372,14 @@
 						if(try_retractor(occupant, surgeried_limb))
 							set_surgery_loop_timer(RETRACT_OPEN_ENCASED_MAX_DURATION)
 							return
+					if(try_retractor(occupant, surgeried_limb))
+						set_surgery_loop_timer(RETRACT_OPEN_ENCASED_MAX_DURATION)
+						return
+
 					surgeried_organ.heal_organ_damage(surgeried_organ.damage)
 					set_surgery_loop_timer(FIX_ORGAN_MAX_DURATION)
 					return
-				if(surgeried_organ.body_part != GROIN)
+				if(surgeried_limb.body_part != GROIN)
 					if(try_retractor(occupant, surgeried_organ))
 						set_surgery_loop_timer(RETRACT_OPEN_ENCASED_MAX_DURATION)
 						return
@@ -1342,44 +1389,70 @@
 				if(try_cautery(occupant, surgeried_organ))
 					set_surgery_loop_timer(CAUTERY_MAX_DURATION)
 					return
-
 				current_surgery = null
 				set_surgery_loop_timer(1 SECONDS)
 				return
 
-		return
+	// Limb surgeries
+	if(current_surgery.surgery_type == AUTODOC_SURGERY_TYPE_LIMB)
+		switch(current_surgery.surgery_procedure)
+			if(AUTODOC_SURGERY_PROCEDURE_INTERNAL_BLEEDING)
+				say("Beginning internal bleeding procedure.")
+				if(current_surgery.surgery_unnecessary)
+					say("Procedure has been deemed unnecessary.")
+					current_surgery = null
+					set_surgery_loop_timer(AUTODOC_SURGERY_UNNEEDED_DELAY)
+					return
+				var/list/datum/wound/limb_wounds = current_surgery.limb_ref.wounds
+				if(length(limb_wounds))
+					if(try_incision_manager(occupant, surgeried_limb))
+						set_surgery_loop_timer(INCISION_MANAGER_MAX_DURATION)
+						return
+					for(var/datum/wound/limb_wound in limb_wounds)
+						set_surgery_loop_timer(FIXVEIN_MAX_DURATION)
+						qdel(limb_wound)
+						return
+				if(try_cautery(occupant, surgeried_organ))
+					set_surgery_loop_timer(CAUTERY_MAX_DURATION)
+					return
+				current_surgery = null
+				set_surgery_loop_timer(1 SECONDS)
+				return
+			if(AUTODOC_SURGERY_PROCEDURE_FRACTURED_BONE)
+				say("Beginning broken bone procedure.")
+				if(current_surgery.surgery_unnecessary)
+					say("Procedure has been deemed unnecessary.")
+					current_surgery = null
+					set_surgery_loop_timer(AUTODOC_SURGERY_UNNEEDED_DELAY)
+					return
+				var/is_broken = surgeried_limb.limb_status & (LIMB_BROKEN|LIMB_SPLINTED|LIMB_STABILIZED)
+				if(is_broken)
+					if(try_incision_manager(occupant, surgeried_limb))
+						set_surgery_loop_timer(INCISION_MANAGER_MAX_DURATION)
+						return
+					if(try_bonegel(occupant, surgeried_organ))
+						set_surgery_loop_timer(BONEGEL_CLOSE_ENCASED_MAX_DURATION)
+						return
+					if(try_bonesetter(occupant, surgeried_organ))
+						set_surgery_loop_timer(BONESETTER_MAX_DURATION)
+						return
+				if(try_cautery(occupant, surgeried_organ))
+					set_surgery_loop_timer(CAUTERY_MAX_DURATION)
+					return
+				current_surgery = null
+				set_surgery_loop_timer(1 SECONDS)
+				return
 
-	if(filtering || blood_transfer || heal_brute || heal_burn || heal_toxin)
-		// We're just waiting until these variables get turned to FALSE via process().
-		set_surgery_loop_timer(2 SECONDS)
-		return
-
-	visible_message("\The [src] clicks and opens up having finished the requested operations.")
-	handle_release_notice(AUTODOC_NOTICE_SUCCESS)
-	eject_occupant()
-
+	// Debugging:
+	to_chat(world, span_boldannounce("A surgery was not accounted for! Surgery Type: [current_surgery.surgery_type], Surgery Procedure: [current_surgery.surgery_procedure]"))
+	current_surgery = null
+	set_surgery_loop_timer(1 SECONDS)
+	return
 
 /*
 		switch(S.type_of_surgery)
 			if(LIMB_SURGERY)
 				switch(S.surgery_procedure)
-					if(ADSURGERY_INTERNAL)
-						say("Beginning internal bleeding procedure.")
-						if(S.unneeded)
-							sleep(UNNEEDED_DELAY)
-							say("Procedure has been deemed unnecessary.")
-							surgery_todo_list -= S
-							continue
-						open_incision(occupant, S.limb_ref)
-						for(var/datum/wound/W in S.limb_ref.wounds)
-							if(!surgery)
-								break
-							sleep(FIXVEIN_MAX_DURATION*surgery_mod)
-							qdel(W)
-						if(!surgery)
-							break
-						close_incision(occupant, S.limb_ref)
-
 					if(ADSURGERY_BROKEN)
 						say("Beginning broken bone procedure.")
 						if(S.unneeded)
@@ -1498,24 +1571,6 @@
 						if(!surgery)
 							break
 						close_incision(occupant, S.limb_ref)
-
-					if(ADSURGERY_GERM)
-						say("Beginning limb disinfection.")
-
-						var/datum/reagent/R = GLOB.chemical_reagents_list[/datum/reagent/medicine/spaceacillin]
-						var/amount = (R.overdose_threshold * 0.5) - occupant.reagents.get_reagent_amount(/datum/reagent/medicine/spaceacillin)
-						var/inject_per_second = 3
-						to_chat(occupant, span_info("You feel a soft prick from a needle."))
-						while(amount > 0)
-							if(!surgery)
-								break
-							if(amount < inject_per_second)
-								occupant.reagents.add_reagent(/datum/reagent/medicine/spaceacillin, amount)
-								break
-							else
-								occupant.reagents.add_reagent(/datum/reagent/medicine/spaceacillin, inject_per_second)
-								amount -= inject_per_second
-								sleep(1 SECONDS)
 
 					if(ADSURGERY_FACIAL) // dumb but covers for incomplete facial surgery
 						say("Beginning Facial Reconstruction Surgery.")
