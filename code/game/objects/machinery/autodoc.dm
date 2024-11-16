@@ -1,3 +1,10 @@
+/* changelog
+	code is less shit
+	process heals one-damage at a time instead of ALL of them at the same time
+	code documented
+	detects all implants (doesn't really matter in campaign since there are basically no autodocs)
+*/
+
 #define AUTODOC_NOTICE_SUCCESS 1
 #define AUTODOC_NOTICE_DEATH 2
 #define AUTODOC_NOTICE_NO_RECORD 3
@@ -28,7 +35,7 @@
 #define AUTODOC_SURGERY_PROCEDURE_DIALYSIS 14
 #define AUTODOC_SURGERY_PROCEDURE_LOW_BLOOD 15
 
-#define AUTODOC_SURGERY_UNNEEDED_DELAY 10 SECONDS // The amount of additional time caused by queuing an unnecessary surgery.
+#define AUTODOC_SURGERY_UNNEEDED_DELAY 2 SECONDS // The amount of additional time caused by queuing an unnecessary surgery.
 
 /datum/autodoc_surgery
 	/// The limb that will be operated on.
@@ -40,7 +47,9 @@
 	/// The surgery precedure.
 	var/surgery_procedure = AUTODOC_SURGERY_PROCEDURE_UNDEFINED
 	/// Was this surgery queued up despite not being required / expecting nothing to be done.
-	var/surgery_unnecessary = 0
+	var/surgery_unnecessary = FALSE
+	/// Progress on this surgery (for autodoc purposes only).
+	var/surgery_progress = 0
 
 /proc/create_autodoc_surgery(limb_ref, surgery_type, surgery_procedure, surgery_unnecessary = FALSE, organ_ref = null)
 	var/datum/autodoc_surgery/autodoc_surgery = new()
@@ -126,7 +135,7 @@
 			surgery_list += create_autodoc_surgery(this_limb, AUTODOC_SURGERY_TYPE_LIMB, AUTODOC_SURGERY_PROCEDURE_OPEN_INCISION)
 
 	// Eyes
-	var/datum/internal_organ/eyes_internal_organ = M.get_organ_slot(ORGAN_SLOT_EYES)
+	var/datum/internal_organ/eyes_internal_organ = this_human.get_organ_slot(ORGAN_SLOT_EYES)
 	if(eyes_internal_organ && (this_human.disabilities & NEARSIGHTED || this_human.disabilities & BLIND || eyes_internal_organ.damage > 0))
 		surgery_list += create_autodoc_surgery(null, AUTODOC_SURGERY_TYPE_ORGAN, AUTODOC_SURGERY_PROCEDURE_EYE_DAMAGE, organ_ref = eyes_internal_organ)
 
@@ -153,14 +162,7 @@
 	return surgery_list
 
 
-/* changelog
-	code is less shit
-	process heals one-damage at a time instead of ALL of them at the same time
-	code documented
-	detects all implants (doesn't really matter in campaign since there are basically no autodocs)
-*/
 
-//Autodoc
 /obj/machinery/autodoc
 	name = "\improper autodoc medical system"
 	desc = "A fancy machine developed to be capable of operating on people with minimal human intervention. However, the interface is rather complex and most of it would only be useful to trained medical personnel."
@@ -184,7 +186,8 @@
 	var/list/queued_surgeries = list()
 	/// The current surgery that we are doing.
 	var/datum/autodoc_surgery/current_surgery
-
+	/// The timer id of the timer that callbacks the surgery loop.
+	var/surgery_loop_timer_id
 
 
 
@@ -293,7 +296,7 @@
 		var/filtered = 0
 		for(var/datum/reagent/x in occupant.reagents.reagent_list)
 			occupant.reagents.remove_reagent(x.type, 10) // same as sleeper, may need reducing
-			filtered += 10
+			filtered = TRUE
 		if(!filtered)
 			filtering = 0
 			say("Blood filtering complete.")
@@ -365,51 +368,10 @@
 		return
 	eject_occupant_unexpected(xeno_attacker) // Xenomorphs get a special case here.
 
-/obj/machinery/autodoc/proc/open_incision(mob/living/carbon/human/target, datum/limb/L)
-	if(target && L && L.surgery_open_stage < 2)
-		sleep(INCISION_MANAGER_MAX_DURATION*surgery_mod)
-		if(!surgery)
-			return
-		L.createwound(CUT, 1)
-		L.clamp_bleeder() //Hemostat function, clamp bleeders
-		L.surgery_open_stage = 2 //Can immediately proceed to other surgery steps
-		target.updatehealth()
 
-/obj/machinery/autodoc/proc/close_incision(mob/living/carbon/human/target, datum/limb/L)
-	if(target && L && 0 < L.surgery_open_stage <= 2)
-		sleep(CAUTERY_MAX_DURATION*surgery_mod)
-		if(!surgery)
-			return
-		L.surgery_open_stage = 0
-		L.germ_level = 0
-		L.remove_limb_flags(LIMB_BLEEDING)
-		target.updatehealth()
 
-/obj/machinery/autodoc/proc/open_encased(mob/living/carbon/human/target, datum/limb/L)
-	if(target && L && L.surgery_open_stage >= 2)
-		if(L.surgery_open_stage == 2) // this will cover for half completed surgeries
-			sleep(SAW_OPEN_ENCASED_MAX_DURATION*surgery_mod)
-			if(!surgery)
-				return
-			L.surgery_open_stage = 2.5
-		if(L.surgery_open_stage == 2.5)
-			sleep(RETRACT_OPEN_ENCASED_MAX_DURATION*surgery_mod)
-			if(!surgery)
-				return
-			L.surgery_open_stage = 3
 
-/obj/machinery/autodoc/proc/close_encased(mob/living/carbon/human/target, datum/limb/L)
-	if(target && L && L.surgery_open_stage > 2)
-		if(L.surgery_open_stage == 3) // this will cover for half completed surgeries
-			sleep(RETRACT_CLOSE_ENCASED_MAX_DURATION*surgery_mod)
-			if(!surgery)
-				return
-			L.surgery_open_stage = 2.5
-		if(L.surgery_open_stage == 2.5)
-			sleep(BONEGEL_CLOSE_ENCASED_MAX_DURATION*surgery_mod)
-			if(!surgery)
-				return
-			L.surgery_open_stage = 2
+
 
 /obj/machinery/autodoc/verb/eject()
 	set name = "Eject Med-Pod"
@@ -995,6 +957,12 @@
 
 
 
+
+
+
+
+
+
 /// Gibs the occupant as well if a shuttle crashes/crushes/qdels this machine.
 /obj/machinery/autodoc/proc/on_shuttle_crush()
 	SIGNAL_HANDLER
@@ -1118,6 +1086,9 @@
 	occupant = null
 	active_surgery = FALSE
 	surgery_todo_list = list()
+	if(surgery_loop_timer_id)
+		deltimer(surgery_loop_timer_id)
+		surgery_loop_timer_id = null
 	update_icon()
 	stop_processing()
 
@@ -1146,15 +1117,31 @@
 		eject_occupant()
 		return
 
-	queued_surgeries = automaticmode ? N.fields["autodoc_data"] : N.fields["autodoc_manual"]
+	queued_surgeries = automatic_mode ? occupant_record.fields["autodoc_data"] : occupant_record.fields["autodoc_manual"]
 	if(!length(queued_surgeries))
 		visible_message("[src] buzzes, no surgical procedures were queued.")
 		return
 
+	// Surgeries that are handled in process() and doesn't need the surgery loop to function.
+	for(var/datum/autodoc_surgery/next_surgery in queued_surgeries)
+		if(next_surgery.surgery_type != AUTODOC_SURGERY_TYPE_EXTERNAL)
+			continue
+		switch(next_surgery.surgery_procedure)
+			if(AUTODOC_SURGERY_PROCEDURE_BRUTE_DAMAGE)
+				heal_brute = TRUE
+			if(AUTODOC_SURGERY_PROCEDURE_BURN_DAMAGE)
+				heal_burn = TRUE
+			if(AUTODOC_SURGERY_PROCEDURE_TOXIN_DAMAGE)
+				heal_toxin = TRUE
+			if(AUTODOC_SURGERY_PROCEDURE_DIALYSIS)
+				filtering = TRUE
+			if(AUTODOC_SURGERY_PROCEDURE_LOW_BLOOD)
+				blood_transfer = TRUE
+		queued_surgeries -= next_surgery
+
 	visible_message("[src] begins to operate, the pod locking shut with a loud click.")
 	active_surgery = TRUE
 	update_icon()
-
 	surgery_loop()
 
 /// Callback to start surgery when someone entered while automatic mode is on.
@@ -1166,162 +1153,214 @@
 	if(!automatic_mode)
 		say("Automatic mode disengaged, awaiting manual inputs.")
 		return
-
 	begin_surgery()
+
+/// Sets and begins the surgery loop timer.
+/obj/machinery/autodoc/proc/set_surgery_loop_timer(miliseconds = 1 SECONDS)
+	surgery_loop_timer_id = addtimer(CALLBACK(src, PROC_REF(surgery_loop)), miliseconds, TIMER_STOPPABLE)
+
+/obj/machinery/autodoc/proc/try_incision_manager(mob/living/carbon/human/limb_owner, datum/limb/limb_ref)
+	if(limb_ref.surgery_open_stage < 2)
+		if(istype(limb_owner) && !(limb_owner.species.species_flags & NO_BLOOD))
+			limb_ref.add_limb_flags(LIMB_BLEEDING)
+
+		limb_ref.createwound(CUT, 1)
+		limb_ref.clamp_bleeder()
+		limb_ref.surgery_open_stage = 2
+		limb_owner.updatehealth()
+		return TRUE
+	return FALSE
+
+/obj/machinery/autodoc/proc/try_circular_saw(mob/living/carbon/human/limb_owner, datum/limb/limb_ref)
+	if(limb_ref.surgery_open_stage == 2)
+		limb_ref.surgery_open_stage = 2.5
+		return TRUE
+	return FALSE
+
+/obj/machinery/autodoc/proc/try_retractor(mob/living/carbon/human/limb_owner, datum/limb/limb_ref)
+	if(limb_ref.surgery_open_stage == 2.5) // Opening
+		limb_ref.surgery_open_stage = 3
+		return TRUE
+	if(limb_ref.surgery_open_stage == 3) // Closing
+		limb_ref.surgery_open_stage = 2.5
+		return TRUE
+	return FALSE
+
+/obj/machinery/autodoc/proc/try_bonegel(mob/living/carbon/human/limb_owner, datum/limb/limb_ref)
+	if(limb_ref.surgery_open_stage == 2.5)
+		limb_ref.surgery_open_stage = 2
+		return TRUE
+	return FALSE
+
+/obj/machinery/autodoc/proc/try_cautery(mob/living/carbon/human/limb_owner, datum/limb/limb_ref)
+	if(limb_ref.surgery_open_stage > 0 && limb_ref.surgery_open_stage <= 2)
+		limb_ref.germ_level = 0
+		limb_ref.remove_limb_flags(LIMB_BLEEDING)
+		limb_ref.surgery_open_stage = 0
+		limb_owner.updatehealth()
+		return TRUE
+	return FALSE
 
 /// Goes through the next surgery step infinitely (by calling itself with a timer) until there is nothing else to do.
 /obj/machinery/autodoc/proc/surgery_loop()
+	if(surgery_loop_timer_id)
+		deltimer(surgery_loop_timer_id)
+		surgery_loop_timer_id = null
+
 	if(QDELETED(occupant) || occupant.stat == DEAD)
 		return
 
-	if(!current_surgery)
-		if(length(queued_surgeries))
-		// Get and set the next queued surgery as our current one.
+	// Get and set the next queued surgery as our current one if we don't have one right now.
+	if(!current_surgery && length(queued_surgeries))
 		for(var/datum/autodoc_surgery/next_surgery in queued_surgeries)
 			current_surgery = next_surgery
+			queued_surgeries -= current_surgery
 			break
-		// If we didn't set anything, that means we might be all done.
-		if(!current_surgery)
-			if(filtering || blood_transfer || heal_brute || heal_burn || heal_toxin)
-				// TODO: SET A TIMER
 
-
-		var/atom/movable/screen/S = char_render_holders[index]
-		screen -= S
-		qdel(S)
-
-			current_surgery = queued_surgeries[currentsurgery]
-
-		// pick first surgery and set it
-	if(current_surgery)
-
+	// No surgeries to do. End it if we're waiting on nothing else.
+	if(!current_surgery)
+		// Waiting on process() to tell us when everything is done.
+		if(filtering || blood_transfer || heal_brute || heal_burn || heal_toxin)
+			set_surgery_loop_timer(2 SECONDS)
+			return
 		visible_message("\The [src] clicks and opens up having finished the requested operations.")
-		surgery = 0
-		go_out(AUTODOC_NOTICE_SUCCESS)
-
-		// do the thing
+		handle_release_notice(AUTODOC_NOTICE_SUCCESS)
+		eject_occupant()
 		return
 
+	// External surgeries should of been handled in `begin_surgery()`.
+	// This is here to prevent it from being stuck looping forever if something did go wrong.
+	if(current_surgery.surgery_type == AUTODOC_SURGERY_TYPE_EXTERNAL)
+		switch(current_surgery.surgery_procedure)
+			if(AUTODOC_SURGERY_PROCEDURE_BRUTE_DAMAGE)
+				heal_brute = TRUE
+			if(AUTODOC_SURGERY_PROCEDURE_BURN_DAMAGE)
+				heal_burn = TRUE
+			if(AUTODOC_SURGERY_PROCEDURE_TOXIN_DAMAGE)
+				heal_toxin = TRUE
+			if(AUTODOC_SURGERY_PROCEDURE_DIALYSIS)
+				filtering = TRUE
+			if(AUTODOC_SURGERY_PROCEDURE_LOW_BLOOD)
+				blood_transfer = TRUE
+		current_surgery = null
+		surgery_loop()
+		return
+
+	if(current_surgery.surgery_type == AUTODOC_SURGERY_TYPE_ORGAN)
+		var/datum/limb/surgeried_limb = current_surgery.limb_ref
+		var/datum/internal_organ/surgeried_organ = current_surgery.organ_ref
+		switch(current_surgery.surgery_procedure)
+			if(AUTODOC_SURGERY_PROCEDURE_INFECTED_GERMS)
+				say("Beginning organ disinfection.")
+				if(current_surgery.surgery_unnecessary)
+					say("Procedure has been deemed unnecessary.")
+					current_surgery = null
+					set_surgery_loop_timer(AUTODOC_SURGERY_UNNEEDED_DELAY)
+					return
+				var/datum/reagent/spaceacillin_reagent = GLOB.chemical_reagents_list[/datum/reagent/medicine/spaceacillin]
+				var/amount_remaining = spaceacillin_reagent.overdose_threshold - occupant.reagents.get_reagent_amount(/datum/reagent/medicine/spaceacillin)
+				var/inject_per_second = 3
+				if(amount_remaining > inject_per_second)
+					occupant.reagents.add_reagent(/datum/reagent/medicine/spaceacillin, inject_per_second)
+					set_surgery_loop_timer(1 SECONDS)
+					return
+				occupant.reagents.add_reagent(/datum/reagent/medicine/spaceacillin, amount_remaining)
+				current_surgery = null
+				set_surgery_loop_timer(1 SECONDS)
+				return
+			if(AUTODOC_SURGERY_PROCEDURE_EYE_DAMAGE)
+				say("Beginning corrective eye surgery.")
+				if(current_surgery.surgery_unnecessary)
+					say("Procedure has been deemed unnecessary.")
+					current_surgery = null
+					set_surgery_loop_timer(AUTODOC_SURGERY_UNNEEDED_DELAY)
+					return
+				if(!istype(surgeried_organ, /datum/internal_organ/eyes))
+					current_surgery = null
+					set_surgery_loop_timer(1 SECONDS)
+					return
+				if(surgeried_organ.damage)
+					// This is the only surgery that doesn't use incision manager. Snowflake time.
+					var/datum/internal_organ/eyes/surgeried_eyes = surgeried_organ
+					switch(surgeried_eyes.eye_surgery_stage)
+						if(0)
+							surgeried_eyes.eye_surgery_stage = 1
+							occupant.disabilities |= NEARSIGHTED
+							set_surgery_loop_timer(EYE_CUT_MAX_DURATION)
+							return
+						if(1)
+							surgeried_eyes.eye_surgery_stage = 2
+							set_surgery_loop_timer(EYE_LIFT_MAX_DURATION)
+							return
+						if(2)
+							surgeried_eyes.eye_surgery_stage = 3
+							set_surgery_loop_timer(EYE_MEND_MAX_DURATION)
+							return
+						if(3)
+							occupant.disabilities &= ~NEARSIGHTED
+							occupant.disabilities &= ~BLIND
+							surgeried_eyes.heal_organ_damage(surgeried_eyes.damage)
+							surgeried_eyes.eye_surgery_stage = 0
+							set_surgery_loop_timer(EYE_CAUTERISE_MAX_DURATION)
+							return
+				current_surgery = null
+				set_surgery_loop_timer(1 SECONDS)
+				return
+			if(AUTODOC_SURGERY_PROCEDURE_ORGAN_REPAIR)
+				say("Beginning organ restoration.")
+				if(current_surgery.surgery_unnecessary)
+					say("Procedure has been deemed unnecessary.")
+					current_surgery = null
+					set_surgery_loop_timer(AUTODOC_SURGERY_UNNEEDED_DELAY)
+					return
+				if(!surgeried_organ)
+					say("Organ is missing.")
+					current_surgery = null
+					set_surgery_loop_timer(1 SECONDS)
+					return
+				if(surgeried_organ.damage)
+					if(try_incision_manager(occupant, surgeried_limb))
+						set_surgery_loop_timer(INCISION_MANAGER_MAX_DURATION)
+						return
+					if(surgeried_limb.body_part != GROIN)
+						if(try_circular_saw(occupant, surgeried_limb))
+							set_surgery_loop_timer(SAW_OPEN_ENCASED_MAX_DURATION)
+							return
+						if(try_retractor(occupant, surgeried_limb))
+							set_surgery_loop_timer(RETRACT_OPEN_ENCASED_MAX_DURATION)
+							return
+					surgeried_organ.heal_organ_damage(surgeried_organ.damage)
+					set_surgery_loop_timer(FIX_ORGAN_MAX_DURATION)
+					return
+				if(surgeried_organ.body_part != GROIN)
+					if(try_retractor(occupant, surgeried_organ))
+						set_surgery_loop_timer(RETRACT_OPEN_ENCASED_MAX_DURATION)
+						return
+					if(try_bonegel(occupant, surgeried_organ))
+						set_surgery_loop_timer(BONEGEL_CLOSE_ENCASED_MAX_DURATION)
+						return
+				if(try_cautery(occupant, surgeried_organ))
+					set_surgery_loop_timer(CAUTERY_MAX_DURATION)
+					return
+
+				current_surgery = null
+				set_surgery_loop_timer(1 SECONDS)
+				return
+
+		return
+
+	if(filtering || blood_transfer || heal_brute || heal_burn || heal_toxin)
+		// We're just waiting until these variables get turned to FALSE via process().
+		set_surgery_loop_timer(2 SECONDS)
+		return
+
+	visible_message("\The [src] clicks and opens up having finished the requested operations.")
+	handle_release_notice(AUTODOC_NOTICE_SUCCESS)
+	eject_occupant()
 
 
 /*
-
-
-	for(var/datum/autodoc_surgery/A in surgery_todo_list)
-		if(A.type_of_surgery == EXTERNAL_SURGERY)
-			switch(A.surgery_procedure)
-				if(ADSURGERY_BRUTE)
-					heal_brute = 1
-				if(ADSURGERY_BURN)
-					heal_burn = 1
-				if(ADSURGERY_TOXIN)
-					heal_toxin = 1
-				if(ADSURGERY_DIALYSIS)
-					filtering = 1
-				if(ADSURGERY_BLOOD)
-					blood_transfer = 1
-			surgery_todo_list -= A
-
-	var/currentsurgery = 1
-	while(length(surgery_todo_list) > 0)
-		if(!surgery)
-			break
-		sleep(-1)
-		var/datum/autodoc_surgery/S = surgery_todo_list[currentsurgery]
-		if(automaticmode)
-			surgery_mod = 1.5 // automatic mode takes longer
-		else
-			surgery_mod = 1 // might need tweaking
-
 		switch(S.type_of_surgery)
-			if(ORGAN_SURGERY)
-				switch(S.surgery_procedure)
-					if(ADSURGERY_GERMS) // Just dose them with the maximum amount of antibiotics and hope for the best
-						say("Beginning organ disinfection.")
-						var/datum/reagent/R = GLOB.chemical_reagents_list[/datum/reagent/medicine/spaceacillin]
-						var/amount = R.overdose_threshold - occupant.reagents.get_reagent_amount(/datum/reagent/medicine/spaceacillin)
-						var/inject_per_second = 3
-						to_chat(occupant, span_info("You feel a soft prick from a needle."))
-						while(amount > 0)
-							if(!surgery)
-								break
-							if(amount < inject_per_second)
-								occupant.reagents.add_reagent(/datum/reagent/medicine/spaceacillin,amount)
-								break
-							else
-								occupant.reagents.add_reagent(/datum/reagent/medicine/spaceacillin,inject_per_second)
-								amount -= inject_per_second
-								sleep(10*surgery_mod)
-
-					if(ADSURGERY_DAMAGE)
-						say("Beginning organ restoration.")
-						if(S.unneeded)
-							sleep(UNNEEDED_DELAY)
-							say("Procedure has been deemed unnecessary.")
-							surgery_todo_list -= S
-							continue
-						open_incision(occupant, S.limb_ref)
-
-						if(S.limb_ref.body_part != GROIN)
-							open_encased(occupant, S.limb_ref)
-
-						if(!istype(S.organ_ref,/datum/internal_organ/brain))
-							sleep(FIX_ORGAN_MAX_DURATION*surgery_mod)
-						else
-							if(S.organ_ref.damage > BONECHIPS_MAX_DAMAGE)
-								sleep(HEMOTOMA_MAX_DURATION*surgery_mod)
-							sleep(BONECHIPS_REMOVAL_MAX_DURATION*surgery_mod)
-						if(!surgery)
-							break
-						if(istype(S.organ_ref,/datum/internal_organ))
-							S.organ_ref.heal_organ_damage(S.organ_ref.damage)
-						else
-							say("Organ is missing.")
-
-						// close them
-						if(S.limb_ref.body_part != GROIN) // TODO: fix brute damage before closing
-							close_encased(occupant, S.limb_ref)
-						close_incision(occupant, S.limb_ref)
-
-					if(ADSURGERY_EYES)
-						say("Beginning corrective eye surgery.")
-						if(S.unneeded)
-							sleep(UNNEEDED_DELAY)
-							say("Procedure has been deemed unnecessary.")
-							surgery_todo_list -= S
-							continue
-						if(istype(S.organ_ref,/datum/internal_organ/eyes))
-							var/datum/internal_organ/eyes/E = S.organ_ref
-
-							if(E.eye_surgery_stage == 0)
-								sleep(EYE_CUT_MAX_DURATION)
-								if(!surgery)
-									break
-								E.eye_surgery_stage = 1
-								occupant.disabilities |= NEARSIGHTED // code\#define\mobs.dm
-
-							if(E.eye_surgery_stage == 1)
-								sleep(EYE_LIFT_MAX_DURATION)
-								if(!surgery)
-									break
-								E.eye_surgery_stage = 2
-
-							if(E.eye_surgery_stage == 2)
-								sleep(EYE_MEND_MAX_DURATION)
-								if(!surgery)
-									break
-								E.eye_surgery_stage = 3
-
-							if(E.eye_surgery_stage == 3)
-								sleep(EYE_CAUTERISE_MAX_DURATION)
-								if(!surgery)
-									break
-								occupant.disabilities &= ~NEARSIGHTED
-								occupant.disabilities &= ~BLIND
-								E.heal_organ_damage(E.damage)
-								E.eye_surgery_stage = 0
-
-
 			if(LIMB_SURGERY)
 				switch(S.surgery_procedure)
 					if(ADSURGERY_INTERNAL)
