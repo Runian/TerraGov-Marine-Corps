@@ -5,6 +5,11 @@
 	detects all implants (doesn't really matter in campaign since there are basically no autodocs)
 */
 
+/* Noticable Differences From sleep() Code Hell:
+	- Looks less shit.
+	- process() does one thing at a time instead of all things.
+	- Everything is documented (and maybe even over-documented).
+*/
 // Notices
 #define AUTODOC_NOTICE_SUCCESS 1
 #define AUTODOC_NOTICE_DEATH 2
@@ -382,7 +387,7 @@
 		return
 	if(xeno_attacker.status_flags & INCORPOREAL || xeno_attacker.do_actions)
 		return
-	eject_occupant_unexpected(xeno_attacker) // Xenomorphs get a special case here.
+	eject_occupant_due_to_someone(xeno_attacker) // Xenomorphs get a special case here.
 
 /obj/machinery/autodoc/MouseDrop_T(mob/dropping, mob/user)
 	. = ..()
@@ -451,7 +456,7 @@
 	set category = "Object"
 	set src in oview(1)
 
-	eject_occupant_unexpected(usr)
+	eject_occupant_due_to_someone(usr)
 
 /obj/machinery/autodoc/verb/enter()
 	set name = "Enter Med-Pod"
@@ -469,8 +474,8 @@
 	eject_occupant()
 	human_occupant.gib()
 
-/// Handles ejection of the occupants when done in an unexpected matter.
-/obj/machinery/autodoc/proc/eject_occupant_unexpected(mob/living/ejector)
+/// Handles ejection of the occupants when caused by someone.
+/obj/machinery/autodoc/proc/eject_occupant_due_to_someone(mob/living/ejector)
 	if(!occupant || ejector.incapacitated(TRUE))
 		return
 
