@@ -1,11 +1,3 @@
-/* Noticable Differences From sleep() Code Hell:
-	- Looks less shit (probably)!
-	- process() does one thing at a time instead of all things.
-	- Everything is documented (and maybe even over-documented).
-	- Each surgery step is done upfront and then delay happens.
-	- Some typos are gone. Maybe bugs too, who knows?
-*/
-
 // Notices
 #define AUTODOC_NOTICE_SUCCESS 1
 #define AUTODOC_NOTICE_DEATH 2
