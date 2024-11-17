@@ -1,15 +1,11 @@
-/* changelog
-	code is less shit
-	process heals one-damage at a time instead of ALL of them at the same time
-	code documented
-	detects all implants (doesn't really matter in campaign since there are basically no autodocs)
-*/
-
 /* Noticable Differences From sleep() Code Hell:
-	- Looks less shit.
+	- Looks less shit (probably)!
 	- process() does one thing at a time instead of all things.
 	- Everything is documented (and maybe even over-documented).
+	- Each surgery step is done upfront and then delay happens.
+	- Some typos are gone. Maybe bugs too, who knows?
 */
+
 // Notices
 #define AUTODOC_NOTICE_SUCCESS 1
 #define AUTODOC_NOTICE_DEATH 2
@@ -45,7 +41,7 @@
 // Procedures: Limb & Organ
 #define AUTODOC_SURGERY_PROCEDURE_INFECTED_GERMS 15
 
-#define AUTODOC_SURGERY_UNNEEDED_DELAY 2 SECONDS // The amount of additional time caused by queuing an unnecessary surgery.
+#define AUTODOC_SURGERY_UNNEEDED_DELAY 10 SECONDS // The amount of additional time caused by queuing an unnecessary surgery.
 
 /datum/autodoc_surgery
 	/// The limb that will be operated on.
@@ -1229,7 +1225,7 @@
 			dat += "[span_danger("Automatic Mode Ready.")]<br>"
 		else
 
-			dat += "[span_danger("Automatic Mode Unavaliable, Scan Patient First.")]<br>"
+			dat += "[span_danger("Automatic Mode Unavailable, Scan Patient First.")]<br>"
 	else
 		if(!isnull(N.fields["autodoc_manual"]))
 			for(var/datum/autodoc_surgery/next_surgery in N.fields["autodoc_manual"])
