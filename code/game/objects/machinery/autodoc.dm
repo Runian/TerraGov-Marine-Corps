@@ -5,6 +5,7 @@
 	detects all implants (doesn't really matter in campaign since there are basically no autodocs)
 */
 
+// Notices
 #define AUTODOC_NOTICE_SUCCESS 1
 #define AUTODOC_NOTICE_DEATH 2
 #define AUTODOC_NOTICE_NO_RECORD 3
@@ -13,31 +14,30 @@
 #define AUTODOC_NOTICE_IDIOT_EJECT 6
 #define AUTODOC_NOTICE_FORCE_EJECT 7
 
-#define AUTODOC_SURGERY_TYPE_UNDEFINED 0
+// Types
 #define AUTODOC_SURGERY_TYPE_LIMB 1
 #define AUTODOC_SURGERY_TYPE_ORGAN 2
 #define AUTODOC_SURGERY_TYPE_EXTERNAL 3
 
-#define AUTODOC_SURGERY_PROCEDURE_UNDEFINED 0
-// External
+// Procedures
+// Procedures: External
 #define AUTODOC_SURGERY_PROCEDURE_BRUTE_DAMAGE 1
 #define AUTODOC_SURGERY_PROCEDURE_BURN_DAMAGE 2
 #define AUTODOC_SURGERY_PROCEDURE_TOXIN_DAMAGE 3
 #define AUTODOC_SURGERY_PROCEDURE_DIALYSIS 4
 #define AUTODOC_SURGERY_PROCEDURE_LOW_BLOOD 5
-// Organ
-#define AUTODOC_SURGERY_PROCEDURE_ORGAN_REPAIR 6
-#define AUTODOC_SURGERY_PROCEDURE_EYE_DAMAGE 7
-// Limb
-#define AUTODOC_SURGERY_PROCEDURE_INTERNAL_BLEEDING 8
-#define AUTODOC_SURGERY_PROCEDURE_DISFIGURED_FACE 9 // Also covers incomplete face surgery.
-#define AUTODOC_SURGERY_PROCEDURE_FRACTURED_BONE 10
-#define AUTODOC_SURGERY_PROCEDURE_MISSING_LIMB 11
-#define AUTODOC_SURGERY_PROCEDURE_NECROTIZED_LIMB 12
-#define AUTODOC_SURGERY_PROCEDURE_FOREIGN_BODIES 13 // Also covers schrapel removal.
-#define AUTODOC_SURGERY_PROCEDURE_OPEN_INCISION 14
-
-// Limb & Organ
+// Procedures: Limb
+#define AUTODOC_SURGERY_PROCEDURE_INTERNAL_BLEEDING 6
+#define AUTODOC_SURGERY_PROCEDURE_DISFIGURED_FACE 7 // Also covers incomplete face surgery.
+#define AUTODOC_SURGERY_PROCEDURE_FRACTURED_BONE 8
+#define AUTODOC_SURGERY_PROCEDURE_MISSING_LIMB 9
+#define AUTODOC_SURGERY_PROCEDURE_NECROTIZED_LIMB 10
+#define AUTODOC_SURGERY_PROCEDURE_FOREIGN_BODIES 11 // Also covers schrapel removal.
+#define AUTODOC_SURGERY_PROCEDURE_OPEN_INCISION 12
+// Procedures: Organ
+#define AUTODOC_SURGERY_PROCEDURE_ORGAN_REPAIR 13
+#define AUTODOC_SURGERY_PROCEDURE_EYE_DAMAGE 14
+// Procedures: Limb & Organ
 #define AUTODOC_SURGERY_PROCEDURE_INFECTED_GERMS 15
 
 #define AUTODOC_SURGERY_UNNEEDED_DELAY 2 SECONDS // The amount of additional time caused by queuing an unnecessary surgery.
@@ -48,9 +48,9 @@
 	/// The organ that will be operated on.
 	var/datum/internal_organ/organ_ref = null
 	/// The surgery type.
-	var/surgery_type = AUTODOC_SURGERY_TYPE_UNDEFINED
+	var/surgery_type
 	/// The surgery precedure.
-	var/surgery_procedure = AUTODOC_SURGERY_PROCEDURE_UNDEFINED
+	var/surgery_procedure
 	/// Was this surgery queued up despite not being required / expecting nothing to be done.
 	var/surgery_unnecessary = FALSE
 	/// If this surgery was started (for autodoc purposes only).
@@ -341,7 +341,7 @@
 		return
 
 	if(heal_brute)
-		if(!occupant.getBruteLoss())
+		if(!occupant.getBruteLoss(TRUE))
 			heal_brute = FALSE
 			say("Trauma repair surgery complete.")
 			return
@@ -353,7 +353,7 @@
 		return
 
 	if(heal_burn)
-		if(!occupant.getFireLoss())
+		if(!occupant.getFireLoss(TRUE))
 			heal_burn = FALSE
 			say("Skin grafts complete.")
 			return
@@ -1095,7 +1095,6 @@
 			if(stored_metal < LIMB_METAL_AMOUNT)
 				say("Metal reserves depleted.")
 				playsound(loc, 'sound/machines/buzz-two.ogg', 15, TRUE)
-				stored_metal -= LIMB_METAL_AMOUNT
 				current_surgery = null
 				set_surgery_loop_timer(1 SECONDS)
 				return
@@ -1119,6 +1118,7 @@
 						say("DEBUG: Step #3")
 						return
 			surgeried_limb.robotize()
+			stored_metal -= LIMB_METAL_AMOUNT
 			occupant.update_body()
 			occupant.updatehealth()
 			occupant.UpdateDamageIcon()
