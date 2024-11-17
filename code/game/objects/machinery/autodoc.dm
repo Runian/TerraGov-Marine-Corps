@@ -1,3 +1,24 @@
+/*
+
+## About The Pull Request
+The backend for the Autodoc has been refactored (if that is the correct word for it). I don't recall the exact changes I've made. However, the changes that I do remember are in the changelog below.
+
+## Why It's Good For The Game
+I saw there was some to-do list somewhere on the github about how autodoc had a billion sleep() and it was super cringe. So I was like, okay, how bad could it be? So now there are no more sleep() and I may of did a bunch of other stuff while doing it.
+
+## Changelog
+:cl:
+qol: More messages have been added to the Autodoc to further explain if and why a procedure has failed.
+balance: Autodoc filters reagents, heals damage, or restores blood one at a time rather than all at once.
+balance: Autodoc now does the surgery step first and then does a delay.
+fix: Autodoc only takes the amount of metal required to refill it rather than taking all of your metal.
+fix: Autodoc no longer gets stuck when trying to heal a occupant that has a damaged robotic limb.
+fix: Trying to insert a incapacitated patient into the Autodoc now works.
+code: Autodoc uses timers now instead of sleep().
+/:cl:
+
+*/
+
 // Notices
 #define AUTODOC_NOTICE_SUCCESS 1
 #define AUTODOC_NOTICE_DEATH 2
