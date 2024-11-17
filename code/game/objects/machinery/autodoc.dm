@@ -727,8 +727,6 @@
 
 /// Goes through the next surgery step infinitely (by calling itself with a timer) until there is nothing else to do.
 /obj/machinery/autodoc/proc/surgery_loop()
-	say("Looped!")
-
 	if(surgery_loop_timer_id)
 		deltimer(surgery_loop_timer_id)
 		surgery_loop_timer_id = null
@@ -739,7 +737,6 @@
 	// Get and set the next queued surgery as our current one if we don't have one right now.
 	if(!current_surgery && length(queued_surgeries))
 		for(var/datum/autodoc_surgery/next_surgery in queued_surgeries)
-			say("current_surgery set!")
 			current_surgery = next_surgery
 			queued_surgeries -= current_surgery
 			break
@@ -831,9 +828,9 @@
 		// So, it is all going to be snowflaked.
 		if(AUTODOC_SURGERY_PROCEDURE_EYE_DAMAGE)
 			if(!istype(surgeried_organ, /datum/internal_organ/eyes))
+				say("Eyes are missing.")
 				current_surgery = null
 				set_surgery_loop_timer(1 SECONDS)
-				say("DEBUG: No eyes!")
 				return
 			var/datum/internal_organ/eyes/surgeried_eyes = surgeried_organ
 			switch(surgeried_eyes.eye_surgery_stage)
@@ -842,17 +839,14 @@
 						surgeried_eyes.eye_surgery_stage = 1
 						occupant.disabilities |= NEARSIGHTED
 						set_surgery_loop_timer(EYE_CUT_MAX_DURATION)
-						say("DEBUG: Step #0")
 						return
 				if(1)
 					surgeried_eyes.eye_surgery_stage = 2
 					set_surgery_loop_timer(EYE_LIFT_MAX_DURATION)
-					say("DEBUG: Step #1")
 					return
 				if(2)
 					surgeried_eyes.eye_surgery_stage = 3
 					set_surgery_loop_timer(EYE_MEND_MAX_DURATION)
-					say("DEBUG: Step #2")
 					return
 				if(3)
 					occupant.disabilities &= ~NEARSIGHTED
@@ -860,31 +854,25 @@
 					surgeried_eyes.heal_organ_damage(surgeried_eyes.damage)
 					surgeried_eyes.eye_surgery_stage = 0
 					set_surgery_loop_timer(EYE_CAUTERISE_MAX_DURATION)
-					say("DEBUG: Step #3")
 					return
 			current_surgery = null
 			set_surgery_loop_timer(1 SECONDS)
-			say("DEBUG: Step #4")
 			return
 		if(AUTODOC_SURGERY_PROCEDURE_INTERNAL_BLEEDING)
 			var/list/datum/wound/limb_wounds = surgeried_limb.wounds
 			if(length(limb_wounds))
 				if(open_surgery_wound(occupant, surgeried_limb))
 					set_surgery_loop_timer(INCISION_MANAGER_MAX_DURATION)
-					say("DEBUG: Step #0")
 					return
 				for(var/datum/wound/limb_wound in limb_wounds)
 					qdel(limb_wound)
 				set_surgery_loop_timer(FIXVEIN_MAX_DURATION)
-				say("DEBUG: Step #1")
 				return
 			if(close_surgery_wound(occupant, surgeried_limb))
 				set_surgery_loop_timer(CAUTERY_MAX_DURATION)
-				say("DEBUG: Step #2")
 				return
 			current_surgery = null
 			set_surgery_loop_timer(1 SECONDS)
-			say("DEBUG: Step #3")
 			return
 		if(AUTODOC_SURGERY_PROCEDURE_ORGAN_REPAIR)
 			if(!surgeried_organ)
@@ -895,49 +883,39 @@
 			if(surgeried_organ.damage)
 				if(open_surgery_wound(occupant, surgeried_limb))
 					set_surgery_loop_timer(INCISION_MANAGER_MAX_DURATION)
-					say("DEBUG: Step #0")
 					return
 				// Non-groins have extra surgery steps to do.
 				if(surgeried_limb.body_part != GROIN)
 					if(saw_open_ribcage(occupant, surgeried_limb))
 						set_surgery_loop_timer(SAW_OPEN_ENCASED_MAX_DURATION)
-						say("DEBUG: Step #1.1")
 						return
 					if(retract_open_ribcage(occupant, surgeried_limb))
 						set_surgery_loop_timer(RETRACT_OPEN_ENCASED_MAX_DURATION)
-						say("DEBUG: Step #1.2")
 						return
 				surgeried_organ.heal_organ_damage(surgeried_organ.damage)
 				set_surgery_loop_timer(FIX_ORGAN_MAX_DURATION)
-				say("DEBUG: Step #2")
 				return
 			// More non-groins extra surgery steps for closing.
 			if(surgeried_limb.body_part != GROIN)
 				if(retract_close_ribcage(occupant, surgeried_limb))
 					set_surgery_loop_timer(RETRACT_OPEN_ENCASED_MAX_DURATION)
-					say("DEBUG: Step #3.1")
 					return
 				if(mend_close_ribcage(occupant, surgeried_limb))
 					set_surgery_loop_timer(BONEGEL_CLOSE_ENCASED_MAX_DURATION)
-					say("DEBUG: Step #3.2")
 					return
 			if(close_surgery_wound(occupant, surgeried_limb))
 				set_surgery_loop_timer(CAUTERY_MAX_DURATION)
-				say("DEBUG: Step #3.3")
 				return
 			current_surgery = null
 			set_surgery_loop_timer(1 SECONDS)
-			say("DEBUG: Step #4")
 			return
 		if(AUTODOC_SURGERY_PROCEDURE_FRACTURED_BONE)
 			if(surgeried_limb.limb_status & (LIMB_BROKEN|LIMB_SPLINTED|LIMB_STABILIZED))
 				if(open_surgery_wound(occupant, surgeried_limb))
 					set_surgery_loop_timer(INCISION_MANAGER_MAX_DURATION)
-					say("DEBUG: Step #0")
 					return
 				if(!surgeried_limb.bone_repair_stage)
 					surgeried_limb.bone_repair_stage = 1
-					say("DEBUG: Step #1")
 					set_surgery_loop_timer(BONEGEL_CLOSE_ENCASED_MAX_DURATION)
 					return
 				// We do not want it to fracture immediately after it is fixed.
@@ -948,57 +926,45 @@
 				surgeried_limb.add_limb_flags(LIMB_REPAIRED)
 				surgeried_limb.bone_repair_stage = 0
 				set_surgery_loop_timer(BONESETTER_MAX_DURATION)
-				say("DEBUG: Step #2")
 				return
 			if(close_surgery_wound(occupant, surgeried_limb))
 				set_surgery_loop_timer(CAUTERY_MAX_DURATION)
-				say("DEBUG: Step #3")
 				return
 			current_surgery = null
 			set_surgery_loop_timer(1 SECONDS)
-			say("DEBUG: Step #4")
 			return
 		if(AUTODOC_SURGERY_PROCEDURE_NECROTIZED_LIMB)
 			var/currently_necrotized = (surgeried_limb.limb_status & LIMB_NECROTIZED)
 			if(currently_necrotized)
 				if(open_surgery_wound(occupant, surgeried_limb))
 					set_surgery_loop_timer(INCISION_MANAGER_MAX_DURATION)
-					say("DEBUG: Step #0")
 					return
 				if(!surgeried_limb.necro_surgery_stage)
 					surgeried_limb.necro_surgery_stage = 1
 					set_surgery_loop_timer(NECRO_REMOVE_MAX_DURATION)
-					say("DEBUG: Step #1")
 					return
 				surgeried_limb.remove_limb_flags(LIMB_NECROTIZED)
 				occupant.update_body()
 				set_surgery_loop_timer(NECRO_TREAT_MAX_DURATION)
-				say("DEBUG: Step #2")
 				return
 			if(close_surgery_wound(occupant, surgeried_limb))
 				set_surgery_loop_timer(CAUTERY_MAX_DURATION)
-				say("DEBUG: Step #3")
 				return
 			current_surgery = null
 			set_surgery_loop_timer(1 SECONDS)
-			say("DEBUG: Step #4")
 			return
 		if(AUTODOC_SURGERY_PROCEDURE_OPEN_INCISION)
 			if(retract_close_ribcage(occupant, surgeried_limb))
 				set_surgery_loop_timer(RETRACT_OPEN_ENCASED_MAX_DURATION)
-				say("DEBUG: Step #0")
 				return
 			if(mend_close_ribcage(occupant, surgeried_limb))
 				set_surgery_loop_timer(BONEGEL_CLOSE_ENCASED_MAX_DURATION)
-				say("DEBUG: Step #1")
 				return
 			if(close_surgery_wound(occupant, surgeried_limb))
 				set_surgery_loop_timer(CAUTERY_MAX_DURATION)
-				say("DEBUG: Step #2")
 				return
 			current_surgery = null
 			set_surgery_loop_timer(1 SECONDS)
-			say("DEBUG: Step #3")
 			return
 		if(AUTODOC_SURGERY_PROCEDURE_DISFIGURED_FACE)
 			if(!istype(surgeried_limb, /datum/limb/head))
@@ -1011,17 +977,14 @@
 					if(0)
 						surgeried_head.face_surgery_stage = 1
 						set_surgery_loop_timer(FACIAL_CUT_MAX_DURATION)
-						say("DEBUG: Step #1")
 						return
 					if(1)
 						surgeried_head.face_surgery_stage = 2
 						set_surgery_loop_timer(FACIAL_MEND_MAX_DURATION)
-						say("DEBUG: Step #2")
 						return
 					if(2)
 						surgeried_head.face_surgery_stage = 3
 						set_surgery_loop_timer(FACIAL_FIX_MAX_DURATION)
-						say("DEBUG: Step #3")
 						return
 					if(3)
 						surgeried_head.remove_limb_flags(LIMB_BLEEDING)
@@ -1029,11 +992,9 @@
 						surgeried_head.owner.name = surgeried_head.owner.get_visible_name()
 						surgeried_head.face_surgery_stage = 0
 						set_surgery_loop_timer(FACIAL_CAUTERISE_MAX_DURATION)
-						say("DEBUG: Step #4")
 						return
 			current_surgery = null
 			set_surgery_loop_timer(1 SECONDS)
-			say("DEBUG: Step #5")
 			return
 		if(AUTODOC_SURGERY_PROCEDURE_FOREIGN_BODIES)
 			var/has_extra_steps = (surgeried_limb.body_part == CHEST || surgeried_limb.body_part == HEAD)
@@ -1048,16 +1009,13 @@
 			if(chest_alien_embryo || length(embredded_items))
 				if(open_surgery_wound(occupant, surgeried_limb))
 					set_surgery_loop_timer(INCISION_MANAGER_MAX_DURATION)
-					say("DEBUG: Step #1")
 					return
 				if(has_extra_steps)
 					if(saw_open_ribcage(occupant, surgeried_limb))
 						set_surgery_loop_timer(SAW_OPEN_ENCASED_MAX_DURATION)
-						say("DEBUG: Step #2")
 						return
 					if(retract_open_ribcage(occupant, surgeried_limb))
 						set_surgery_loop_timer(RETRACT_OPEN_ENCASED_MAX_DURATION)
-						say("DEBUG: Step #3")
 						return
 				if(chest_alien_embryo)
 					occupant.visible_message(span_warning("[src] defty extracts a wriggling parasite from [occupant]'s ribcage!"))
@@ -1069,30 +1027,24 @@
 						occupant.status_flags &= ~XENO_HOST
 					qdel(chest_alien_embryo)
 					set_surgery_loop_timer(HEMOSTAT_REMOVE_MAX_DURATION)
-					say("DEBUG: Step #4")
 					return
 				if(length(embredded_items))
 					for(var/obj/item/embedded AS in embredded_items)
 						embedded.unembed_ourself(TRUE)
 						set_surgery_loop_timer(HEMOSTAT_REMOVE_MAX_DURATION)
 						return
-					say("DEBUG: Step #5")
 			if(has_extra_steps)
 				if(retract_close_ribcage(occupant, surgeried_limb))
 					set_surgery_loop_timer(RETRACT_OPEN_ENCASED_MAX_DURATION)
-					say("DEBUG: Step #6")
 					return
 				if(mend_close_ribcage(occupant, surgeried_limb))
 					set_surgery_loop_timer(BONEGEL_CLOSE_ENCASED_MAX_DURATION)
-					say("DEBUG: Step #7")
 					return
 			if(close_surgery_wound(occupant, surgeried_limb))
 				set_surgery_loop_timer(CAUTERY_MAX_DURATION)
-				say("DEBUG: Step #8")
 				return
 			current_surgery = null
 			set_surgery_loop_timer(1 SECONDS)
-			say("DEBUG: Step #9")
 			return
 		// Missing limb surgery is one of the surgeries that doesn't use surgery_stage on limbs (or a incision manager).
 		// So, it is all going to be snowflaked as well.
@@ -1108,19 +1060,16 @@
 					if(0)
 						surgeried_limb.limb_replacement_stage = 1
 						set_surgery_loop_timer(ROBOLIMB_CUT_MAX_DURATION)
-						say("DEBUG: Step #1")
 						return
 					if(1)
 						surgeried_limb.limb_replacement_stage = 2
 						set_surgery_loop_timer(ROBOLIMB_MEND_MAX_DURATION)
-						say("DEBUG: Step #2")
 						return
 					if(2)
 						surgeried_limb.add_limb_flags(LIMB_AMPUTATED)
 						surgeried_limb.setAmputatedTree()
 						surgeried_limb.limb_replacement_stage = 0
 						set_surgery_loop_timer(ROBOLIMB_PREPARE_MAX_DURATION)
-						say("DEBUG: Step #3")
 						return
 			surgeried_limb.robotize()
 			stored_metal -= LIMB_METAL_AMOUNT
@@ -1129,7 +1078,6 @@
 			occupant.UpdateDamageIcon()
 			current_surgery = null
 			set_surgery_loop_timer(ROBOLIMB_ATTACH_MAX_DURATION)
-			say("DEBUG: Step #4")
 			return
 
 	visible_message("\The [src] clicks and opens up having finished the requested operations.")
