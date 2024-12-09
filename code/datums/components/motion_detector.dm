@@ -52,7 +52,7 @@
 		if(detector_status == MOTION_DETECTOR_HOSTILE)
 			hostile_detected = TRUE
 	for (var/mob/living/carbon/xenomorph/nearby_xeno AS in cheap_get_xenos_near(human_parent, range))
-		if(nearby_xeno.last_move_time + move_sensitivity < world.time )
+		if(nearby_xeno.last_move_time + move_sensitivity < world.time)
 			continue
 		create_blip(nearby_xeno, MOTION_DETECTOR_HOSTILE)
 		hostile_detected = TRUE
