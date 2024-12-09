@@ -91,7 +91,7 @@
 // *********** Blips
 // ***************************************
 
-///Remove the blip from the operator screen.
+/// Remove the blip from the operator screen.
 /obj/effect/blip/proc/remove_blip(mob/operator)
 	return
 
@@ -111,7 +111,6 @@
 	setDir(direction)
 	update_icon()
 
-/// Remove the blip from the operator screen.
 /obj/effect/blip/edge_blip/remove_blip(mob/operator)
 	operator?.client?.screen -= src
 	qdel(src)
@@ -132,7 +131,6 @@
 	blip_image.layer = BELOW_FULLSCREEN_LAYER
 	operator.client.images += blip_image
 
-/// Remove the blip from the operator images.
 /obj/effect/blip/close_blip/remove_blip(mob/operator)
 	operator?.client?.images -= blip_image
 	qdel(src)
