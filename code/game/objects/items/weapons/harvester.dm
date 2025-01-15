@@ -107,3 +107,14 @@
 	if(!.)
 		return
 	toggle_item_bump_attack(user, FALSE)
+
+// The officer sword except it is fitted for vali.
+/obj/item/weapon/sword/officersword/harvester
+	name = "\improper HP-C Harvester rapier"
+	desc = "Extremely expensive looking blade, with a golden handle and engravings, unexpectedly effective in combat, despite its ceremonial looks, compacted with a vali module."
+	icon_state = "officer_sword"
+	worn_icon_state = "officer_sword"
+
+/obj/item/weapon/sword/officersword/harvester/Initialize(mapload)
+	. = ..()
+	AddComponent(/datum/component/harvester)
