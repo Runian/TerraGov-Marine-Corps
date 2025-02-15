@@ -2,8 +2,11 @@
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
 >>>>>>> b5f196601e (my autism list (for calm dragon))
+=======
+>>>>>>> 9b7a3bd24b64bc7da5fb4691d3446eec96b06291
 The Less Brain-Dead List:
 ✔️ Can Speak Common
 ✔️ Stamina Bar
@@ -49,8 +52,11 @@ The Less Brain-Dead List:
 ❌ Dragon's Flight / Landing (Ability)
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
 >>>>>>> c80747b8b1 (ill get back to this)
+=======
+>>>>>>> 9b7a3bd24b64bc7da5fb4691d3446eec96b06291
 	✔️ 60 second cooldown.
 	✔️ Costs 0 stamina to use.
 	❌ Flying:
@@ -70,6 +76,7 @@ The Less Brain-Dead List:
 		❌ If landing right ontop of a carbon, deal double damage and cause them to emote: scream.
 		❌ Restores sprite to normal (from shadow sprite).
 		❌ Successfully casting should display a landing animation of sorts.
+<<<<<<< HEAD
 <<<<<<< HEAD
 =======
 	- 60 second cooldown.
@@ -103,6 +110,8 @@ The Less Brain-Dead List:
 >>>>>>> b5f196601e (my autism list (for calm dragon))
 =======
 >>>>>>> c80747b8b1 (ill get back to this)
+=======
+>>>>>>> 9b7a3bd24b64bc7da5fb4691d3446eec96b06291
 	- Right Click:
 		If flying:
 			If non-hijack:
@@ -168,6 +177,7 @@ The Less Brain-Dead List:
 	After success, remove all gas and fling carbons 7 tiles as non-safe throw & knockdown of 1 second.
 ... TBA ...
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
 base xeno_caste, xeno, etc
 Health (calm)
@@ -219,6 +229,8 @@ REAL Sprites
 >>>>>>> 3b691bcd4d (initial garbage)
 =======
 >>>>>>> b5f196601e (my autism list (for calm dragon))
+=======
+>>>>>>> 9b7a3bd24b64bc7da5fb4691d3446eec96b06291
 */
 
 /datum/xeno_caste/dragon
@@ -245,6 +257,7 @@ REAL Sprites
 	// *** Health *** //
 	max_health = 1650 // Calm (750) + Enraged (900)
 
+<<<<<<< HEAD
 	tier = XENO_TIER_FOUR
 	upgrade = XENO_UPGRADE_BASETYPE
 	wound_type = "dragon" //used to match appropriate wound overlays
@@ -256,10 +269,16 @@ REAL Sprites
 	upgrade_threshold = TIER_THREE_THRESHOLD
 	maximum_active_caste = 1
 
+=======
+	// *** Evolution *** //
+	upgrade_threshold = TIER_THREE_THRESHOLD
+	maximum_active_caste = 1
+>>>>>>> 9b7a3bd24b64bc7da5fb4691d3446eec96b06291
 	evolve_min_xenos = 15
 	death_evolution_delay = 10 MINUTES
 
 	// *** Flags *** //
+<<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
@@ -273,6 +292,9 @@ REAL Sprites
 =======
 	caste_flags = CASTE_NO_HEALING|CASTE_NO_PLASMA_REGEN|CASTE_IS_INTELLIGENT|CASTE_STAGGER_IMMUNE|CASTE_KNOCKBACK_IMMUNE|CASTE_SLOW_IMMUNE|CASTE_STUN_IMMUNE|CASTE_NO_PSYCHIC_SUMMON|CASTE_INSTANT_EVOLUTION|CASTE_LEADER_TYPE
 >>>>>>> 5d4f9851fc (all kinds of immunity)
+=======
+	caste_flags = CASTE_NO_HEALING|CASTE_NO_PLASMA_REGEN|CASTE_IS_INTELLIGENT|CASTE_STAGGER_IMMUNE|CASTE_KNOCKBACK_IMMUNE|CASTE_SLOW_IMMUNE|CASTE_STUN_IMMUNE|CASTE_NO_PSYCHIC_SUMMON|CASTE_INSTANT_EVOLUTION|CASTE_LEADER_TYPE
+>>>>>>> 9b7a3bd24b64bc7da5fb4691d3446eec96b06291
 	can_flags = CASTE_CAN_CORRUPT_GENERATOR
 	caste_traits = null
 
@@ -289,10 +311,14 @@ REAL Sprites
 		/datum/action/ability/activable/xeno/psydrain,
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> 9b7a3bd24b64bc7da5fb4691d3446eec96b06291
 		// Dragon-specific actions:
 		/datum/action/ability/xeno_action/dragon_flight,
 		/datum/action/ability/activable/xeno/dragon_breath,
 		/datum/action/ability/activable/xeno/tail_swipe,
+<<<<<<< HEAD
 =======
 >>>>>>> 1fd1fae70e (descs)
 =======
@@ -303,6 +329,8 @@ REAL Sprites
 =======
 		/datum/action/ability/activable/xeno/tail_swipe,
 >>>>>>> 69bd3761e7 (tail swipe)
+=======
+>>>>>>> 9b7a3bd24b64bc7da5fb4691d3446eec96b06291
 		// Actions given to all T4s:
 		/datum/action/ability/xeno_action/call_of_the_burrowed,
 		/datum/action/ability/xeno_action/hive_message,
@@ -327,10 +355,14 @@ REAL Sprites
 		/datum/action/ability/activable/xeno/psydrain,
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> 9b7a3bd24b64bc7da5fb4691d3446eec96b06291
 		// Dragon-specific actions:
 		/datum/action/ability/xeno_action/dragon_flight,
 		/datum/action/ability/activable/xeno/dragon_breath,
 		/datum/action/ability/activable/xeno/tail_swipe,
+<<<<<<< HEAD
 =======
 >>>>>>> 1fd1fae70e (descs)
 =======
@@ -341,6 +373,8 @@ REAL Sprites
 =======
 		/datum/action/ability/activable/xeno/tail_swipe,
 >>>>>>> 69bd3761e7 (tail swipe)
+=======
+>>>>>>> 9b7a3bd24b64bc7da5fb4691d3446eec96b06291
 		// Actions given to all T4s:
 		/datum/action/ability/xeno_action/call_of_the_burrowed,
 		/datum/action/ability/xeno_action/hive_message,

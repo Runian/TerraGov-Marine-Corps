@@ -13,6 +13,7 @@
 	pixel_x = -16
 	mob_size = MOB_SIZE_BIG
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
 	drag_delay = 6
 >>>>>>> 994a30ec14 (half of dragon flight)
@@ -23,12 +24,19 @@
 =======
 	tier = XENO_TIER_FOUR //Dragon, like queen, doesn't count towards population limit.
 >>>>>>> 8fe40bfdb9 (desc pt. 2)
+=======
+	drag_delay = 6
+	resistance_flags = BANISH_IMMUNE
+	initial_language_holder = /datum/language_holder/xeno/dragon
+	tier = XENO_TIER_FOUR //Dragon, like queen, doesn't count towards population limit.
+>>>>>>> 9b7a3bd24b64bc7da5fb4691d3446eec96b06291
 	upgrade = XENO_UPGRADE_NORMAL
 	bubble_icon = "alienroyal"
 	inherent_verbs = list(
 		/mob/living/carbon/xenomorph/proc/hijack,
 	)
 	xeno_flags = XENO_ROUNY // Because my sprites are so trash.
+<<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
@@ -53,6 +61,12 @@
 	/// Whether we are currently in flight.
 	var/is_flying = FALSE
 >>>>>>> b1fc44b9df (3/4 of dragon flight)
+=======
+	/// Whether we are attacking.
+	var/is_attacking = FALSE
+	/// Whether we are currently in flight.
+	var/is_flying = FALSE
+>>>>>>> 9b7a3bd24b64bc7da5fb4691d3446eec96b06291
 
 /mob/living/carbon/xenomorph/dragon/Initialize(mapload)
 	. = ..()
@@ -89,6 +103,10 @@
 	playsound(loc, 'sound/voice/alien/king_died.ogg', 75, 0)
 
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+
+>>>>>>> 9b7a3bd24b64bc7da5fb4691d3446eec96b06291
 /mob/living/carbon/xenomorph/dragon/can_receive_aura(aura_type, atom/source, datum/aura_bearer/bearer)
 	. = ..()
 	return FALSE
@@ -193,6 +211,7 @@
 	src.resistance_flags &= ~RESIST_ALL
 	src.allow_pass_flags = initial(src.allow_pass_flags)
 	src.pass_flags = initial(src.pass_flags)
+<<<<<<< HEAD
 =======
 
 /mob/living/carbon/xenomorph/dragon/can_receive_aura(aura_type, atom/source, datum/aura_bearer/bearer)
@@ -306,3 +325,5 @@
 	src.allow_pass_flags = initial(src.allow_pass_flags)
 	src.pass_flags = initial(src.pass_flags)
 >>>>>>> b1fc44b9df (3/4 of dragon flight)
+=======
+>>>>>>> 9b7a3bd24b64bc7da5fb4691d3446eec96b06291

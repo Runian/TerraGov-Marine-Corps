@@ -612,7 +612,7 @@ Returns TRUE when loc_weeds_type changes. Returns FALSE when it doesn’t change
 		return
 	INVOKE_ASYNC(src, PROC_REF(carry_target), user, TRUE)
 
-<<<<<<< HEAD
+
 ///updates the xenos glow, based on its base glow/color, and its ammo reserves. More green ammo = more green glow; more yellow = more yellow.
 /mob/living/carbon/xenomorph/proc/update_ammo_glow()
 	var/current_ammo = corrosive_ammo + neuro_ammo
@@ -629,8 +629,6 @@ Returns TRUE when loc_weeds_type changes. Returns FALSE when it doesn’t change
 		set_light_on(FALSE)
 	set_light_range_power_color(glow, 4, color)
 
-=======
->>>>>>> 5d4f9851fc (all kinds of immunity)
 /// Prevents this xenomorph from getting thrown.
 /mob/living/carbon/xenomorph/proc/cancel_knockback_throw(source)
 	SIGNAL_HANDLER

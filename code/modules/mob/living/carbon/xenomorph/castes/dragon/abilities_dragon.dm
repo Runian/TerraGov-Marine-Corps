@@ -1,10 +1,3 @@
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
->>>>>>> c80747b8b1 (ill get back to this)
 /// The radius/range to check for landing turfs.
 #define DRAGON_FLIGHT_FLIGHT_RANGE 2
 /// The amount of time it takes to begin flight.
@@ -13,7 +6,7 @@
 #define DRAGON_FLIGHT_LAND_TIME 4 SECONDS
 /// How much brute damage is dealt for being in the landing radius (non-epicenter + epicenter)
 // Note: Double damage for vehicles and directly stomped on (if carbon).
-<<<<<<< HEAD
+
 #define DRAGON_FLIGHT_LAND_DAMAGE 75
 /// How long the knockdown is for being in the landing radius (not-epicenter + epicenter)
 #define DRAGON_FLIGHT_KNOCKDOWN 2 SECONDS
@@ -31,29 +24,14 @@
 // ***************************************
 // *********** Dragon's Flight
 // ***************************************
-=======
-// ***************************************
-// *********** Dragon's Flight
-// ***************************************
-
-=======
->>>>>>> e51b8d9873 (thinking about revamping abilities so far made)
 #define DRAGON_FLIGHT_FLIGHT_TIME 3 SECONDS
 #define DRAGON_FLIGHT_LAND_TIME 3 SECONDS
-=======
->>>>>>> c80747b8b1 (ill get back to this)
+
 #define DRAGON_FLIGHT_LAND_DAMAGE 75
 /// How long the knockdown is for being in the landing radius (not-epicenter + epicenter)
 #define DRAGON_FLIGHT_KNOCKDOWN 2 SECONDS
 
-<<<<<<< HEAD
-<<<<<<< HEAD
->>>>>>> 994a30ec14 (half of dragon flight)
-=======
-/* All dragon abilities must satisfy the following conditions unless there is a reasonable exception:
-=======
 /* All dragon abilities generally satisfy the following conditions unless there is a reasonable exception:
->>>>>>> c80747b8b1 (ill get back to this)
  * Lengthy cooldown.
  * Lengthy cast time.
  * Telegraphed / must be plainly obviously that something is happening.
@@ -63,31 +41,20 @@
  * Self-contained code wise (e.g. does not refer to /mob/living/carbon/xenomorph/dragon or any types beyond itself).
 */
 
-// ***************************************
-// *********** Dragon's Flight
-// ***************************************
->>>>>>> e51b8d9873 (thinking about revamping abilities so far made)
 /datum/action/ability/xeno_action/dragon_flight
 	name = "Dragon's Flight"
 	action_icon_state = "shattering_roar"
 	action_icon = 'icons/Xeno/actions/king.dmi'
-<<<<<<< HEAD
-<<<<<<< HEAD
 	desc = "After a long wind-up, take flight to the skies. While flying, you slowly regenerate your health and can choose where you'll land with a similar wind-up."
 	cooldown_duration = 60 SECONDS
 	/// Is the owner currently flying?
 	var/is_in_flight = FALSE
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
->>>>>>> c80747b8b1 (ill get back to this)
 	/// The timer id used to play the introduction sound (multiple times).
 	var/intro_sound_timer_id
 	/// The targeted turfs that is referenced for telegraphing and impact.
 	var/list/turf/targetted_turfs = list()
 	/// The effects that shows the telegraphed area to avoid getting hit (for marines).
 	var/list/obj/effect/dragon_telegraphed_warning/telegraph_effects = list()
-<<<<<<< HEAD
 
 /datum/action/ability/xeno_action/dragon_flight/can_use_action(silent = FALSE, override_flags)
 	silent = TRUE
@@ -111,7 +78,6 @@
 			if(!silent)
 				owner.balloon_alert(owner, "No landing in marine base!")
 			return FALSE
-
 
 /datum/action/ability/xeno_action/dragon_flight/succeed_activate(ability_cost_override)
 	..()
@@ -268,18 +234,6 @@
 	if(new_area.ceiling > CEILING_OBSTRUCTED)
 		return COMPONENT_MOVABLE_BLOCK_PRE_MOVE
 
-
-=======
-	desc = "After a long wind-up, take flight to the skies. While flying, you slowly regenerate your health and choose where you'll land."
-=======
-	desc = "After a long wind-up, take flight to the skies. While flying, you slowly regenerate your health and can choose where you'll land with a similar wind-up."
->>>>>>> 2c7050a773 (unneeded vars)
-	cooldown_duration = 1 SECONDS // TODO: set to 60 SECONDS
-=======
->>>>>>> e51b8d9873 (thinking about revamping abilities so far made)
-=======
->>>>>>> c80747b8b1 (ill get back to this)
-
 /datum/action/ability/xeno_action/dragon_flight/can_use_action(silent = FALSE, override_flags)
 	silent = TRUE
 	. = ..()
@@ -410,8 +364,6 @@
 	add_cooldown()
 	succeed_activate()
 
-<<<<<<< HEAD
-<<<<<<< HEAD
 /// Handles all variables that need to be set upon landing or flight.
 /datum/action/ability/xeno_action/dragon_flight/proc/handle_flight_variables()
 	if(flying)
@@ -423,10 +375,6 @@
 	owner.resistance_flags &= RESIST_ALL
 	owner.pass_flags = initial(owner.pass_flags)
 
->>>>>>> 994a30ec14 (half of dragon flight)
-=======
->>>>>>> b1fc44b9df (3/4 of dragon flight)
-=======
 /// Get nearby visible turfs of a certain range.
 /datum/action/ability/xeno_action/dragon_flight/proc/get_landing_turfs()
 	var/list/turf/nearby_visible_turfs = list()
@@ -478,6 +426,8 @@
 
 
 >>>>>>> c80747b8b1 (ill get back to this)
+=======
+>>>>>>> 9b7a3bd24b64bc7da5fb4691d3446eec96b06291
 // ***************************************
 // *********** Dragon's Breath
 // ***************************************
@@ -490,38 +440,24 @@
 #define DRAGON_BREATH_STACKS 10
 #define DRAGON_BREATH_CHARGE_TIME 2 SECONDS
 
-<<<<<<< HEAD
 // This acts similar to the King's Shattering Roar, except it is fire-themed!
 /datum/action/ability/activable/xeno/dragon_breath
 	name = "Dragon Breath"
 	action_icon_state = "shattering_roar"
 	action_icon = 'icons/Xeno/actions/king.dmi'
-=======
-#define DRAGON_BREATH_RANGE 4
-#define DRAGON_BREATH_ANGLE 60
-#define DRAGON_BREATH_SPEED 4
-=======
-#define DRAGON_BREATH_RANGE 5
-#define DRAGON_BREATH_ANGLE 90
-#define DRAGON_BREATH_SPEED 2
->>>>>>> 69bd3761e7 (tail swipe)
-#define DRAGON_BREATH_DAMAGE 20
-#define DRAGON_BREATH_VEHICLE_DAMAGE 10
-#define DRAGON_BREATH_STACKS 10
-#define DRAGON_BREATH_CHARGE_TIME 2 SECONDS
 
 // ***************************************
 // *********** Dragon's Breath
 // ***************************************
 
-=======
->>>>>>> 994a30ec14 (half of dragon flight)
 // This acts similar to the King's Shattering Roar, except it is fire-themed!
 /datum/action/ability/activable/xeno/dragon_breath
 	name = "Dragon Breath"
 	action_icon_state = "shattering_roar"
 	action_icon = 'icons/Xeno/actions/king.dmi'
 >>>>>>> f5bda68175 (dragon breath)
+=======
+>>>>>>> 9b7a3bd24b64bc7da5fb4691d3446eec96b06291
 	desc = "Unleash a massive cone of fire in front of you after a wind-up."
 	ability_cost = 1
 	cooldown_duration = 12 SECONDS
@@ -534,11 +470,15 @@
 
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 
 <<<<<<< HEAD
 =======
 
 >>>>>>> 1d39b17272 (7/8 of dragon flight)
+=======
+
+>>>>>>> 9b7a3bd24b64bc7da5fb4691d3446eec96b06291
 /datum/action/ability/activable/xeno/dragon_breath/can_use_action(silent = FALSE, override_flags)
 	. = ..()
 	var/mob/living/carbon/xenomorph/dragon/dragon_owner = owner
@@ -549,6 +489,7 @@
 			dragon_owner.balloon_alert(src, "Can't while flying!")
 		return FALSE
 
+<<<<<<< HEAD
 <<<<<<< HEAD
 =======
 >>>>>>> b1fc44b9df (3/4 of dragon flight)
@@ -573,6 +514,8 @@
 	var/successful = do_after(owner, DRAGON_BREATH_CHARGE_TIME, NONE, owner, BUSY_ICON_DANGER, extra_checks = CALLBACK(src, PROC_REF(can_use_action), FALSE, ABILITY_USE_BUSY))
 >>>>>>> f5bda68175 (dragon breath)
 =======
+=======
+>>>>>>> 9b7a3bd24b64bc7da5fb4691d3446eec96b06291
 /datum/action/ability/activable/xeno/dragon_breath/use_ability(atom/target)
 	var/mob/living/carbon/xenomorph/dragon/dragon_owner = owner
 	if(!target)
@@ -582,6 +525,7 @@
 	playsound(dragon_owner, 'sound/voice/alien/king_roar.ogg', 70, sound_range = 20)
 
 <<<<<<< HEAD
+<<<<<<< HEAD
 	dragon_owner.is_busy = TRUE
 	var/successful = do_after(dragon_owner, DRAGON_BREATH_CHARGE_TIME, NONE, dragon_owner, BUSY_ICON_DANGER, extra_checks = CALLBACK(src, PROC_REF(can_use_action), FALSE, ABILITY_USE_BUSY))
 	dragon_owner.is_busy = FALSE
@@ -590,12 +534,19 @@
 	ADD_TRAIT(dragon_owner, TRAIT_IMMOBILE, DRAGON_BREATH_ABILITY_TRAIT)
 	var/successful = do_after(dragon_owner, DRAGON_BREATH_CHARGE_TIME, NONE, dragon_owner, BUSY_ICON_DANGER, extra_checks = CALLBACK(src, PROC_REF(can_use_action), FALSE))
 >>>>>>> b0d4c5eb57 (dont actually need this)
+=======
+	ADD_TRAIT(dragon_owner, TRAIT_IMMOBILE, DRAGON_BREATH_ABILITY_TRAIT)
+	var/successful = do_after(dragon_owner, DRAGON_BREATH_CHARGE_TIME, NONE, dragon_owner, BUSY_ICON_DANGER, extra_checks = CALLBACK(src, PROC_REF(can_use_action), FALSE))
+>>>>>>> 9b7a3bd24b64bc7da5fb4691d3446eec96b06291
 	REMOVE_TRAIT(owner, TRAIT_IMMOBILE, DRAGON_BREATH_ABILITY_TRAIT)
 
 	// They generally shouldn't be interrupted given that they are immune to stun and stagger, but if they are interrupted:
 	if(!successful)
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> 9b7a3bd24b64bc7da5fb4691d3446eec96b06291
 		dragon_owner.balloon_alert(dragon_owner, "interrupted!")
 		add_cooldown(cooldown_duration/2)
 		return fail_activate()
@@ -603,6 +554,7 @@
 	playsound(dragon_owner, 'sound/voice/alien/xenos_roaring.ogg', 90, sound_range = 30)
 	for(var/mob/living/carbon/human/human_victim AS in GLOB.humans_by_zlevel["[dragon_owner.z]"])
 		if(get_dist(human_victim, dragon_owner) > 9)
+<<<<<<< HEAD
 =======
 		owner.balloon_alert(owner, "interrupted!")
 		add_cooldown(cooldown_duration/2)
@@ -621,6 +573,8 @@
 	for(var/mob/living/carbon/human/human_victim AS in GLOB.humans_by_zlevel["[dragon_owner.z]"])
 		if(get_dist(human_victim, dragon_owner) > 9)
 >>>>>>> 1d39b17272 (7/8 of dragon flight)
+=======
+>>>>>>> 9b7a3bd24b64bc7da5fb4691d3446eec96b06291
 			continue
 		shake_camera(human_victim, 2 SECONDS, 1)
 
@@ -651,6 +605,9 @@
 	for(var/atom/movable/attacked_atom AS in attacked_turf)
 		if(isxeno(attacked_atom))
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> 9b7a3bd24b64bc7da5fb4691d3446eec96b06291
 			continue
 		if(iscarbon(attacked_atom))
 			var/mob/living/carbon/attacked_carbon = attacked_atom
@@ -683,6 +640,7 @@
 	desc = "Swipes your tail behind you and knockdowns in a massive range."
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 	ability_cost = 1
 	cooldown_duration = 12 SECONDS
 =======
@@ -693,6 +651,10 @@
 	ability_cost = 1
 	cooldown_duration = 12 SECONDS
 >>>>>>> 52d1bd1aa7 (non-dev cost/cooldown)
+=======
+	ability_cost = 1
+	cooldown_duration = 12 SECONDS
+>>>>>>> 9b7a3bd24b64bc7da5fb4691d3446eec96b06291
 	target_flags = ABILITY_TURF_TARGET
 	keybinding_signals = list(
 		KEYBINDING_NORMAL = COMSIG_XENOABILITY_TAIL_SWIPE,
@@ -700,8 +662,11 @@
 
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
 >>>>>>> 1d39b17272 (7/8 of dragon flight)
+=======
+>>>>>>> 9b7a3bd24b64bc7da5fb4691d3446eec96b06291
 /datum/action/ability/activable/xeno/tail_swipe/can_use_action(silent = FALSE, override_flags)
 	. = ..()
 	var/mob/living/carbon/xenomorph/dragon/dragon_owner = owner
@@ -716,13 +681,17 @@
 	var/mob/living/carbon/xenomorph/dragon/dragon_owner = owner
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
 /datum/action/ability/activable/xeno/tail_swipe/use_ability(atom/target)
 >>>>>>> 69bd3761e7 (tail swipe)
+=======
+>>>>>>> 9b7a3bd24b64bc7da5fb4691d3446eec96b06291
 	if(!target)
 		return
 
 	// Turn to get the turfs in front of us.
+<<<<<<< HEAD
 <<<<<<< HEAD
 	dragon_owner.face_atom(target)
 =======
@@ -738,6 +707,9 @@
 	// Turn to get the turfs in front of us.
 	dragon_owner.face_atom(target)
 >>>>>>> 1d39b17272 (7/8 of dragon flight)
+=======
+	dragon_owner.face_atom(target)
+>>>>>>> 9b7a3bd24b64bc7da5fb4691d3446eec96b06291
 
 	// Inner targetted turfs.
 	var/list/turf/inner_targetted_turfs = list()
@@ -746,12 +718,16 @@
 	// Column 1
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
 >>>>>>> 1d39b17272 (7/8 of dragon flight)
+=======
+>>>>>>> 9b7a3bd24b64bc7da5fb4691d3446eec96b06291
 	var/turf/inner_north_turf = get_step(dragon_owner, turn(dragon_owner.dir, -90))
 	var/turf/outer_north_turf = get_step(inner_north_turf, turn(dragon_owner.dir, -90))
 	var/turf/inner_south_turf = get_step(dragon_owner, turn(dragon_owner.dir, 90))
 	var/turf/outer_south_turf = get_step(inner_south_turf, turn(dragon_owner.dir, 90))
+<<<<<<< HEAD
 <<<<<<< HEAD
 =======
 	var/turf/inner_north_turf = get_step(owner, turn(owner.dir, -90))
@@ -761,6 +737,8 @@
 >>>>>>> 69bd3761e7 (tail swipe)
 =======
 >>>>>>> 1d39b17272 (7/8 of dragon flight)
+=======
+>>>>>>> 9b7a3bd24b64bc7da5fb4691d3446eec96b06291
 	inner_targetted_turfs += inner_north_turf
 	outer_targetted_turfs += outer_north_turf
 	inner_targetted_turfs += inner_south_turf
@@ -769,13 +747,17 @@
 	// Column 2
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
 >>>>>>> 1d39b17272 (7/8 of dragon flight)
+=======
+>>>>>>> 9b7a3bd24b64bc7da5fb4691d3446eec96b06291
 	var/turf/outer_north_turf_1 = get_step(outer_north_turf, dragon_owner.dir)
 	var/turf/inner_north_corner_turf = get_step(inner_north_turf, dragon_owner.dir)
 	var/turf/inner_behind_turf = get_step(dragon_owner, dragon_owner.dir)
 	var/turf/inner_south_corner_turf = get_step(inner_south_turf, dragon_owner.dir)
 	var/turf/outer_south_turf_1 = get_step(outer_south_turf, dragon_owner.dir)
+<<<<<<< HEAD
 <<<<<<< HEAD
 =======
 	var/turf/outer_north_turf_1 = get_step(outer_north_turf, owner.dir)
@@ -786,6 +768,8 @@
 >>>>>>> 69bd3761e7 (tail swipe)
 =======
 >>>>>>> 1d39b17272 (7/8 of dragon flight)
+=======
+>>>>>>> 9b7a3bd24b64bc7da5fb4691d3446eec96b06291
 	outer_targetted_turfs += outer_north_turf_1
 	inner_targetted_turfs += inner_north_corner_turf
 	inner_targetted_turfs += inner_behind_turf
@@ -795,13 +779,17 @@
 	// Column 3
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
 >>>>>>> 1d39b17272 (7/8 of dragon flight)
+=======
+>>>>>>> 9b7a3bd24b64bc7da5fb4691d3446eec96b06291
 	var/turf/outer_north_corner_turf = get_step(outer_north_turf_1, dragon_owner.dir)
 	var/turf/outer_behind_north_turf = get_step(inner_north_corner_turf, dragon_owner.dir)
 	var/turf/outer_behind_turf = get_step(inner_behind_turf, dragon_owner.dir)
 	var/turf/outer_behind_south_turf = get_step(inner_south_corner_turf, dragon_owner.dir)
 	var/turf/outer_south_corner_turf = get_step(outer_south_turf_1, dragon_owner.dir)
+<<<<<<< HEAD
 <<<<<<< HEAD
 =======
 	var/turf/outer_north_corner_turf = get_step(outer_north_turf_1, owner.dir)
@@ -812,6 +800,8 @@
 >>>>>>> 69bd3761e7 (tail swipe)
 =======
 >>>>>>> 1d39b17272 (7/8 of dragon flight)
+=======
+>>>>>>> 9b7a3bd24b64bc7da5fb4691d3446eec96b06291
 	outer_targetted_turfs += outer_north_corner_turf
 	outer_targetted_turfs += outer_behind_north_turf
 	outer_targetted_turfs += outer_behind_turf
@@ -821,6 +811,7 @@
 	// Then turn us around so it looks like we're using our tail.
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 	dragon_owner.setDir(turn(dragon_owner.dir, 180))
 =======
 	owner.setDir(turn(owner.dir, 180))
@@ -828,6 +819,9 @@
 =======
 	dragon_owner.setDir(turn(dragon_owner.dir, 180))
 >>>>>>> 1d39b17272 (7/8 of dragon flight)
+=======
+	dragon_owner.setDir(turn(dragon_owner.dir, 180))
+>>>>>>> 9b7a3bd24b64bc7da5fb4691d3446eec96b06291
 
 	// Telegraph this attack.
 	var/list/obj/effect/dragon_telegraphed_warning/warnings = list()
@@ -838,6 +832,9 @@
 
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> 9b7a3bd24b64bc7da5fb4691d3446eec96b06291
 	ADD_TRAIT(dragon_owner, TRAIT_IMMOBILE, TAIL_SWIPE_ABILITY_TRAIT)
 	var/successful = do_after(dragon_owner, TAIL_SWIPE_CHARGE_TIME, NONE, dragon_owner, BUSY_ICON_DANGER, extra_checks = CALLBACK(src, PROC_REF(can_use_action), FALSE))
 	for(var/obj/effect/warning in warnings)
@@ -850,6 +847,7 @@
 		add_cooldown(cooldown_duration/2)
 		return fail_activate()
 
+<<<<<<< HEAD
 =======
 	ADD_TRAIT(owner, TRAIT_IMMOBILE, TAIL_SWIPE_ABILITY_TRAIT)
 =======
@@ -879,6 +877,8 @@
 >>>>>>> 69bd3761e7 (tail swipe)
 =======
 >>>>>>> 1d39b17272 (7/8 of dragon flight)
+=======
+>>>>>>> 9b7a3bd24b64bc7da5fb4691d3446eec96b06291
 	var/anyone_hit = FALSE
 	for(var/turf/targetted_turf in inner_targetted_turfs)
 		for(var/atom/movable/attacked_atom AS in targetted_turf)
@@ -891,10 +891,14 @@
 				shake_camera(attacked_carbon, 2, 1)
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> 9b7a3bd24b64bc7da5fb4691d3446eec96b06291
 				attacked_carbon.Knockdown(TAIL_SWIPE_KNOCKDOWN)
 				attacked_carbon.adjust_stagger(TAIL_SWIPE_STAGGER)
 				attacked_carbon.adjust_slowdown(TAIL_SWIPE_SLOWDOWN)
 				attacked_carbon.apply_damage(TAIL_SWIPE_DAMAGE * dragon_owner.xeno_melee_damage_modifier, BRUTE, blocked = MELEE, updating_health = TRUE)
+<<<<<<< HEAD
 =======
 				playsound(attacked_carbon, 'sound/weapons/alien_claw_block.ogg', 50, 1)
 =======
@@ -908,6 +912,8 @@
 =======
 				attacked_carbon.apply_damage(TAIL_SWIPE_DAMAGE * dragon_owner.xeno_melee_damage_modifier, BRUTE, blocked = MELEE, updating_health = TRUE)
 >>>>>>> 1d39b17272 (7/8 of dragon flight)
+=======
+>>>>>>> 9b7a3bd24b64bc7da5fb4691d3446eec96b06291
 				anyone_hit = TRUE
 
 	for(var/turf/targetted_turf in outer_targetted_turfs)
@@ -921,6 +927,9 @@
 				shake_camera(attacked_carbon, 2, 1)
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> 9b7a3bd24b64bc7da5fb4691d3446eec96b06291
 				attacked_carbon.Knockdown(TAIL_SWIPE_KNOCKDOWN/2)
 				attacked_carbon.adjust_stagger(TAIL_SWIPE_STAGGER/2)
 				attacked_carbon.adjust_slowdown(TAIL_SWIPE_SLOWDOWN/2)
@@ -935,6 +944,7 @@
 
 	succeed_activate()
 	add_cooldown()
+<<<<<<< HEAD
 =======
 			continue
 		if(iscarbon(attacked_atom))
@@ -970,3 +980,5 @@
 	succeed_activate()
 	add_cooldown()
 >>>>>>> 69bd3761e7 (tail swipe)
+=======
+>>>>>>> 9b7a3bd24b64bc7da5fb4691d3446eec96b06291

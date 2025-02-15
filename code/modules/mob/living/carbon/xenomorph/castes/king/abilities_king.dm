@@ -519,6 +519,7 @@ GLOBAL_LIST_EMPTY(active_summons)
 		if(sister.z != owner.z)
 			continue
 <<<<<<< HEAD
+<<<<<<< HEAD
 		sister.remove_filter("summonoutline")
 <<<<<<< HEAD
 		if(sister.z != owner.z)
@@ -527,6 +528,8 @@ GLOBAL_LIST_EMPTY(active_summons)
 >>>>>>> a965c72fc3 (psychic summon immunity)
 =======
 >>>>>>> 2aae2cbc62 (order)
+=======
+>>>>>>> 9b7a3bd24b64bc7da5fb4691d3446eec96b06291
 		sister.forceMove(get_turf(X))
 		sisters_teleported ++
 

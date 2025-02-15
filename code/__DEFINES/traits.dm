@@ -110,21 +110,9 @@
 #define SHATTERING_ROAR_ABILITY_TRAIT "shattering_roar_ability_trait"
 #define ZERO_FORM_BEAM_ABILITY_TRAIT "zero_form_beam_ability_trait"
 #define HEATRAY_BEAM_ABILITY_TRAIT "heatray_ability_trait"
-<<<<<<< HEAD
-<<<<<<< HEAD
 #define DRAGON_BREATH_ABILITY_TRAIT "dragon_breath_ability_trait"
 #define TAIL_SWIPE_ABILITY_TRAIT "tail_swipe_ability_trait"
 #define DRAGON_FLIGHT_ABILITY_TRAIT "dragon_flight_ability_trait"
-<<<<<<< HEAD
-=======
-#define DRAGON_BREATH_ABILITY_TRAIT "shattering_roar_ability_trait"
->>>>>>> f5bda68175 (dragon breath)
-=======
-#define DRAGON_BREATH_ABILITY_TRAIT "dragon_breath_ability_trait"
-#define TAIL_SWIPE_ABILITY_TRAIT "tail_swipe_ability_trait"
->>>>>>> 69bd3761e7 (tail swipe)
-=======
->>>>>>> 994a30ec14 (half of dragon flight)
 #define VALHALLA_TRAIT "valhalla"
 #define WEIGHTBENCH_TRAIT "weightbench"
 #define BOILER_ROOTED_TRAIT "boiler_rooted"
