@@ -139,6 +139,7 @@
 	xeno_owner.emote("roar")
 	xeno_owner.AdjustImmobilized(0.5 SECONDS)
 	ADD_TRAIT(xeno_owner, TRAIT_HANDS_BLOCKED, src)
+	xeno_owner.move_resist = MOVE_FORCE_EXTREMELY_STRONG
 	for(var/i = 0; i < GORGER_DRAIN_INSTANCES; i++)
 		target_human.Immobilize(GORGER_DRAIN_DELAY)
 		if(!do_after(xeno_owner, GORGER_DRAIN_DELAY, IGNORE_HELD_ITEM, target_human))
@@ -153,6 +154,7 @@
 		xeno_owner.adjustOverheal(drain_healing)
 		SEND_SIGNAL(target_human, COMSIG_XENO_DRAIN_HIT, xeno_owner.xeno_caste.drain_plasma_gain, xeno_owner)
 		xeno_owner.gain_plasma(xeno_owner.xeno_caste.drain_plasma_gain)
+	xeno_owner.move_resist = initial(xeno_owner.move_resist)
 
 	REMOVE_TRAIT(xeno_owner, TRAIT_HANDS_BLOCKED, src)
 	target_human.blur_eyes(1)
