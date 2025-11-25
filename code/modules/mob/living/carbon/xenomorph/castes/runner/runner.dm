@@ -77,13 +77,6 @@
 	RegisterSignal(src, COMSIG_XENOMORPH_ATTACK_OBJ, PROC_REF(on_attack_obj))
 	RegisterSignal(src, COMSIG_XENOMORPH_POSTATTACK_LIVING, PROC_REF(on_postattack_living))
 
-/mob/living/carbon/xenomorph/runner/melter/death(gibbing, deathmessage, silent)
-	for(var/turf/acid_tile AS in RANGE_TURFS(2, loc))
-		if(!line_of_sight(loc, acid_tile))
-			continue
-		xenomorph_spray(acid_tile, 6 SECONDS, 16, src, TRUE, TRUE)
-	return ..()
-
 /// Deals a second instance of melee damage to damageable objects. Damage type and armor type may vary.
 /mob/living/carbon/xenomorph/runner/melter/proc/on_attack_obj(mob/living/carbon/xenomorph/source, obj/target)
 	SIGNAL_HANDLER
