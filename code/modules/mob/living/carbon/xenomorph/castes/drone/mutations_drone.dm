@@ -227,7 +227,7 @@
 
 /datum/mutation_upgrade/spur/drone/aggressive_connection
 	name = "Aggressive Connection"
-	desc = "While actively connected with your Essence Link partner, your melee damage is increased up to 30% inversely proportional to your partner's health. Critical health grants the maximum amount."
+	desc = "While actively connected with your Essence Link partner, your slash damage is increased up to 30% based on your partner's missing health. Critical health grants the maximum amount."
 	var/current_damage_multiplier = 0
 
 /datum/mutation_upgrade/spur/drone/aggressive_connection/on_mutation_enabled()
