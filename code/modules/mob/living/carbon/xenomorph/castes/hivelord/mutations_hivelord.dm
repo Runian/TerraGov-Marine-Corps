@@ -104,54 +104,6 @@
 //*********************//
 //         Spur        //
 //*********************//
-/datum/mutation_upgrade/spur/combustive_jelly
-	name = "Combustive Jelly"
-	desc = "You lose the ability, Place Resin Jelly Pod. Resin jelly you throw no longer grants fire immunity, but creates thin sticky resin in a 3x3 where it lands for 15 seconds. Direct impacts on humans stagger for 2/4/6 seconds."
-	/// For each structure, the additional amount of deciseconds that thrown Resin Jelly will stagger for if it impacts a human.
-	var/duration_per_structure = 2 SECONDS
-
-/datum/mutation_upgrade/spur/combustive_jelly/get_desc_for_alert(new_amount)
-	if(!new_amount)
-		return ..()
-	return "You lose the ability, Place Resin Jelly Pod. Resin jelly you throw no longer grants fire immunity, but creates thin sticky resin in a 3x3 where it lands for 15 seconds. Direct impacts on humans stagger for [get_duration(new_amount) / 10] seconds."
-
-/datum/mutation_upgrade/spur/combustive_jelly/on_mutation_enabled()
-	var/datum/action/ability/xeno_action/place_jelly_pod/pod_ability = xenomorph_owner.actions_by_path[/datum/action/ability/xeno_action/place_jelly_pod]
-	if(pod_ability)
-		pod_ability.remove_action(xenomorph_owner)
-	RegisterSignals(xenomorph_owner, list(COMSIG_MOB_DROPPING_ITEM, COMSIG_LIVING_PICKED_UP_ITEM), PROC_REF(update_resin_jelly))
-	return ..()
-
-/datum/mutation_upgrade/spur/combustive_jelly/on_mutation_disabled()
-	var/datum/action/ability/xeno_action/place_jelly_pod/pod_ability = new()
-	pod_ability.give_action(xenomorph_owner)
-	UnregisterSignal(xenomorph_owner, list(COMSIG_MOB_DROPPING_ITEM, COMSIG_LIVING_PICKED_UP_ITEM))
-	return ..()
-
-/datum/mutation_upgrade/spur/combustive_jelly/on_structure_update(previous_amount, new_amount)
-	. = ..()
-	var/datum/action/ability/xeno_action/place_jelly_pod/pod_ability = xenomorph_owner.actions_by_path[/datum/action/ability/xeno_action/place_jelly_pod]
-	if(!pod_ability)
-		return
-	update_resin_jelly(null,  xenomorph_owner.get_active_held_item())
-	update_resin_jelly(null,  xenomorph_owner.get_inactive_held_item())
-
-/datum/mutation_upgrade/shell/combustive_jelly/on_xenomorph_upgrade()
-	var/datum/action/ability/xeno_action/place_jelly_pod/pod_ability = xenomorph_owner.actions_by_path[/datum/action/ability/xeno_action/place_jelly_pod]
-	if(pod_ability)
-		pod_ability.remove_action(xenomorph_owner)
-
-/datum/mutation_upgrade/spur/combustive_jelly/proc/update_resin_jelly(datum/source, obj/item/item_in_question)
-	SIGNAL_HANDLER
-	if(!isresinjelly(item_in_question))
-		return
-	var/obj/item/resin_jelly/jelly_item = item_in_question
-	jelly_item.combustive_duration = initial(jelly_item.combustive_duration) + get_duration(get_total_structures())
-
-/// Returns the amount of deciseconds that thrown Resin Jelly will stagger for if it impacts a human.
-/datum/mutation_upgrade/spur/combustive_jelly/proc/get_duration(structure_count)
-	return duration_per_structure * structure_count
-
 /datum/mutation_upgrade/spur/resin_splash
 	name = "Resin Splash"
 	desc = "Whenever you slash a human, 600/400/200 plasma is consumed to throw a sticky resin grenade at them. This can occur every 8 seconds."

@@ -2,9 +2,21 @@
 	interaction_flags = INTERACT_UI_INTERACT
 	/// A list of disk colors that have been fully printed.
 	var/list/completed_disk_colors = list()
+	/// List of all mutation upgrades.
+	var/list/datum/mutation_upgrade/all_mutation_upgrades = list()
+
+/datum/mutation_datum/proc/initialize_all_mutation_upgrades()
+	if(length(all_mutation_upgrades))
+		return
+	for(var/mutation_upgrade_type AS in subtypesof(/datum/mutation_upgrade))
+		var/datum/mutation_upgrade/mutation = new mutation_upgrade_type()
+		// Only initializing mutations that have a name and are available for at least one caste.
+		if(mutation.name && length(mutation.allowed_caste_names) > 0)
+			all_mutation_upgrades += mutation
 
 /datum/mutation_datum/New()
 	. = ..()
+	initialize_all_mutation_upgrades()
 	RegisterSignal(SSdcs, COMSIG_GLOB_DISK_GENERATED, PROC_REF(on_disk_printed))
 
 /datum/mutation_datum/ui_state(mob/user)
@@ -27,7 +39,6 @@
 
 /datum/mutation_datum/ui_static_data(mob/user)
 	. = ..()
-
 	var/mob/living/carbon/xenomorph/xenomorph_user = user
 	.["shell_mutations"] = list()
 	.["spur_mutations"] = list()
@@ -35,17 +46,19 @@
 	.["already_has_shell"] = has_any_mutation_in_category(xenomorph_user, MUTATION_SHELL)
 	.["already_has_spur"] = has_any_mutation_in_category(xenomorph_user, MUTATION_SPUR)
 	.["already_has_veil"] = has_any_mutation_in_category(xenomorph_user, MUTATION_VEIL)
-	for(var/datum/mutation_upgrade/mutation AS in xenomorph_user.xeno_caste.mutations)
+	for(var/datum/mutation_upgrade/mutation AS in all_mutation_upgrades)
+		if(!can_choose_mutation(xenomorph_user, mutation))
+			continue
 		var/list_name = "veil_mutations"
-		if(is_shell_mutation(mutation))
+		if(mutation.category == MUTATION_SHELL)
 			list_name = "shell_mutations"
-		else if(is_spur_mutation(mutation))
+		else if(mutation.category == MUTATION_SPUR)
 			list_name = "spur_mutations"
 		.[list_name] += list(list(
 			"name" = mutation.name,
 			"type" = mutation.type,
 			"desc" = mutation.desc,
-			"owned" = has_mutation(xenomorph_user, mutation)
+			"owned" = has_mutation_by_typepath(xenomorph_user, mutation.type)
 		))
 
 /datum/mutation_datum/ui_act(action, params)
@@ -61,8 +74,18 @@
 
 	SStgui.close_user_uis(usr, src)
 
-/// Returns TRUE if the xenomorph has a mutation based on a typepath.
-/datum/mutation_datum/proc/has_mutation(mob/living/carbon/xenomorph/xenomorph_target, datum/mutation_upgrade/mutation_typepath)
+/// Returns the mutation from the global list if it can be found with its typepath.
+/datum/mutation_datum/proc/find_mutation_by_typepath(datum/mutation_upgrade/mutation_typepath)
+	for(var/datum/mutation_upgrade/mutation AS in all_mutation_upgrades)
+		if(istype(mutation, mutation_typepath))
+			return mutation
+
+/// Returns TRUE if the xenomorph's caste has the option to choose this mutation.
+/datum/mutation_datum/proc/can_choose_mutation(mob/living/carbon/xenomorph/xenomorph_target, datum/mutation_upgrade/mutation_target)
+	return xenomorph_target.xeno_caste.caste_name in mutation_target.allowed_caste_names
+
+/// Returns TRUE if the xenomorph already has a mutation by its typepath.
+/datum/mutation_datum/proc/has_mutation_by_typepath(mob/living/carbon/xenomorph/xenomorph_target, datum/mutation_upgrade/mutation_typepath)
 	if(!length(xenomorph_target.owned_mutations))
 		return FALSE
 	for(var/datum/mutation_upgrade/owned_mutation AS in xenomorph_target.owned_mutations)
@@ -76,16 +99,8 @@
 	if(!length(xenomorph_target.owned_mutations))
 		return FALSE
 	for(var/datum/mutation_upgrade/owned_mutation AS in xenomorph_target.owned_mutations)
-		switch(mutation_category)
-			if(MUTATION_SHELL)
-				if(is_shell_mutation(owned_mutation))
-					return TRUE
-			if(MUTATION_SPUR)
-				if(is_spur_mutation(owned_mutation))
-					return TRUE
-			if(MUTATION_VEIL)
-				if(is_veil_mutation(owned_mutation))
-					return TRUE
+		if(mutation_category == owned_mutation.category)
+			return TRUE
 	return FALSE
 
 /// Tries to purchase a mutation based on its typepath. Returns TRUE if the mutation was successfully purchased.
@@ -96,8 +111,12 @@
 		return FALSE
 	if(!(xenomorph_purchaser.xeno_caste.caste_flags & CASTE_MUTATIONS_ALLOWED))
 		return FALSE
-	if(!(mutation_typepath in xenomorph_purchaser.xeno_caste.mutations))
+	var/datum/mutation_upgrade/mutation = find_mutation_by_typepath(mutation_typepath)
+	if(!mutation)
 		to_chat(xenomorph_purchaser, span_warning("That is not a valid mutation."))
+		return FALSE
+	if(!can_choose_mutation(xenomorph_purchaser, mutation))
+		to_chat(xenomorph_purchaser, span_warning("Your caste cannot get this mutation."))
 		return FALSE
 	if(xenomorph_purchaser.fortify)
 		to_chat(xenomorph_purchaser, span_warning("You cannot buy mutations while fortified!"))
@@ -105,7 +124,7 @@
 	if(!HAS_TRAIT(xenomorph_purchaser, TRAIT_VALHALLA_XENO) && length(xenomorph_purchaser.owned_mutations) >= length(completed_disk_colors)) // Checking if buying another would put us over the completed disk count.
 		to_chat(xenomorph_purchaser, span_warning("The hive hasn't developed enough to get another mutation..."))
 		return FALSE
-	if(has_mutation(xenomorph_purchaser, mutation_typepath))
+	if(has_mutation_by_typepath(xenomorph_purchaser, mutation_typepath))
 		to_chat(xenomorph_purchaser, span_warning("You already own this mutation!"))
 		return FALSE
 	if(has_any_mutation_in_category(xenomorph_purchaser, mutation_typepath.category))

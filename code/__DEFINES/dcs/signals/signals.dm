@@ -877,6 +877,9 @@
 
 #define COMSIG_XENO_PSYCHIC_LINK_REMOVED "xeno_psychic_link_removed"
 
+#define COMSIG_XENO_ESSENCE_LINK_ENDING "xeno_essence_link_ending"
+#define COMSIG_XENO_ESSENCE_LINK_TOGGLED "xeno_essence_link_toggled"
+
 #define COMSIG_XENOMORPH_LEAP_BUMP "xenomorph_leap_bump" //from /mob/living/carbon/xenomorph/bump
 
 #define COMSIG_XENO_SELECTED_REAGENT_CHANGED "xenomorph_selected_reagent_changed" // from [/mob/living/carbon/xenomorph/set_selected_reagent]: (/datum/reagent/old_reagent_typepath, /datum/reagent/new_reagent_typepath)

@@ -11,15 +11,27 @@
 	var/atom/movable/screen/alert/alert_typepath
 	/// The alert that was given to the owner.
 	var/atom/movable/screen/alert/alert
-	/// The xenomorph owner of this mutation upgrade.
+	/// If any, the xenomorph owner of this mutation upgrade.
 	var/mob/living/carbon/xenomorph/xenomorph_owner
+	/// If the prospective xenomorph_owner is one of these castes (compared via name), they can view this option. Any /datum/xeno_caste are converted to names during /New().
+	var/list/allowed_caste_names = list()
 	/// If the prospective xenomorph_owner already has one of these mutation types, they cannot get this mutation.
 	var/list/datum/mutation_upgrade/conflicting_mutation_types = list()
 
-/// Sets up the owner, applies the alert for having the mutation, registers various signals, and then updates with current structure count.
+/// Handles creation of an mutation upgrade. If there will be an owner, applies the alert for having the mutation, registers various signals, and then updates with current structure count.
 /datum/mutation_upgrade/New(mob/living/carbon/xenomorph/new_xenomorph_owner)
+	if(length(allowed_caste_names) > 0)
+		var/list/saner_caste_names = list()
+		for(var/possible_caste_type AS in allowed_caste_names)
+			if(ispath(possible_caste_type, /datum/xeno_caste))
+				var/datum/xeno_caste/caste_type = possible_caste_type
+				saner_caste_names += caste_type.caste_name
+				continue
+			saner_caste_names += possible_caste_type // We are assuming that it is the caste's name.
+		allowed_caste_names.Cut()
+		allowed_caste_names = saner_caste_names
 	if(!new_xenomorph_owner)
-		CRASH("/datum/mutation_upgrade created with no owner.")
+		return ..()
 	xenomorph_owner = new_xenomorph_owner
 	xenomorph_owner.owned_mutations += src
 	alert = xenomorph_owner.throw_alert("mutation_[category]", alert_typepath)
@@ -33,8 +45,10 @@
 	RegisterSignal(xenomorph_owner, COMSIG_XENOMORPH_ABILITY_ON_UPGRADE, TYPE_PROC_REF(/datum/mutation_upgrade, on_xenomorph_upgrade))
 	on_structure_change(null, MUTATION_CHAMBER_MINIMUM, get_total_structures())
 
-/// Removes the status effect for having the mutation, unregisters various signals, and then updates with zero structures.
+/// Handles destruction of an mutation upgrade. If there was an owner, removes the status effect for having the mutation, unregisters various signals, and then updates with zero structures.
 /datum/mutation_upgrade/Destroy(force)
+	if(!xenomorph_owner)
+		return ..()
 	if(alert)
 		xenomorph_owner.clear_alert("mutation_[category]")
 	if(xenomorph_owner.owned_mutations.Find(src))
@@ -146,4 +160,3 @@
 	name = "Veil Mutation"
 	desc = "Your Veil Mutation is taking effect."
 	icon_state = "xeno_mutation_veil"
-

@@ -302,8 +302,6 @@
 	var/immune_time = 30 SECONDS
 	/// Holder to ensure only one user per resin jelly.
 	var/current_user
-	/// If thrown, should it create a 3x3 when it lands? If so, how long in deciseconds if it impacts a human?
-	var/combustive_duration = 0 SECONDS
 
 /obj/item/resin_jelly/attack_alien(mob/living/carbon/xenomorph/xeno_attacker, damage_amount = xeno_attacker.xeno_caste.melee_damage, damage_type = BRUTE, armor_type = MELEE, effects = TRUE, armor_penetration = xeno_attacker.xeno_caste.melee_ap, isrightclick = FALSE)
 	if(xeno_attacker.status_flags & INCORPOREAL)
@@ -354,7 +352,6 @@
 /obj/item/resin_jelly/throw_at(atom/target, range, speed, thrower, spin, flying = FALSE, targetted_throw = TRUE)
 	if(isxenohivelord(thrower))
 		RegisterSignal(src, COMSIG_MOVABLE_IMPACT, PROC_REF(on_throw_impact))
-		RegisterSignal(src, COMSIG_MOVABLE_POST_THROW, PROC_REF(on_throw_ended))
 	. = ..()
 
 /// Applies the jelly effect for xenomorphs. Otherwise, may explode into sticky resin against everyone else.
@@ -363,17 +360,6 @@
 	if(!isliving(hit_atom))
 		return
 	UnregisterSignal(source, list(COMSIG_MOVABLE_IMPACT, COMSIG_MOVABLE_POST_THROW))
-	var/mob/living/hit_living = hit_atom
-	if(combustive_duration)
-		for(var/turf/sticky_tile AS in RANGE_TURFS(1, get_turf(hit_living)))
-			if(!locate(/obj/alien/resin/sticky/thin) in sticky_tile.contents)
-				var/obj/alien/resin/sticky/thin/temporary_resin = new(sticky_tile)
-				QDEL_IN(temporary_resin, 15 SECONDS)
-		if(!hit_living.issamexenohive(thrower))
-			hit_living.adjust_stagger(combustive_duration)
-		playsound(loc, SFX_ALIEN_RESIN_BUILD, 50, 1)
-		qdel(src)
-		return
 	if(!isxeno(hit_atom))
 		return
 	var/mob/living/carbon/xenomorph/hit_xenomorph = hit_atom
@@ -381,19 +367,6 @@
 		return
 	hit_xenomorph.visible_message(span_notice("[hit_xenomorph] is splattered with jelly!"))
 	INVOKE_ASYNC(src, PROC_REF(activate_jelly), hit_xenomorph)
-
-/// Possibly explode into sticky resin upon finishing the throw.
-/obj/item/resin_jelly/proc/on_throw_ended(datum/source)
-	SIGNAL_HANDLER
-	UnregisterSignal(source, list(COMSIG_MOVABLE_IMPACT, COMSIG_MOVABLE_POST_THROW))
-	if(!combustive_duration)
-		return
-	for(var/turf/sticky_tile AS in RANGE_TURFS(1, loc))
-		if(!locate(/obj/alien/resin/sticky/thin) in sticky_tile.contents)
-			var/obj/alien/resin/sticky/thin/temporary_resin = new(sticky_tile)
-			QDEL_IN(temporary_resin, 15 SECONDS)
-	playsound(loc, SFX_ALIEN_RESIN_BUILD, 50, 1)
-	qdel(src)
 
 ///////////////////////
 /// Globadier Mines ///
