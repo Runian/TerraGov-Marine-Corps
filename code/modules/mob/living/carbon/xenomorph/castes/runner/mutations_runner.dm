@@ -1,4 +1,18 @@
 //*********************//
+//        Base        //
+//*********************//
+
+/datum/mutation_upgrade/shell/runner
+	allowed_caste_names = list(/datum/xeno_caste/runner)
+
+/datum/mutation_upgrade/spur/runner
+	allowed_caste_names = list(/datum/xeno_caste/runner)
+
+/datum/mutation_upgrade/veil/runner
+	allowed_caste_names = list(/datum/xeno_caste/runner)
+
+
+//*********************//
 //        Shell        //
 //*********************//
 /datum/mutation_upgrade/shell/upfront_evasion
