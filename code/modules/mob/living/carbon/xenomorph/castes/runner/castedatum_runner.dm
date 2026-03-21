@@ -51,19 +51,6 @@
 		/datum/action/ability/activable/xeno/pounce/runner,
 	)
 
-	mutations = list(
-		/datum/mutation_upgrade/shell/upfront_evasion,
-		/datum/mutation_upgrade/shell/borrowed_time,
-		/datum/mutation_upgrade/shell/ingrained_evasion,
-		/datum/mutation_upgrade/spur/sneak_attack,
-		/datum/mutation_upgrade/spur/right_here,
-		/datum/mutation_upgrade/spur/mutilate,
-		/datum/mutation_upgrade/veil/headslam,
-		/datum/mutation_upgrade/veil/frenzy,
-		/datum/mutation_upgrade/veil/passing_glance
-	)
-
-
 /datum/xeno_caste/runner/normal
 	upgrade = XENO_UPGRADE_NORMAL
 
@@ -117,12 +104,6 @@
 		/datum/action/ability/activable/xeno/charge/acid_dash/melter,
 		/datum/action/ability/activable/xeno/melter_shroud,
 		/datum/action/ability/xeno_action/xenohide,
-	)
-
-	mutations = list(
-		/datum/mutation_upgrade/shell/acid_release,
-		/datum/mutation_upgrade/spur/fully_acid,
-		/datum/mutation_upgrade/veil/acid_reserves
 	)
 
 /datum/xeno_caste/runner/melter/normal

@@ -76,10 +76,6 @@
 /datum/mutation_upgrade/shell/runner/ingrained_evasion
 	name = "Ingrained Evasion"
 	desc = "Evasion is now a passive ability and grants 40% chance to dodge. Highly accurate projectiles have less chance to be dodged."
-	conflicting_mutation_types = list(
-		/datum/mutation_upgrade/shell/extended_evasion,
-		/datum/mutation_upgrade/veil/passing_glance
-	)
 	/// After this amount of time since their last move, they will no longer dodge.
 	var/movement_leniency = 0.5 SECONDS
 	/// If a projectile's accuracy is above this value, then it reduces the dodge chance by the amount above the value.
@@ -166,9 +162,6 @@
 /datum/mutation_upgrade/shell/runner/extended_evasion
 	name = "Extended Evasion"
 	desc = "Evasion starts with an additional 2 seconds, but cannot be refreshed to be longer."
-	conflicting_mutation_types = list(
-		/datum/mutation_upgrade/shell/ingrained_evasion
-	)
 
 /datum/mutation_upgrade/shell/runner/extended_evasion/on_gain()
 	var/datum/action/ability/xeno_action/evasion/evasion = xenomorph_owner.actions_by_path[/datum/action/ability/xeno_action/evasion]
@@ -375,9 +368,6 @@
 /datum/mutation_upgrade/veil/passing_glance
 	name = "Passing Glance"
 	desc = "While Evasion is on, moving onto the same location as a standing human will confuse them for 2/3/4 seconds. This can only happens once per human."
-	conflicting_mutation_types = list(
-		/datum/mutation_upgrade/shell/upfront_evasion,
-	)
 	/// For the first structure, the amount of deciseconds that Evasion will confuse humans who are passed through.
 	var/duration_initial = 1 SECONDS
 	/// For each structure, the amount of deciseconds that Evasion will confuse humans who are passed through.
