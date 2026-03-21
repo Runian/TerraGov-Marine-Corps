@@ -37,17 +37,22 @@
 /datum/mutation_datum/ui_static_data(mob/user)
 	. = ..()
 	var/mob/living/carbon/xenomorph/xenomorph_user = user
-	.["shell_mutations"] = list()
-	.["spur_mutations"] = list()
-	.["veil_mutations"] = list()
+	.["defense_mutations"] = list()
+	.["offense_mutations"] = list()
+	.["utility_mutations"] = list()
 	for(var/datum/mutation_upgrade/mutation AS in all_mutation_upgrades)
 		if(!can_choose_mutation(xenomorph_user, mutation))
 			continue
-		var/list_name = "veil_mutations"
-		if(mutation.category == MUTATION_SHELL)
-			list_name = "shell_mutations"
-		else if(mutation.category == MUTATION_SPUR)
-			list_name = "spur_mutations"
+		var/list_name
+		switch(mutation.category)
+			if(MUTATION_DEFENSE)
+				list_name = "defense_mutations"
+			if(MUTATION_OFFENSE)
+				list_name = "defense_mutations"
+			if(MUTATION_UTILITY)
+				list_name = "utility_mutations"
+		if(!list_name)
+			continue
 		.[list_name] += list(list(
 			"name" = mutation.name,
 			"type" = mutation.type,

@@ -71,10 +71,10 @@
 	)
 
 	mutations = list(
-		/datum/mutation_upgrade/shell/stone_armor,
-		/datum/mutation_upgrade/spur/minion_king,
-		/datum/mutation_upgrade/veil/widefall,
-		/datum/mutation_upgrade/veil/flarefall
+		/datum/mutation_upgrade/defense/stone_armor,
+		/datum/mutation_upgrade/offense/minion_king,
+		/datum/mutation_upgrade/utility/widefall,
+		/datum/mutation_upgrade/utility/flarefall
 	)
 
 /datum/xeno_caste/king/normal
@@ -174,9 +174,9 @@
 	)
 
 	mutations = list(
-		/datum/mutation_upgrade/shell/healing_jab,
-		/datum/mutation_upgrade/spur/telefrag,
-		/datum/mutation_upgrade/veil/dasher
+		/datum/mutation_upgrade/defense/healing_jab,
+		/datum/mutation_upgrade/offense/telefrag,
+		/datum/mutation_upgrade/utility/dasher
 	)
 
 /datum/xeno_caste/king/conqueror/normal

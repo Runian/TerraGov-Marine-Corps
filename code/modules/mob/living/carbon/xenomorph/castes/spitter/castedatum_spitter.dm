@@ -60,9 +60,9 @@
 	)
 
 	mutations = list(
-		/datum/mutation_upgrade/shell/acid_sweat,
-		/datum/mutation_upgrade/spur/hit_and_run,
-		/datum/mutation_upgrade/veil/wet_claws
+		/datum/mutation_upgrade/defense/acid_sweat,
+		/datum/mutation_upgrade/offense/hit_and_run,
+		/datum/mutation_upgrade/utility/wet_claws
 	)
 
 /datum/xeno_caste/spitter/normal
@@ -108,9 +108,9 @@
 	)
 
 	mutations = list(
-		/datum/mutation_upgrade/shell/self_explosion,
-		/datum/mutation_upgrade/spur/blood_grenades,
-		/datum/mutation_upgrade/veil/repurposed_capacity
+		/datum/mutation_upgrade/defense/self_explosion,
+		/datum/mutation_upgrade/offense/blood_grenades,
+		/datum/mutation_upgrade/utility/repurposed_capacity
 	)
 
 /datum/xeno_caste/spitter/globadier/normal

@@ -46,9 +46,9 @@
 	)
 
 	mutations = list(
-		/datum/mutation_upgrade/shell/flesh_for_life,
-		/datum/mutation_upgrade/spur/suffocating_presence,
-		/datum/mutation_upgrade/veil/shifting_costs
+		/datum/mutation_upgrade/defense/flesh_for_life,
+		/datum/mutation_upgrade/offense/suffocating_presence,
+		/datum/mutation_upgrade/utility/shifting_costs
 	)
 
 /datum/xeno_caste/puppeteer/normal

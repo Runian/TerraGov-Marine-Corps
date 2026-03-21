@@ -55,9 +55,9 @@
 	)
 
 	mutations = list(
-		/datum/mutation_upgrade/shell/rocky_layers,
-		/datum/mutation_upgrade/spur/refined_palate,
-		/datum/mutation_upgrade/veil/avalanche
+		/datum/mutation_upgrade/defense/rocky_layers,
+		/datum/mutation_upgrade/offense/refined_palate,
+		/datum/mutation_upgrade/utility/avalanche
 	)
 
 /datum/xeno_caste/behemoth/normal

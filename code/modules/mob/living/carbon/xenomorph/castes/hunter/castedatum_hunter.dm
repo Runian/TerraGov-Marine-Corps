@@ -67,15 +67,15 @@
 	silent_vent_crawl = TRUE
 
 	mutations = list(
-		/datum/mutation_upgrade/shell/fleeting_mirage,
-		/datum/mutation_upgrade/shell/splitting_mirage,
-		/datum/mutation_upgrade/shell/cloaking_mirage,
-		/datum/mutation_upgrade/spur/debilitating_strike,
-		/datum/mutation_upgrade/spur/ambush,
-		/datum/mutation_upgrade/spur/maul,
-		/datum/mutation_upgrade/veil/one_target,
-		/datum/mutation_upgrade/veil/mirage_flood,
-		/datum/mutation_upgrade/veil/faceblind
+		/datum/mutation_upgrade/defense/fleeting_mirage,
+		/datum/mutation_upgrade/defense/splitting_mirage,
+		/datum/mutation_upgrade/defense/cloaking_mirage,
+		/datum/mutation_upgrade/offense/debilitating_strike,
+		/datum/mutation_upgrade/offense/ambush,
+		/datum/mutation_upgrade/offense/maul,
+		/datum/mutation_upgrade/utility/one_target,
+		/datum/mutation_upgrade/utility/mirage_flood,
+		/datum/mutation_upgrade/utility/faceblind
 	)
 
 /datum/xeno_caste/hunter/normal

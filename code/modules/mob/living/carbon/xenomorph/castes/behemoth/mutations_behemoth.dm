@@ -1,7 +1,7 @@
 //*********************//
 //        Shell        //
 //*********************//
-/datum/mutation_upgrade/shell/rocky_layers
+/datum/mutation_upgrade/defense/rocky_layers
 	name = "Rocky Layers"
 	desc = "When your health is 50% or lower, gain 15/20/25 hard armor."
 	/// For the first structure, the amount of hard armor that will be granted.
@@ -13,24 +13,24 @@
 	/// The attached hard armor, if any.
 	var/datum/armor/attached_armor
 
-/datum/mutation_upgrade/shell/rocky_layers/get_desc_for_alert(new_amount)
+/datum/mutation_upgrade/defense/rocky_layers/get_desc_for_alert(new_amount)
 	if(!new_amount)
 		return ..()
 	return "When your health is [PERCENT(max_health_percentage_threshold)]% or lower, gain [get_armor(new_amount)] hard armor."
 
-/datum/mutation_upgrade/shell/rocky_layers/on_gain()
+/datum/mutation_upgrade/defense/rocky_layers/on_gain()
 	RegisterSignal(xenomorph_owner, COMSIG_LIVING_UPDATE_HEALTH, PROC_REF(on_update_health))
 	if(xenomorph_owner.health <= (xenomorph_owner.maxHealth * max_health_percentage_threshold))
 		toggle()
 	return ..()
 
-/datum/mutation_upgrade/shell/rocky_layers/on_loss()
+/datum/mutation_upgrade/defense/rocky_layers/on_loss()
 	UnregisterSignal(xenomorph_owner, COMSIG_LIVING_UPDATE_HEALTH)
 	if(attached_armor)
 		toggle()
 	return ..()
 
-/datum/mutation_upgrade/shell/rocky_layers/on_structure_update(previous_amount, new_amount)
+/datum/mutation_upgrade/defense/rocky_layers/on_structure_update(previous_amount, new_amount)
 	. = ..()
 	if(!attached_armor)
 		return
@@ -39,7 +39,7 @@
 	attached_armor = attached_armor.modifyAllRatings(difference)
 
 /// Gives or removes the hard armor.
-/datum/mutation_upgrade/shell/rocky_layers/proc/toggle()
+/datum/mutation_upgrade/defense/rocky_layers/proc/toggle()
 	if(!attached_armor)
 		var/armor_amount = get_armor(get_total_structures())
 		attached_armor = getArmor(armor_amount, armor_amount, armor_amount, armor_amount, armor_amount, armor_amount, armor_amount, armor_amount)
@@ -49,7 +49,7 @@
 	attached_armor = null
 
 /// If their health is negative, activate it if possible. If it is full, let them activate it next time.
-/datum/mutation_upgrade/shell/rocky_layers/proc/on_update_health(datum/source)
+/datum/mutation_upgrade/defense/rocky_layers/proc/on_update_health(datum/source)
 	SIGNAL_HANDLER
 	var/health = (xenomorph_owner.status_flags & GODMODE) ? xenomorph_owner.maxHealth : (xenomorph_owner.maxHealth - xenomorph_owner.getFireLoss() - xenomorph_owner.getBruteLoss())
 	if(health <= xenomorph_owner.get_death_threshold())
@@ -59,33 +59,33 @@
 		toggle()
 
 /// Returns the amount of hard armor that will be granted.
-/datum/mutation_upgrade/shell/rocky_layers/proc/get_armor(structure_count)
+/datum/mutation_upgrade/defense/rocky_layers/proc/get_armor(structure_count)
 	return armor_initial + (armor_per_structure * structure_count)
 
 //*********************//
 //         Spur        //
 //*********************//
-/datum/mutation_upgrade/spur/refined_palate
+/datum/mutation_upgrade/offense/refined_palate
 	name = "Refined Palate"
 	desc = "Your slashes deal an additional 0.5/1/1.5x damage to barricades."
 	/// For each structure, the multiplier to add as a second instance of damage to barricades.
 	var/multiplier_per_structure = 0.5
 
-/datum/mutation_upgrade/spur/refined_palate/get_desc_for_alert(new_amount)
+/datum/mutation_upgrade/offense/refined_palate/get_desc_for_alert(new_amount)
 	if(!new_amount)
 		return ..()
 	return "Your slashes deal an additional [get_multiplier(new_amount)]x damage to barricades."
 
-/datum/mutation_upgrade/spur/refined_palate/on_gain()
+/datum/mutation_upgrade/offense/refined_palate/on_gain()
 	RegisterSignal(xenomorph_owner, COMSIG_XENOMORPH_ATTACK_OBJ, PROC_REF(on_attack_obj))
 	return ..()
 
-/datum/mutation_upgrade/spur/refined_palate/on_loss()
+/datum/mutation_upgrade/offense/refined_palate/on_loss()
 	UnregisterSignal(xenomorph_owner, COMSIG_XENOMORPH_ATTACK_OBJ)
 	return ..()
 
 /// Deals a variable amount of damage to barricades.
-/datum/mutation_upgrade/spur/refined_palate/proc/on_attack_obj(mob/living/carbon/xenomorph/source, obj/target)
+/datum/mutation_upgrade/offense/refined_palate/proc/on_attack_obj(mob/living/carbon/xenomorph/source, obj/target)
 	SIGNAL_HANDLER
 	if(!(target.resistance_flags & XENO_DAMAGEABLE) || !isbarricade(target))
 		return
@@ -93,24 +93,24 @@
 	playsound(xenomorph_owner, 'sound/items/eatfood.ogg', 9, 1) // Nom nom nom!
 
 /// Returns the multiplier to add as a second instance of damage to barricades.
-/datum/mutation_upgrade/spur/refined_palate/proc/get_multiplier(structure_count)
+/datum/mutation_upgrade/offense/refined_palate/proc/get_multiplier(structure_count)
 	return multiplier_per_structure * structure_count
 
 //*********************//
 //         Veil        //
 //*********************//
-/datum/mutation_upgrade/veil/avalanche
+/datum/mutation_upgrade/utility/avalanche
 	name = "Avalanche"
 	desc = "Earth Riser can have 1/2/3 more pillars active at a time, but its cooldown duration is doubled."
 	/// For each structure, the amount that Earth Riser's maximum pillars should be increased by.
 	var/amount_per_structure = 1
 
-/datum/mutation_upgrade/veil/avalanche/get_desc_for_alert(new_amount)
+/datum/mutation_upgrade/utility/avalanche/get_desc_for_alert(new_amount)
 	if(!new_amount)
 		return ..()
 	return "Earth Riser can have [get_amount(new_amount)] more pillars active at a time, but its cooldown duration is doubled."
 
-/datum/mutation_upgrade/veil/avalanche/on_gain()
+/datum/mutation_upgrade/utility/avalanche/on_gain()
 	. = ..()
 	var/datum/action/ability/activable/xeno/earth_riser/earth_ability = xenomorph_owner.actions_by_path[/datum/action/ability/activable/xeno/earth_riser]
 	if(!earth_ability)
@@ -121,7 +121,7 @@
 		return
 	earth_ability.cooldown_duration += initial(earth_ability.cooldown_duration)
 
-/datum/mutation_upgrade/veil/avalanche/on_loss()
+/datum/mutation_upgrade/utility/avalanche/on_loss()
 	. = ..()
 	var/datum/action/ability/activable/xeno/earth_riser/earth_ability = xenomorph_owner.actions_by_path[/datum/action/ability/activable/xeno/earth_riser]
 	if(!earth_ability)
@@ -132,7 +132,7 @@
 		return
 	earth_ability.cooldown_duration -= initial(earth_ability.cooldown_duration)
 
-/datum/mutation_upgrade/veil/avalanche/on_structure_update(previous_amount, new_amount)
+/datum/mutation_upgrade/utility/avalanche/on_structure_update(previous_amount, new_amount)
 	. = ..()
 	var/datum/action/ability/activable/xeno/earth_riser/earth_ability = xenomorph_owner.actions_by_path[/datum/action/ability/activable/xeno/earth_riser]
 	if(!earth_ability)
@@ -144,5 +144,5 @@
 	earth_ability.maximum_pillars += get_amount(new_amount - previous_amount)
 
 /// Returns the amount that Earth Riser's maximum pillars should be increased by.
-/datum/mutation_upgrade/veil/avalanche/proc/get_amount(structure_count)
+/datum/mutation_upgrade/utility/avalanche/proc/get_amount(structure_count)
 	return amount_per_structure * structure_count

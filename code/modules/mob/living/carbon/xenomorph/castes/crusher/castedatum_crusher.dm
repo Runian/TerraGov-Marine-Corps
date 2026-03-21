@@ -56,9 +56,9 @@
 	)
 
 	mutations = list(
-		/datum/mutation_upgrade/shell/tough_rock,
-		/datum/mutation_upgrade/spur/earthquake,
-		/datum/mutation_upgrade/veil/friendly_chest
+		/datum/mutation_upgrade/defense/tough_rock,
+		/datum/mutation_upgrade/offense/earthquake,
+		/datum/mutation_upgrade/utility/friendly_chest
 	)
 
 /datum/xeno_caste/crusher/on_caste_applied(mob/xenomorph)

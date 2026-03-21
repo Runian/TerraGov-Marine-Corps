@@ -63,9 +63,9 @@
 	)
 
 	mutations = list(
-		/datum/mutation_upgrade/shell/regenerative_armor,
-		/datum/mutation_upgrade/spur/breath_of_variety,
-		/datum/mutation_upgrade/veil/benevolence
+		/datum/mutation_upgrade/defense/regenerative_armor,
+		/datum/mutation_upgrade/offense/breath_of_variety,
+		/datum/mutation_upgrade/utility/benevolence
 	)
 
 /datum/xeno_caste/dragon/normal

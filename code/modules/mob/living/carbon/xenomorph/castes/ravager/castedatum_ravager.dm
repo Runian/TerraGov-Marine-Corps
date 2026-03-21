@@ -57,15 +57,15 @@
 	var/plasma_damage_recieved_mult = 0.5
 
 	mutations = list(
-		/datum/mutation_upgrade/shell/little_more,
-		/datum/mutation_upgrade/shell/keep_going,
-		/datum/mutation_upgrade/shell/inward_focus,
-		/datum/mutation_upgrade/spur/deep_slash,
-		/datum/mutation_upgrade/spur/super_cut,
-		/datum/mutation_upgrade/spur/onslaught,
-		/datum/mutation_upgrade/veil/recurring_rage,
-		/datum/mutation_upgrade/veil/fight_in_flames,
-		/datum/mutation_upgrade/veil/bloody_endure
+		/datum/mutation_upgrade/defense/little_more,
+		/datum/mutation_upgrade/defense/keep_going,
+		/datum/mutation_upgrade/defense/inward_focus,
+		/datum/mutation_upgrade/offense/deep_slash,
+		/datum/mutation_upgrade/offense/super_cut,
+		/datum/mutation_upgrade/offense/onslaught,
+		/datum/mutation_upgrade/utility/recurring_rage,
+		/datum/mutation_upgrade/utility/fight_in_flames,
+		/datum/mutation_upgrade/utility/bloody_endure
 	)
 
 /datum/xeno_caste/ravager/on_caste_applied(mob/xenomorph)
@@ -130,9 +130,9 @@
 	plasma_damage_recieved_mult = 0.75
 
 	mutations = list(
-		/datum/mutation_upgrade/shell/no_end,
-		/datum/mutation_upgrade/spur/early_rage,
-		/datum/mutation_upgrade/veil/safety_trap
+		/datum/mutation_upgrade/defense/no_end,
+		/datum/mutation_upgrade/offense/early_rage,
+		/datum/mutation_upgrade/utility/safety_trap
 	)
 
 /datum/xeno_caste/ravager/bloodthirster/normal

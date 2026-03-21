@@ -75,29 +75,29 @@
 /datum/mutation_upgrade/proc/on_xenomorph_upgrade()
 	return
 
-/datum/mutation_upgrade/shell
-	category = MUTATION_SHELL
-	alert_typepath = MUTATION_SHELL_ALERT
+/datum/mutation_upgrade/defense
+	category = MUTATION_DEFENSE
+	alert_typepath = MUTATION_DEFENSE_ALERT
 
-/datum/mutation_upgrade/spur
-	category = MUTATION_SPUR
-	alert_typepath = MUTATION_SPUR_ALERT
+/datum/mutation_upgrade/offense
+	category = MUTATION_OFFENSE
+	alert_typepath = MUTATION_OFFENSE_ALERT
 
-/datum/mutation_upgrade/veil
-	category = MUTATION_VEIL
-	alert_typepath = MUTATION_VEIL_ALERT
+/datum/mutation_upgrade/utility
+	category = MUTATION_UTILITY
+	alert_typepath = MUTATION_UTILITY_ALERT
 
-/atom/movable/screen/alert/shell_mutation
-	name = "shell mutation"
-	icon_state = "xeno_mutation_shell"
+/atom/movable/screen/alert/defense_mutation
+	name = "defense mutation"
+	icon_state = "xeno_mutation_defense"
 
-/atom/movable/screen/alert/spur_mutation
-	name = "spur mutation"
-	icon_state = "xeno_mutation_spur"
+/atom/movable/screen/alert/offense_mutation
+	name = "offense mutation"
+	icon_state = "xeno_mutation_offense"
 
-/atom/movable/screen/alert/veil_mutation
-	name = "veil mutation"
-	icon_state = "xeno_mutation_veil"
+/atom/movable/screen/alert/utility_mutation
+	name = "utility mutation"
+	icon_state = "xeno_mutation_utility"
 
 
 /datum/mutation_upgrade/proc/on_structure_update(previous_amount, new_amount)

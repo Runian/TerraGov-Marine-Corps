@@ -67,15 +67,15 @@
 	)
 
 	mutations = list(
-		/datum/mutation_upgrade/shell/shared_jelly,
-		/datum/mutation_upgrade/shell/hugger_overflow,
-		/datum/mutation_upgrade/shell/recurring_panic,
-		/datum/mutation_upgrade/spur/leapfrog,
-		/datum/mutation_upgrade/spur/claw_delivered,
-		/datum/mutation_upgrade/spur/fake_huggers,
-		/datum/mutation_upgrade/veil/oviposition,
-		/datum/mutation_upgrade/veil/life_for_life,
-		/datum/mutation_upgrade/veil/swarm_trap
+		/datum/mutation_upgrade/defense/shared_jelly,
+		/datum/mutation_upgrade/defense/hugger_overflow,
+		/datum/mutation_upgrade/defense/recurring_panic,
+		/datum/mutation_upgrade/offense/leapfrog,
+		/datum/mutation_upgrade/offense/claw_delivered,
+		/datum/mutation_upgrade/offense/fake_huggers,
+		/datum/mutation_upgrade/utility/oviposition,
+		/datum/mutation_upgrade/utility/life_for_life,
+		/datum/mutation_upgrade/utility/swarm_trap
 	)
 
 /datum/xeno_caste/carrier/normal

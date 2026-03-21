@@ -69,9 +69,9 @@
 	)
 
 	mutations = list(
-		/datum/mutation_upgrade/shell/panic_gas,
-		/datum/mutation_upgrade/spur/envenomed,
-		/datum/mutation_upgrade/veil/wide_gas
+		/datum/mutation_upgrade/defense/panic_gas,
+		/datum/mutation_upgrade/offense/envenomed,
+		/datum/mutation_upgrade/utility/wide_gas
 	)
 
 	// *** Pheromones *** //

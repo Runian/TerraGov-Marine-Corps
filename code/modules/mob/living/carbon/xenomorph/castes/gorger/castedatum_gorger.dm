@@ -61,9 +61,9 @@
 	)
 
 	mutations = list(
-		/datum/mutation_upgrade/shell/unmoving_link,
-		/datum/mutation_upgrade/spur/necrotic_link,
-		/datum/mutation_upgrade/veil/burst_healing
+		/datum/mutation_upgrade/defense/unmoving_link,
+		/datum/mutation_upgrade/offense/necrotic_link,
+		/datum/mutation_upgrade/utility/burst_healing
 	)
 
 /datum/xeno_caste/gorger/normal

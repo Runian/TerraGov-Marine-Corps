@@ -80,15 +80,15 @@
 	)
 
 	mutations = list(
-		/datum/mutation_upgrade/shell/lone_healer,
-		/datum/mutation_upgrade/shell/shared_cure,
-		/datum/mutation_upgrade/shell/resistant_cure,
-		/datum/mutation_upgrade/spur/smashing_fling,
-		/datum/mutation_upgrade/spur/body_fling,
-		/datum/mutation_upgrade/spur/gravity_tide,
-		/datum/mutation_upgrade/veil/delayed_condition,
-		/datum/mutation_upgrade/veil/deflective_force,
-		/datum/mutation_upgrade/veil/psychic_choke
+		/datum/mutation_upgrade/defense/lone_healer,
+		/datum/mutation_upgrade/defense/shared_cure,
+		/datum/mutation_upgrade/defense/resistant_cure,
+		/datum/mutation_upgrade/offense/smashing_fling,
+		/datum/mutation_upgrade/offense/body_fling,
+		/datum/mutation_upgrade/offense/gravity_tide,
+		/datum/mutation_upgrade/utility/delayed_condition,
+		/datum/mutation_upgrade/utility/deflective_force,
+		/datum/mutation_upgrade/utility/psychic_choke
 	)
 
 /datum/xeno_caste/shrike/normal

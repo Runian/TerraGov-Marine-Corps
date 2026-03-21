@@ -1,7 +1,7 @@
 //*********************//
 //        Shell        //
 //*********************//
-/datum/mutation_upgrade/shell/flame_cloak
+/datum/mutation_upgrade/defense/flame_cloak
 	name = "Flame Cloak"
 	desc = "If you are ontop of fire, you gain 5/10/15 armor in all categories."
 	/// For each structure, the armor that is given for being ontop of any fire.
@@ -11,23 +11,23 @@
 	/// The fire that granted the armor.
 	var/obj/fire/armor_granting_fire
 
-/datum/mutation_upgrade/shell/flame_cloak/get_desc_for_alert(new_amount)
+/datum/mutation_upgrade/defense/flame_cloak/get_desc_for_alert(new_amount)
 	if(!new_amount)
 		return ..()
 	return "If you are ontop of fire, you gain [get_armor(new_amount)] in all categories."
 
-/datum/mutation_upgrade/shell/flame_cloak/on_gain()
+/datum/mutation_upgrade/defense/flame_cloak/on_gain()
 	. = ..()
 	RegisterSignal(xenomorph_owner, COMSIG_MOVABLE_MOVED, PROC_REF(on_movement))
 	grant_armor(get_fire_in_turf(get_turf(xenomorph_owner)))
 
-/datum/mutation_upgrade/shell/flame_cloak/on_loss()
+/datum/mutation_upgrade/defense/flame_cloak/on_loss()
 	UnregisterSignal(xenomorph_owner, COMSIG_MOVABLE_MOVED)
 	revoke_armor()
 	return ..()
 
 /// Grants armor.
-/datum/mutation_upgrade/shell/flame_cloak/proc/grant_armor(obj/fire/chosen_fire)
+/datum/mutation_upgrade/defense/flame_cloak/proc/grant_armor(obj/fire/chosen_fire)
 	if(attached_armor || !chosen_fire)
 		return
 	var/total_armor = get_armor(get_total_structures())
@@ -36,7 +36,7 @@
 	set_armor_granting_fire(chosen_fire)
 
 /// Removes armor.
-/datum/mutation_upgrade/shell/flame_cloak/proc/revoke_armor()
+/datum/mutation_upgrade/defense/flame_cloak/proc/revoke_armor()
 	if(!attached_armor)
 		return
 	xenomorph_owner.soft_armor = xenomorph_owner.soft_armor.detachArmor(attached_armor)
@@ -44,7 +44,7 @@
 	set_armor_granting_fire()
 
 /// Sets signals for the chosen fire.
-/datum/mutation_upgrade/shell/flame_cloak/proc/set_armor_granting_fire(obj/fire/chosen_fire)
+/datum/mutation_upgrade/defense/flame_cloak/proc/set_armor_granting_fire(obj/fire/chosen_fire)
 	if(armor_granting_fire)
 		UnregisterSignal(armor_granting_fire, COMSIG_QDELETING, PROC_REF(on_fire_qdel))
 		armor_granting_fire = null
@@ -53,7 +53,7 @@
 		RegisterSignal(armor_granting_fire, COMSIG_QDELETING, PROC_REF(on_fire_qdel))
 
 /// Gets the longest lasting fire on a turf.
-/datum/mutation_upgrade/shell/flame_cloak/proc/get_fire_in_turf(turf/turf_to_search)
+/datum/mutation_upgrade/defense/flame_cloak/proc/get_fire_in_turf(turf/turf_to_search)
 	var/obj/fire/longest_lasting_fire
 	for(var/obj/fire/fire_in_turf in turf_to_search)
 		if(QDELING(fire_in_turf))
@@ -69,7 +69,7 @@
 	return longest_lasting_fire
 
 // Revokes / grant armor based on if their location that has a fire. Assigns a fire that will basically re-proc this if it is deleted.
-/datum/mutation_upgrade/shell/flame_cloak/proc/set_armor_adjustingly()
+/datum/mutation_upgrade/defense/flame_cloak/proc/set_armor_adjustingly()
 	var/obj/fire/fire_here = get_fire_in_turf(get_turf(xenomorph_owner))
 	if(!attached_armor)
 		if(fire_here)
@@ -81,34 +81,34 @@
 	set_armor_granting_fire(fire_here)
 
 /// Called when the owner moves. Functionally revokes or grant armor if there are any fire. If they are already have armor and the new location has fire, assigns a new fire.
-/datum/mutation_upgrade/shell/flame_cloak/proc/on_movement(datum/source, atom/old_loc, movement_dir, forced, list/old_locs)
+/datum/mutation_upgrade/defense/flame_cloak/proc/on_movement(datum/source, atom/old_loc, movement_dir, forced, list/old_locs)
 	SIGNAL_HANDLER
 	set_armor_adjustingly()
 
 /// Called when the fire associated with the armor is deleted. Functionally revokes armor if fire is not found. Otherwise, assigns a new fire.
-/datum/mutation_upgrade/shell/flame_cloak/proc/on_fire_qdel(datum/source, atom/old_loc, movement_dir, forced, list/old_locs)
+/datum/mutation_upgrade/defense/flame_cloak/proc/on_fire_qdel(datum/source, atom/old_loc, movement_dir, forced, list/old_locs)
 	SIGNAL_HANDLER
 	set_armor_adjustingly()
 
 /// Returns the amount of armor that should be given for being on the same turf as fire.
-/datum/mutation_upgrade/shell/flame_cloak/proc/get_armor(structure_count)
+/datum/mutation_upgrade/defense/flame_cloak/proc/get_armor(structure_count)
 	return armor_per_structure * structure_count
 
 //*********************//
 //         Spur        //
 //*********************//
-/datum/mutation_upgrade/spur/only_fire
+/datum/mutation_upgrade/offense/only_fire
 	name = "Only Fire"
 	desc = "Fire Charge deals no damage, does not consume melting fire stacks, and now pierces humans. Humans who are hit get 2/4/6 melting fire stacks."
 	/// For each structure, the additional melting fire stacks to apply.
 	var/stacks_per_structure = 2
 
-/datum/mutation_upgrade/spur/only_fire/get_desc_for_alert(new_amount)
+/datum/mutation_upgrade/offense/only_fire/get_desc_for_alert(new_amount)
 	if(!new_amount)
 		return ..()
 	return "Fire Charge deals no damage, does not consume melting fire stacks, and pierces humans. Humans who are hit get [stacks_per_structure * new_amount] melting fire stacks."
 
-/datum/mutation_upgrade/spur/only_fire/on_gain()
+/datum/mutation_upgrade/offense/only_fire/on_gain()
 	var/datum/action/ability/activable/xeno/charge/fire_charge/charge_ability = xenomorph_owner.actions_by_path[/datum/action/ability/activable/xeno/charge/fire_charge]
 	if(!charge_ability)
 		return
@@ -118,7 +118,7 @@
 	charge_ability.pierces_mobs = TRUE
 	return ..()
 
-/datum/mutation_upgrade/spur/only_fire/on_loss()
+/datum/mutation_upgrade/offense/only_fire/on_loss()
 	var/datum/action/ability/activable/xeno/charge/fire_charge/charge_ability = xenomorph_owner.actions_by_path[/datum/action/ability/activable/xeno/charge/fire_charge]
 	if(!charge_ability)
 		return
@@ -128,7 +128,7 @@
 	charge_ability.pierces_mobs = initial(charge_ability.pierces_mobs)
 	return ..()
 
-/datum/mutation_upgrade/spur/only_fire/on_structure_update(previous_amount, new_amount)
+/datum/mutation_upgrade/offense/only_fire/on_structure_update(previous_amount, new_amount)
 	. = ..()
 	var/datum/action/ability/activable/xeno/charge/fire_charge/charge_ability = xenomorph_owner.actions_by_path[/datum/action/ability/activable/xeno/charge/fire_charge]
 	if(!charge_ability)
@@ -136,14 +136,14 @@
 	charge_ability.stacks_to_add += get_stacks(new_amount - previous_amount)
 
 /// Returns the amount of melting fire stacks that Fire Charge should inflict.
-/datum/mutation_upgrade/spur/only_fire/proc/get_stacks(structure_count)
+/datum/mutation_upgrade/offense/only_fire/proc/get_stacks(structure_count)
 	return stacks_per_structure * structure_count
 
 //*********************//
 //         Veil        //
 //*********************//
 
-/datum/mutation_upgrade/veil/burnt_wounds
+/datum/mutation_upgrade/utility/burnt_wounds
 	name = "Burnt Wounds"
 	desc = "Melting fire stacks you inflict causes 15/25/35% healing reduction against brute and burn."
 	/// For the first structure, the percentage in which those inflicted with Melting Fire stacks will have their brute/burn healing reduced by.
@@ -151,26 +151,26 @@
 	/// For each structure, the percentage in which those inflicted with Melting Fire stacks will have their brute/burn healing reduced by.
 	var/percentage_per_structure = 0.1
 
-/datum/mutation_upgrade/veil/burnt_wounds/get_desc_for_alert(new_amount)
+/datum/mutation_upgrade/utility/burnt_wounds/get_desc_for_alert(new_amount)
 	if(!new_amount)
 		return ..()
 	return "Melting fire stacks you inflict cause [PERCENT(get_percentage(new_amount))]% healing reduction against brute and burn."
 
-/datum/mutation_upgrade/veil/burnt_wounds/on_gain()
+/datum/mutation_upgrade/utility/burnt_wounds/on_gain()
 	if(!isxenopyrogen(xenomorph_owner))
 		return
 	var/mob/living/carbon/xenomorph/pyrogen/pyrogen_owner = xenomorph_owner
 	pyrogen_owner.melting_fire_healing_reduction += get_percentage(0)
 	return ..()
 
-/datum/mutation_upgrade/veil/burnt_wounds/on_loss()
+/datum/mutation_upgrade/utility/burnt_wounds/on_loss()
 	if(!isxenopyrogen(xenomorph_owner))
 		return
 	var/mob/living/carbon/xenomorph/pyrogen/pyrogen_owner = xenomorph_owner
 	pyrogen_owner.melting_fire_healing_reduction -= get_percentage(0)
 	return ..()
 
-/datum/mutation_upgrade/veil/burnt_wounds/on_structure_update(previous_amount, new_amount)
+/datum/mutation_upgrade/utility/burnt_wounds/on_structure_update(previous_amount, new_amount)
 	. = ..()
 	if(!isxenopyrogen(xenomorph_owner))
 		return
@@ -178,5 +178,5 @@
 	pyrogen_owner.melting_fire_healing_reduction += get_percentage(new_amount - previous_amount, FALSE)
 
 /// Returns the percentage in which those inflicted with Melting Fire stacks will have their brute/burn healing reduced by.
-/datum/mutation_upgrade/veil/burnt_wounds/proc/get_percentage(structure_count, include_initial = TRUE)
+/datum/mutation_upgrade/utility/burnt_wounds/proc/get_percentage(structure_count, include_initial = TRUE)
 	return (include_initial ? percentage_initial : 0) + (percentage_per_structure * structure_count)

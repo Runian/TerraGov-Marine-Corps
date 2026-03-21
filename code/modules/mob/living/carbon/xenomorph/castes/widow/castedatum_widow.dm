@@ -73,9 +73,9 @@
 	)
 
 	mutations = list(
-		/datum/mutation_upgrade/shell/hive_toughness,
-		/datum/mutation_upgrade/spur/web_yank,
-		/datum/mutation_upgrade/veil/incubator
+		/datum/mutation_upgrade/defense/hive_toughness,
+		/datum/mutation_upgrade/offense/web_yank,
+		/datum/mutation_upgrade/utility/incubator
 	)
 
 /datum/xeno_caste/widow/on_caste_applied(mob/xenomorph)

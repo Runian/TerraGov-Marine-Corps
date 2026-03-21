@@ -68,15 +68,15 @@
 	)
 
 	mutations = list(
-		/datum/mutation_upgrade/shell/staggered_panic,
-		/datum/mutation_upgrade/shell/thick_containment,
-		/datum/mutation_upgrade/shell/dim_containment,
-		/datum/mutation_upgrade/spur/gaseous_spray,
-		/datum/mutation_upgrade/spur/hip_fire,
-		/datum/mutation_upgrade/spur/rapid_fire,
-		/datum/mutation_upgrade/veil/acid_trail,
-		/datum/mutation_upgrade/veil/chemical_mixing,
-		/datum/mutation_upgrade/veil/binoculars
+		/datum/mutation_upgrade/defense/staggered_panic,
+		/datum/mutation_upgrade/defense/thick_containment,
+		/datum/mutation_upgrade/defense/dim_containment,
+		/datum/mutation_upgrade/offense/gaseous_spray,
+		/datum/mutation_upgrade/offense/hip_fire,
+		/datum/mutation_upgrade/offense/rapid_fire,
+		/datum/mutation_upgrade/utility/acid_trail,
+		/datum/mutation_upgrade/utility/chemical_mixing,
+		/datum/mutation_upgrade/utility/binoculars
 	)
 
 /datum/xeno_caste/boiler/normal
@@ -123,9 +123,9 @@
 	)
 
 	mutations = list(
-		/datum/mutation_upgrade/shell/gaseous_trail,
-		/datum/mutation_upgrade/spur/neurotoxin_swap,
-		/datum/mutation_upgrade/veil/fast_acid
+		/datum/mutation_upgrade/defense/gaseous_trail,
+		/datum/mutation_upgrade/offense/neurotoxin_swap,
+		/datum/mutation_upgrade/utility/fast_acid
 	)
 
 /datum/xeno_caste/boiler/sizzler/primordial

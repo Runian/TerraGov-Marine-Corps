@@ -58,15 +58,15 @@
 	)
 
 	mutations = list(
-		/datum/mutation_upgrade/shell/comforting_acid,
-		/datum/mutation_upgrade/shell/healing_sting,
-		/datum/mutation_upgrade/shell/constant_surge,
-		/datum/mutation_upgrade/spur/acidic_slasher,
-		/datum/mutation_upgrade/spur/far_sting,
-		/datum/mutation_upgrade/spur/imbued_claws,
-		/datum/mutation_upgrade/veil/toxic_compatibility,
-		/datum/mutation_upgrade/veil/toxic_blood,
-		/datum/mutation_upgrade/veil/automatic_sting,
+		/datum/mutation_upgrade/defense/comforting_acid,
+		/datum/mutation_upgrade/defense/healing_sting,
+		/datum/mutation_upgrade/defense/constant_surge,
+		/datum/mutation_upgrade/offense/acidic_slasher,
+		/datum/mutation_upgrade/offense/far_sting,
+		/datum/mutation_upgrade/offense/imbued_claws,
+		/datum/mutation_upgrade/utility/toxic_compatibility,
+		/datum/mutation_upgrade/utility/toxic_blood,
+		/datum/mutation_upgrade/utility/automatic_sting,
 	)
 
 /datum/xeno_caste/sentinel/normal
@@ -114,9 +114,9 @@
 	)
 
 	mutations = list(
-		/datum/mutation_upgrade/shell/gaseous_blood,
-		/datum/mutation_upgrade/spur/toxic_claws,
-		/datum/mutation_upgrade/veil/toxic_spillage
+		/datum/mutation_upgrade/defense/gaseous_blood,
+		/datum/mutation_upgrade/offense/toxic_claws,
+		/datum/mutation_upgrade/utility/toxic_spillage
 	)
 
 /datum/xeno_caste/sentinel/retrograde/primordial

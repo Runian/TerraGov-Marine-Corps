@@ -40,9 +40,9 @@ export const MutationSelector = (_props: any) => {
         <Section title="Mutation Evolution" key="Mutation Evolution">
           <MutationBar />
         </Section>
-        <MutationSection category_name="Shell" mutations={shell_mutations} />
-        <MutationSection category_name="Spur" mutations={spur_mutations} />
-        <MutationSection category_name="Veil" mutations={veil_mutations} />
+        <MutationSection category_name="Defense" mutations={shell_mutations} />
+        <MutationSection category_name="Offense" mutations={spur_mutations} />
+        <MutationSection category_name="Utility" mutations={veil_mutations} />
       </Window.Content>
     </Window>
   );

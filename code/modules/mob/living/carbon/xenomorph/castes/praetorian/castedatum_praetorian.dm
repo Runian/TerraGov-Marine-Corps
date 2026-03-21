@@ -69,9 +69,9 @@
 	)
 
 	mutations = list(
-		/datum/mutation_upgrade/shell/adaptive_armor,
-		/datum/mutation_upgrade/spur/circular_acid,
-		/datum/mutation_upgrade/veil/wide_pheromones
+		/datum/mutation_upgrade/defense/adaptive_armor,
+		/datum/mutation_upgrade/offense/circular_acid,
+		/datum/mutation_upgrade/utility/wide_pheromones
 	)
 
 /datum/xeno_caste/praetorian/normal
@@ -134,9 +134,9 @@
 	)
 
 	mutations = list(
-		/datum/mutation_upgrade/shell/flame_dance,
-		/datum/mutation_upgrade/spur/bob_and_weave,
-		/datum/mutation_upgrade/veil/eb_and_flow
+		/datum/mutation_upgrade/defense/flame_dance,
+		/datum/mutation_upgrade/offense/bob_and_weave,
+		/datum/mutation_upgrade/utility/eb_and_flow
 	)
 
 /datum/xeno_caste/praetorian/dancer/normal
@@ -194,9 +194,9 @@
 	)
 
 	mutations = list(
-		/datum/mutation_upgrade/shell/advance_away,
-		/datum/mutation_upgrade/spur/wall_bang,
-		/datum/mutation_upgrade/veil/low_charge
+		/datum/mutation_upgrade/defense/advance_away,
+		/datum/mutation_upgrade/offense/wall_bang,
+		/datum/mutation_upgrade/utility/low_charge
 	)
 
 /datum/xeno_caste/praetorian/oppressor/normal
