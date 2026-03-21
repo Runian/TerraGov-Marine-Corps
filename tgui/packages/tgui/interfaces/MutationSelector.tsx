@@ -53,7 +53,7 @@ const MutationBar = (_props: any) => {
   const { points_available, points_used, points_maximum } = data;
 
   let tooltipContent = 'You are ready to buy another mutation.';
-  if (points_maximum === 3) {
+  if (points_maximum === points_used) {
     tooltipContent = 'You have the maximum amount of mutations!';
   } else if (points_used >= points_available) {
     tooltipContent = "You can't buy another mutation yet...";
@@ -80,9 +80,7 @@ const MutationSection = (props: {
   const { points_available, points_used } = data;
 
   return (
-    <Collapsible
-      title={`${props.category_name} Mutations | ${props.category_name}`}
-    >
+    <Collapsible title={`${props.category_name} Mutations`}>
       {props.mutations &&
         props.mutations.map((mutation) => (
           <Section

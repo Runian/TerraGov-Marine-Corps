@@ -39,21 +39,21 @@
 	name = "Together In Claws"
 	desc = "While actively connected with your Essence Link partner, your partner's slash attacks heal you for 20% of the damage dealt."
 
-/datum/mutation_upgrade/spur/drone/together_in_claws/on_gain()
+/datum/mutation_upgrade/shell/drone/together_in_claws/on_gain()
 	RegisterSignal(xenomorph_owner, COMSIG_XENO_ESSENCE_LINK_TOGGLED, PROC_REF(on_essence_link_toggle))
 	var/datum/action/ability/activable/xeno/essence_link/ability = xenomorph_owner.actions_by_path[/datum/action/ability/activable/xeno/essence_link]
 	if(ability?.existing_link && ability.existing_link.current_beam)
 		on_essence_link_toggle(xenomorph_owner, ability.existing_link.link_target, TRUE)
 	return ..()
 
-/datum/mutation_upgrade/spur/drone/together_in_claws/on_loss()
+/datum/mutation_upgrade/shell/drone/together_in_claws/on_loss()
 	UnregisterSignal(xenomorph_owner, list(COMSIG_XENO_ESSENCE_LINK_TOGGLED))
 	var/datum/action/ability/activable/xeno/essence_link/ability = xenomorph_owner.actions_by_path[/datum/action/ability/activable/xeno/essence_link]
 	if(ability?.existing_link && ability.existing_link.current_beam)
 		on_essence_link_toggle(xenomorph_owner, ability.existing_link.link_target, FALSE)
 	return ..()
 
-/datum/mutation_upgrade/spur/drone/together_in_claws/proc/on_essence_link_toggle(datum/source, mob/living/carbon/xenomorph/link_partner, toggled)
+/datum/mutation_upgrade/shell/drone/together_in_claws/proc/on_essence_link_toggle(datum/source, mob/living/carbon/xenomorph/link_partner, toggled)
 	SIGNAL_HANDLER
 	if(toggled)
 		RegisterSignal(link_partner, COMSIG_XENOMORPH_POSTATTACK_LIVING, PROC_REF(on_postattack_living))
@@ -61,23 +61,23 @@
 	UnregisterSignal(link_partner, COMSIG_XENOMORPH_POSTATTACK_LIVING)
 
 /// Heals the owner for a portion of damage dealt by the Essence Link partner's slash attacks.
-/datum/mutation_upgrade/spur/drone/together_in_claws/proc/on_postattack_living(datum/source, mob/living/attacked_target, damage_dealt, list/damage_modifiers)
+/datum/mutation_upgrade/shell/drone/together_in_claws/proc/on_postattack_living(datum/source, mob/living/attacked_target, damage_dealt, list/damage_modifiers)
 	SIGNAL_HANDLER
 	var/damage_to_heal = damage_dealt * 0.2 // 20%
 	HEAL_XENO_DAMAGE(xenomorph_owner, damage_to_heal, FALSE)
 
-/datum/mutation_upgrade/spur/drone/emergency_repel
+/datum/mutation_upgrade/shell/drone/emergency_repel
 	name = "Emergency Repel"
 	desc = "While actively connected with your Essence Link partner, cancelling the link will heal 20% of your missing health per attunement bar and throws you towards your partner bypassing wired barricades."
 
-/datum/mutation_upgrade/spur/drone/emergency_repel/on_gain()
+/datum/mutation_upgrade/shell/drone/emergency_repel/on_gain()
 	RegisterSignal(xenomorph_owner, COMSIG_XENO_ESSENCE_LINK_TOGGLED, PROC_REF(on_essence_link_toggle))
 	var/datum/action/ability/activable/xeno/essence_link/ability = xenomorph_owner.actions_by_path[/datum/action/ability/activable/xeno/essence_link]
 	if(ability?.existing_link && ability.existing_link.current_beam)
 		on_essence_link_toggle(xenomorph_owner, ability.existing_link.link_target, TRUE)
 	return ..()
 
-/datum/mutation_upgrade/spur/drone/emergency_repel/on_loss()
+/datum/mutation_upgrade/shell/drone/emergency_repel/on_loss()
 	UnregisterSignal(xenomorph_owner, COMSIG_XENO_ESSENCE_LINK_TOGGLED)
 	var/datum/action/ability/activable/xeno/essence_link/ability = xenomorph_owner.actions_by_path[/datum/action/ability/activable/xeno/essence_link]
 	if(ability?.existing_link && ability.existing_link.current_beam)
@@ -85,14 +85,14 @@
 	return ..()
 
 /// Handles signal registration for when Essence Link begins to end.
-/datum/mutation_upgrade/spur/drone/emergency_repel/proc/on_essence_link_toggle(datum/source, mob/living/carbon/xenomorph/link_partner, toggled)
+/datum/mutation_upgrade/shell/drone/emergency_repel/proc/on_essence_link_toggle(datum/source, mob/living/carbon/xenomorph/link_partner, toggled)
 	if(toggled)
 		RegisterSignal(link_partner, COMSIG_XENO_ESSENCE_LINK_ENDING, PROC_REF(on_essence_link_ending))
 		return
 	UnregisterSignal(link_partner, COMSIG_XENO_ESSENCE_LINK_ENDING)
 
 /// Upon manual disconnection, heal percentage of missing health, gives HOVERING pass flag, and throws them toward their partner.
-/datum/mutation_upgrade/spur/drone/emergency_repel/proc/on_essence_link_ending(datum/source, datum/status_effect/stacking/essence_link/existing_link, was_manually_disconnected)
+/datum/mutation_upgrade/shell/drone/emergency_repel/proc/on_essence_link_ending(datum/source, datum/status_effect/stacking/essence_link/existing_link, was_manually_disconnected)
 	if(!was_manually_disconnected)
 		return
 	var/missing_health_to_heal = (xenomorph_owner.status_flags & GODMODE) ? 0 : ((xenomorph_owner.getFireLoss() + xenomorph_owner.getBruteLoss()) * 0.2 * existing_link.stacks)
@@ -103,7 +103,7 @@
 	xenomorph_owner.throw_at(existing_link.link_target, 7, 3, xenomorph_owner)
 
 /// Removes the HOVERING pass flag that was given during the throw.
-/datum/mutation_upgrade/spur/drone/emergency_repel/proc/on_post_throw(datum/source)
+/datum/mutation_upgrade/shell/drone/emergency_repel/proc/on_post_throw(datum/source)
 	SIGNAL_HANDLER
 	xenomorph_owner.remove_pass_flags(HOVERING, type)
 	UnregisterSignal(source, COMSIG_MOVABLE_POST_THROW)

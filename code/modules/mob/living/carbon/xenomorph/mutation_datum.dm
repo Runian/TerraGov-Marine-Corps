@@ -54,7 +54,7 @@
 			"desc" = mutation.desc,
 			"owned" = has_mutation_by_typepath(xenomorph_user, mutation.type)
 		))
-	.["points_available"] = GLOB.hive_datums[xenomorph_user.hivenumber].mutation_points
+	.["points_available"] = HAS_TRAIT(xenomorph_user, TRAIT_VALHALLA_XENO) ? MUTATION_MAXIMUM_POINTS : GLOB.hive_datums[xenomorph_user.hivenumber].mutation_points
 	.["points_used"] = length(xenomorph_user.owned_mutations)
 	.["points_maximum"] = MUTATION_MAXIMUM_POINTS
 
@@ -91,15 +91,6 @@
 		return TRUE
 	return FALSE
 
-/// Returns TRUE if the xenomorph has a mutation in a certain category.
-/datum/mutation_datum/proc/has_any_mutation_in_category(mob/living/carbon/xenomorph/xenomorph_target, mutation_category)
-	if(!length(xenomorph_target.owned_mutations))
-		return FALSE
-	for(var/datum/mutation_upgrade/owned_mutation AS in xenomorph_target.owned_mutations)
-		if(mutation_category == owned_mutation.category)
-			return TRUE
-	return FALSE
-
 /// Tries to purchase a mutation based on its typepath. Returns TRUE if the mutation was successfully purchased.
 /datum/mutation_datum/proc/try_purchase_mutation(mob/living/carbon/xenomorph/xenomorph_purchaser, datum/mutation_upgrade/mutation_typepath)
 	if(!xenomorph_purchaser.hive || !mutation_typepath)
@@ -118,14 +109,11 @@
 	if(xenomorph_purchaser.fortify)
 		to_chat(xenomorph_purchaser, span_warning("You cannot buy mutations while fortified!"))
 		return FALSE
-	if(!HAS_TRAIT(xenomorph_purchaser, TRAIT_VALHALLA_XENO) && (length(xenomorph_purchaser.owned_mutations) >= length(completed_disk_colors) || length(xenomorph_purchaser.owned_mutations) > MUTATION_MAXIMUM_POINTS))
+	if(length(xenomorph_purchaser.owned_mutations) > MUTATION_MAXIMUM_POINTS || (!HAS_TRAIT(xenomorph_purchaser, TRAIT_VALHALLA_XENO) && (length(xenomorph_purchaser.owned_mutations) >= length(completed_disk_colors))))
 		to_chat(xenomorph_purchaser, span_warning("The hive hasn't developed enough to get another mutation..."))
 		return FALSE
 	if(has_mutation_by_typepath(xenomorph_purchaser, mutation_typepath))
 		to_chat(xenomorph_purchaser, span_warning("You already own this mutation!"))
-		return FALSE
-	if(has_any_mutation_in_category(xenomorph_purchaser, mutation_typepath.category))
-		to_chat(xenomorph_purchaser, span_warning("You already have a mutation in this category!"))
 		return FALSE
 	for(var/datum/mutation_upgrade/owned_mutation AS in xenomorph_purchaser.owned_mutations)
 		if(!(mutation_typepath in owned_mutation.conflicting_mutation_types))
@@ -144,3 +132,12 @@
 	if(!disk_color || (disk_color in completed_disk_colors))
 		return
 	completed_disk_colors += disk_color
+
+/mob/living/carbon/xenomorph/verb/open_mutation_menu()
+	set name = "Mutate"
+	set desc = "Opens the mutation selector menu."
+	set category = "Alien"
+
+	SStgui.close_user_uis(src, GLOB.mutation_selector)
+	GLOB.mutation_selector.ui_interact(src)
+
