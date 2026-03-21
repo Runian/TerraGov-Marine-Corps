@@ -18,13 +18,13 @@
 		return ..()
 	return "If you are staggered while carrying [get_globs(new_amount)] stored globs, adjacent tiles will be sprayed with stunning acid. This recharges once you reach full health."
 
-/datum/mutation_upgrade/shell/staggered_panic/on_mutation_enabled()
+/datum/mutation_upgrade/shell/staggered_panic/on_gain()
 	RegisterSignal(xenomorph_owner, COMSIG_LIVING_UPDATE_HEALTH, PROC_REF(on_update_health))
 	RegisterSignal(xenomorph_owner, COMSIG_LIVING_STATUS_STAGGER, PROC_REF(on_staggered))
 	can_be_activated = (xenomorph_owner.health >= xenomorph_owner.maxHealth)
 	return ..()
 
-/datum/mutation_upgrade/shell/staggered_panic/on_mutation_disabled()
+/datum/mutation_upgrade/shell/staggered_panic/on_loss()
 	UnregisterSignal(xenomorph_owner, list(COMSIG_LIVING_UPDATE_HEALTH, COMSIG_LIVING_STATUS_STAGGER))
 	can_be_activated = FALSE
 	return ..()
@@ -68,11 +68,11 @@
 		return ..()
 	return "Having excess globs no longer causes you to glow, but will instead slow you down by [get_slowdown(new_amount)] for each excess glob."
 
-/datum/mutation_upgrade/shell/thick_containment/on_mutation_enabled()
+/datum/mutation_upgrade/shell/thick_containment/on_gain()
 	xenomorph_owner.glob_luminosity_slowing += get_slowdown(0)
 	return ..()
 
-/datum/mutation_upgrade/shell/thick_containment/on_mutation_disabled()
+/datum/mutation_upgrade/shell/thick_containment/on_loss()
 	xenomorph_owner.glob_luminosity_slowing -= get_slowdown(0)
 	return ..()
 
@@ -121,14 +121,14 @@
 		return ..()
 	return "While you have [get_globs(new_amount)], your acid spray also leaves a trail of non-opaque gas of your selected glob type."
 
-/datum/mutation_upgrade/spur/gaseous_spray/on_mutation_enabled()
+/datum/mutation_upgrade/spur/gaseous_spray/on_gain()
 	. = ..()
 	var/datum/action/ability/activable/xeno/spray_acid/line/boiler/spray_ability = xenomorph_owner.actions_by_path[/datum/action/ability/activable/xeno/spray_acid/line/boiler]
 	if(!spray_ability)
 		return
 	spray_ability.gaseous_spray_threshold += get_globs(0)
 
-/datum/mutation_upgrade/spur/gaseous_spray/on_mutation_disabled()
+/datum/mutation_upgrade/spur/gaseous_spray/on_loss()
 	. = ..()
 	var/datum/action/ability/activable/xeno/spray_acid/line/boiler/spray_ability = xenomorph_owner.actions_by_path[/datum/action/ability/activable/xeno/spray_acid/line/boiler]
 	if(!spray_ability)
@@ -162,7 +162,7 @@
 		return ..()
 	return "Bombard's preparation and firing cast delay is set to [PERCENT(1 + get_multiplier(new_amount))]% of their original value. You lose Long Range Sight."
 
-/datum/mutation_upgrade/spur/hip_fire/on_mutation_enabled()
+/datum/mutation_upgrade/spur/hip_fire/on_gain()
 	. = ..()
 	var/datum/action/ability/activable/xeno/bombard/bombard_ability = xenomorph_owner.actions_by_path[/datum/action/ability/activable/xeno/bombard]
 	if(!bombard_ability)
@@ -174,7 +174,7 @@
 	bombard_ability.fire_length += initial(bombard_ability.fire_length) * get_multiplier(0)
 	return ..()
 
-/datum/mutation_upgrade/spur/hip_fire/on_mutation_disabled()
+/datum/mutation_upgrade/spur/hip_fire/on_loss()
 	var/datum/action/ability/activable/xeno/bombard/bombard_ability = xenomorph_owner.actions_by_path[/datum/action/ability/activable/xeno/bombard]
 	if(!bombard_ability)
 		return
@@ -214,7 +214,7 @@
 		return ..()
 	return "Your normal globs are replaced with fast globs. Fast globs are twice as fast, but the gas is transparent, smaller, and dissipates in two seconds. If a fast glob is used, Bombard's cooldown to [PERCENT(1 + get_multiplier(new_amount))]% of its original value."
 
-/datum/mutation_upgrade/spur/rapid_fire/on_mutation_enabled()
+/datum/mutation_upgrade/spur/rapid_fire/on_gain()
 	. = ..()
 	var/datum/action/ability/xeno_action/toggle_bomb/toggle_ability = xenomorph_owner.actions_by_path[/datum/action/ability/xeno_action/toggle_bomb]
 	if(!toggle_ability)
@@ -225,7 +225,7 @@
 	toggle_ability.fast_gas = TRUE
 	bombard_ability.fast_cooldown_multiplier += get_multiplier(0)
 
-/datum/mutation_upgrade/spur/rapid_fire/on_mutation_disabled()
+/datum/mutation_upgrade/spur/rapid_fire/on_loss()
 	var/datum/action/ability/xeno_action/toggle_bomb/toggle_ability = xenomorph_owner.actions_by_path[/datum/action/ability/xeno_action/toggle_bomb]
 	if(!toggle_ability)
 		return
@@ -267,11 +267,11 @@
 		return ..()
 	return "Whenever you move while carrying [get_globs(new_amount)] stored globs, an acid splatter is created underneath you."
 
-/datum/mutation_upgrade/veil/acid_trail/on_mutation_enabled()
+/datum/mutation_upgrade/veil/acid_trail/on_gain()
 	RegisterSignal(xenomorph_owner, COMSIG_MOVABLE_MOVED, PROC_REF(on_movement))
 	return ..()
 
-/datum/mutation_upgrade/veil/acid_trail/on_mutation_disabled()
+/datum/mutation_upgrade/veil/acid_trail/on_loss()
 	UnregisterSignal(xenomorph_owner, COMSIG_MOVABLE_MOVED)
 	return ..()
 
@@ -299,7 +299,7 @@
 		return ..()
 	return "Bombard now has the option to shoot Ozelomelyn, Hemodile, and Sanguinal. These will consume [get_globs(new_amount)] stored globs per shot."
 
-/datum/mutation_upgrade/veil/chemical_mixing/on_mutation_enabled()
+/datum/mutation_upgrade/veil/chemical_mixing/on_gain()
 	. = ..()
 	var/datum/action/ability/activable/xeno/bombard/bombard_ability = xenomorph_owner.actions_by_path[/datum/action/ability/activable/xeno/bombard]
 	if(!bombard_ability)
@@ -311,7 +311,7 @@
 	toggle_ability.unique_gas = TRUE
 	toggle_ability.reset_selectable_glob_typepath_list()
 
-/datum/mutation_upgrade/veil/chemical_mixing/on_mutation_disabled()
+/datum/mutation_upgrade/veil/chemical_mixing/on_loss()
 	. = ..()
 	var/datum/action/ability/activable/xeno/bombard/bombard_ability = xenomorph_owner.actions_by_path[/datum/action/ability/activable/xeno/bombard]
 	if(!bombard_ability)
@@ -350,14 +350,14 @@
 		return ..()
 	return "Bombard and Long Range Sight can go [get_range(new_amount)] tiles further. The time required to use Long Range Sight is set to 250% of its original value."
 
-/datum/mutation_upgrade/veil/binoculars/on_mutation_enabled()
+/datum/mutation_upgrade/veil/binoculars/on_gain()
 	. = ..()
 	var/datum/action/ability/xeno_action/toggle_long_range/range_ability = xenomorph_owner.actions_by_path[/datum/action/ability/xeno_action/toggle_long_range]
 	if(!range_ability)
 		return
 	range_ability.do_after_length += initial(range_ability.do_after_length) * 1.5
 
-/datum/mutation_upgrade/veil/binoculars/on_mutation_disabled()
+/datum/mutation_upgrade/veil/binoculars/on_loss()
 	. = ..()
 	var/datum/action/ability/xeno_action/toggle_long_range/range_ability = xenomorph_owner.actions_by_path[/datum/action/ability/xeno_action/toggle_long_range]
 	if(!range_ability)

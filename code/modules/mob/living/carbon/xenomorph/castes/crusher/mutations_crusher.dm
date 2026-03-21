@@ -20,11 +20,11 @@
 		return ..()
 	return "After not moving for [timer_length * 0.1] second, gain [get_armor(new_amount)] soft armor in all categories."
 
-/datum/mutation_upgrade/shell/tough_rock/on_mutation_enabled()
+/datum/mutation_upgrade/shell/tough_rock/on_gain()
 	. = ..()
 	RegisterSignal(xenomorph_owner, COMSIG_MOVABLE_MOVED, PROC_REF(on_movement))
 
-/datum/mutation_upgrade/shell/tough_rock/on_mutation_disabled()
+/datum/mutation_upgrade/shell/tough_rock/on_loss()
 	UnregisterSignal(xenomorph_owner, list(COMSIG_MOVABLE_MOVED))
 	if(attached_armor)
 		toggle()
@@ -89,7 +89,7 @@
 		return ..()
 	return "Stomp's range is increased by [range_initial] and the distance before damage begins to falloff is increased by [-falloff_initial]. However, Stomp deals [PERCENT(1 + get_multiplier(new_amount))]% of its original damage and no longer has extra stun duration for stomping ontop of targets."
 
-/datum/mutation_upgrade/spur/earthquake/on_mutation_enabled()
+/datum/mutation_upgrade/spur/earthquake/on_gain()
 	. = ..()
 	var/datum/action/ability/activable/xeno/stomp/stomp_ability = xenomorph_owner.actions_by_path[/datum/action/ability/activable/xeno/stomp]
 	if(!stomp_ability)
@@ -99,7 +99,7 @@
 	stomp_ability.stomp_falloff += falloff_initial
 	stomp_ability.distance_bonus_allowed = FALSE
 
-/datum/mutation_upgrade/spur/earthquake/on_mutation_disabled()
+/datum/mutation_upgrade/spur/earthquake/on_loss()
 	. = ..()
 	var/datum/action/ability/activable/xeno/stomp/stomp_ability = xenomorph_owner.actions_by_path[/datum/action/ability/activable/xeno/stomp]
 	if(!stomp_ability)
@@ -136,14 +136,14 @@
 		return ..()
 	return "Crest Toss's cooldown is set to [PERCENT(1 + get_multiplier(new_amount))]% of its original cooldown if it was used on allies."
 
-/datum/mutation_upgrade/veil/friendly_chest/on_mutation_enabled()
+/datum/mutation_upgrade/veil/friendly_chest/on_gain()
 	. = ..()
 	var/datum/action/ability/activable/xeno/cresttoss/toss_ability = xenomorph_owner.actions_by_path[/datum/action/ability/activable/xeno/cresttoss]
 	if(!toss_ability)
 		return
 	toss_ability.ally_cooldown_multiplier += get_multiplier(0)
 
-/datum/mutation_upgrade/veil/friendly_chest/on_mutation_disabled()
+/datum/mutation_upgrade/veil/friendly_chest/on_loss()
 	. = ..()
 	var/datum/action/ability/activable/xeno/cresttoss/toss_ability = xenomorph_owner.actions_by_path[/datum/action/ability/activable/xeno/cresttoss]
 	if(!toss_ability)

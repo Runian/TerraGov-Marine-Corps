@@ -38,10 +38,12 @@
 	/// Queue of all clients wanting to join xeno side
 	var/list/client/candidates
 
-	///Reference to upgrades available and purchased by this hive.
+	/// Reference to upgrades available and purchased by this hive.
 	var/datum/hive_purchases/purchases = new
 	/// The nuke HUD timer datum, shown on each xeno's screen
 	var/atom/movable/screen/text/screen_timer/nuke_hud_timer
+	/// The amount of mutation points that have been given so far.
+	var/mutation_points = 0
 
 // ***************************************
 // *********** Init
@@ -152,13 +154,6 @@
 	// Acid Jaws
 	for(var/obj/structure/xeno/acid_maw/acid_jaws AS in GLOB.xeno_acid_jaws_by_hive[hivenumber])
 		.["hive_structures"] += list(get_structure_packet(acid_jaws))
-	// Mutation chambers
-	for(var/obj/structure/xeno/mutation_chamber/shell/chamber AS in GLOB.hive_datums[hivenumber].shell_chambers)
-		.["hive_structures"] += list(get_structure_packet(chamber))
-	for(var/obj/structure/xeno/mutation_chamber/spur/chamber AS in GLOB.hive_datums[hivenumber].spur_chambers)
-		.["hive_structures"] += list(get_structure_packet(chamber))
-	for(var/obj/structure/xeno/mutation_chamber/veil/chamber AS in GLOB.hive_datums[hivenumber].veil_chambers)
-		.["hive_structures"] += list(get_structure_packet(chamber))
 
 	.["xeno_info"] = list()
 	for(var/mob/living/carbon/xenomorph/xeno AS in get_all_xenos())
@@ -1237,24 +1232,6 @@ to_chat will check for valid clients itself already so no need to double check f
 
 	tier3_xeno_limit = max(threes, FLOOR((zeros + ones + twos + fours + threes*SSticker.mode.tier_three_inclusion) / 3 + length(psychictowers) + 1  - SSticker.mode.tier_three_penalty, 1))
 	tier2_xeno_limit = max(twos, (zeros + ones + fours) + length(psychictowers) * 2 + 1 - threes)
-
-/// Returns TRUE if the hive owns any mutation structures.
-/datum/hive_status/proc/has_any_mutation_structures()
-	return length(shell_chambers) || length(spur_chambers) || length(veil_chambers)
-
-/// Returns TRUE if the hive owns any mutation structures in a particular category.
-/datum/hive_status/proc/has_any_mutation_structures_in_category(category)
-	switch(category)
-		if(MUTATION_SHELL)
-			if(length(shell_chambers))
-				return TRUE
-		if(MUTATION_SPUR)
-			if(length(spur_chambers))
-				return TRUE
-		if(MUTATION_VEIL)
-			if(length(veil_chambers))
-				return TRUE
-	return FALSE
 
 
 // ***************************************

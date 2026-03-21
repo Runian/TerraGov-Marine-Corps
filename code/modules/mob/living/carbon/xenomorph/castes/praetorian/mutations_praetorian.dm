@@ -24,11 +24,11 @@
 		return ..()
 	return "When you are hit by a non-friendly projectile, you gain [get_defended_armor(new_amount)] armor against that particular projectile's armor type and lose [-get_other_armor(new_amount)] in all other types. A colored outline appears around you for [timer_length * 0.1] seconds during the duration."
 
-/datum/mutation_upgrade/shell/adaptive_armor/on_mutation_enabled()
+/datum/mutation_upgrade/shell/adaptive_armor/on_gain()
 	RegisterSignal(xenomorph_owner, COMSIG_XENO_PROJECTILE_HIT, PROC_REF(pre_projectile_hit))
 	return ..()
 
-/datum/mutation_upgrade/shell/adaptive_armor/on_mutation_disabled()
+/datum/mutation_upgrade/shell/adaptive_armor/on_loss()
 	UnregisterSignal(xenomorph_owner, list(COMSIG_XENO_PROJECTILE_HIT))
 	return ..()
 
@@ -97,7 +97,7 @@
 		return ..()
 	return "Acid Spray now creates acid underneath you and in a circle around you in a radius of [get_range(new_amount)] tiles."
 
-/datum/mutation_upgrade/spur/circular_acid/on_mutation_enabled()
+/datum/mutation_upgrade/spur/circular_acid/on_gain()
 	var/datum/action/ability/activable/xeno/spray_acid/cone/cone_ability = xenomorph_owner.actions_by_path[/datum/action/ability/activable/xeno/spray_acid/cone]
 	if(cone_ability)
 		cone_ability.remove_action(xenomorph_owner)
@@ -107,7 +107,7 @@
 		circle_ability.give_action(xenomorph_owner) // Range will be set during structure update.
 	return ..()
 
-/datum/mutation_upgrade/spur/circular_acid/on_mutation_disabled()
+/datum/mutation_upgrade/spur/circular_acid/on_loss()
 	var/datum/action/ability/activable/xeno/spray_acid/cone/circle/circle_ability = xenomorph_owner.actions_by_path[/datum/action/ability/activable/xeno/spray_acid/cone/circle]
 	if(circle_ability)
 		circle_ability.remove_action(xenomorph_owner)
@@ -150,11 +150,11 @@
 		return ..()
 	return "Your pheromone strength is decreased by [-strength_initial], but its range is increased by [get_range(new_amount)] tiles."
 
-/datum/mutation_upgrade/veil/wide_pheromones/on_mutation_enabled()
+/datum/mutation_upgrade/veil/wide_pheromones/on_gain()
 	add_strength_and_range(strength_initial)
 	return ..()
 
-/datum/mutation_upgrade/veil/wide_pheromones/on_mutation_disabled()
+/datum/mutation_upgrade/veil/wide_pheromones/on_loss()
 	add_strength_and_range(-strength_initial)
 	return ..()
 

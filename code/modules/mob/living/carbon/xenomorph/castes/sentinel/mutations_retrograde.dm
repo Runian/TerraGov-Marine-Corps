@@ -19,11 +19,11 @@
 		return ..()
 	return "Everytime you take damage, you emit non-opaque light neurotoxin gas with a radius of [gas_range]. This can happen once every [get_cooldown(new_amount) * 0.1] seconds."
 
-/datum/mutation_upgrade/shell/gaseous_blood/on_mutation_enabled()
+/datum/mutation_upgrade/shell/gaseous_blood/on_gain()
 	RegisterSignals(xenomorph_owner, list(COMSIG_XENOMORPH_BRUTE_DAMAGE, COMSIG_XENOMORPH_BURN_DAMAGE), PROC_REF(on_damage))
 	return ..()
 
-/datum/mutation_upgrade/shell/gaseous_blood/on_mutation_disabled()
+/datum/mutation_upgrade/shell/gaseous_blood/on_loss()
 	UnregisterSignal(xenomorph_owner, list(COMSIG_XENOMORPH_BRUTE_DAMAGE, COMSIG_XENOMORPH_BURN_DAMAGE))
 	return ..()
 
@@ -63,7 +63,7 @@
 		return ..()
 	return "You gain an ability that makes your slashes inject [get_amount(new_amount)]u Neurotoxin for the next 3 slashes. You no longer have the ability Neurotoxin Sting."
 
-/datum/mutation_upgrade/spur/toxic_claws/on_mutation_enabled()
+/datum/mutation_upgrade/spur/toxic_claws/on_gain()
 	var/datum/action/ability/activable/xeno/neurotox_sting/sting_ability = xenomorph_owner.actions_by_path[/datum/action/ability/activable/xeno/neurotox_sting]
 	if(sting_ability)
 		sting_ability.remove_action(xenomorph_owner)
@@ -73,7 +73,7 @@
 	xenomorph_owner.set_selected_reagent(/datum/reagent/toxin/xeno_neurotoxin)
 	return ..()
 
-/datum/mutation_upgrade/spur/toxic_claws/on_mutation_disabled()
+/datum/mutation_upgrade/spur/toxic_claws/on_loss()
 	var/datum/action/ability/xeno_action/reagent_slash/slash_ability = xenomorph_owner.actions_by_path[/datum/action/ability/activable/xeno/neurotox_sting]
 	if(slash_ability)
 		slash_ability.remove_action(xenomorph_owner) // No need to decrease the reagent slash amount since the ability is gone now.
@@ -119,7 +119,7 @@
 		return ..()
 	return "Neurotoxin Sting injects [PERCENT(injection_multiplier)]% as much neurotoxin. It creates non-opaque light neurotoxin gas spreading out up to [get_range(new_amount)] tiles on use."
 
-/datum/mutation_upgrade/veil/toxic_spillage/on_mutation_enabled()
+/datum/mutation_upgrade/veil/toxic_spillage/on_gain()
 	var/datum/action/ability/activable/xeno/neurotox_sting/sting_ability = xenomorph_owner.actions_by_path[/datum/action/ability/activable/xeno/neurotox_sting]
 	if(!sting_ability)
 		return
@@ -128,7 +128,7 @@
 	sting_ability.sting_gas_range += get_range(0)
 	return ..()
 
-/datum/mutation_upgrade/veil/toxic_spillage/on_mutation_disabled()
+/datum/mutation_upgrade/veil/toxic_spillage/on_loss()
 	var/datum/action/ability/activable/xeno/neurotox_sting/sting_ability = xenomorph_owner.actions_by_path[/datum/action/ability/activable/xeno/neurotox_sting]
 	if(!sting_ability)
 		return

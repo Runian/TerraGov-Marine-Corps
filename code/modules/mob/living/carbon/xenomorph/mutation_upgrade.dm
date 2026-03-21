@@ -1,12 +1,10 @@
 /datum/mutation_upgrade
-	/// The name that is displayed in the TGUI.
+	/// The name of the mutation.
 	var/name
-	/// The description that is displayed in the TGUI.
+	/// The description of the mutation.
 	var/desc
-	/// The category slot that this upgrade takes. This prevents the owner from buying additional mutation that have the same category.
+	/// The category it appears in.
 	var/category
-	/// The structure that needs to exist for a successful purchase.
-	var/required_structure
 	/// The typepath of the alert to be given.
 	var/atom/movable/screen/alert/alert_typepath
 	/// The alert that was given to the owner.
@@ -31,132 +29,80 @@
 		allowed_caste_names.Cut()
 		allowed_caste_names = saner_caste_names
 	if(!new_xenomorph_owner)
-		return ..()
+		return
 	xenomorph_owner = new_xenomorph_owner
 	xenomorph_owner.owned_mutations += src
-	alert = xenomorph_owner.throw_alert("mutation_[category]", alert_typepath)
-	switch(required_structure)
-		if(MUTATION_SHELL)
-			RegisterSignal(SSdcs, COMSIG_GLOB_MUTATION_CHAMBER_SHELL, PROC_REF(on_structure_change))
-		if(MUTATION_SPUR)
-			RegisterSignal(SSdcs, COMSIG_GLOB_MUTATION_CHAMBER_SPUR, PROC_REF(on_structure_change))
-		if(MUTATION_VEIL)
-			RegisterSignal(SSdcs, COMSIG_GLOB_MUTATION_CHAMBER_VEIL, PROC_REF(on_structure_change))
+	alert = xenomorph_owner.throw_alert("mutation_[REF(src)]", alert_typepath)
+	update_alert()
 	RegisterSignal(xenomorph_owner, COMSIG_XENOMORPH_ABILITY_ON_UPGRADE, TYPE_PROC_REF(/datum/mutation_upgrade, on_xenomorph_upgrade))
-	on_structure_change(null, MUTATION_CHAMBER_MINIMUM, get_total_structures())
+	on_gain()
 
 /// Handles destruction of an mutation upgrade. If there was an owner, removes the status effect for having the mutation, unregisters various signals, and then updates with zero structures.
 /datum/mutation_upgrade/Destroy(force)
 	if(!xenomorph_owner)
 		return ..()
 	if(alert)
-		xenomorph_owner.clear_alert("mutation_[category]")
+		xenomorph_owner.clear_alert("mutation_[REF(src)]")
 	if(xenomorph_owner.owned_mutations.Find(src))
 		xenomorph_owner.owned_mutations -= src
-	switch(required_structure)
-		if(MUTATION_SHELL)
-			UnregisterSignal(SSdcs, COMSIG_GLOB_MUTATION_CHAMBER_SHELL)
-		if(MUTATION_SPUR)
-			UnregisterSignal(SSdcs, COMSIG_GLOB_MUTATION_CHAMBER_SPUR)
-		if(MUTATION_VEIL)
-			UnregisterSignal(SSdcs, COMSIG_GLOB_MUTATION_CHAMBER_VEIL)
 	UnregisterSignal(xenomorph_owner, COMSIG_XENOMORPH_ABILITY_ON_UPGRADE)
-	on_structure_change(null, get_total_structures())
+	on_loss()
 	return ..()
 
-/// Called whenever the mutation is created/deleted or when the amount of structures has changed.
-/datum/mutation_upgrade/proc/on_structure_change(datum/source, previous_amount, new_amount)
-	SIGNAL_HANDLER
-	if(previous_amount == new_amount) // No change.
-		return FALSE
-	if(!previous_amount && new_amount) // The mutation is now enabled.
-		on_mutation_enabled()
-	if(previous_amount && !new_amount) // The mutation is now disabled.
-		on_mutation_disabled()
-	on_structure_update(previous_amount, new_amount)
-	if(alert)
-		handle_alert(new_amount)
-	return TRUE
-
-/// Called whenever the mutation becomes enabled (going from zero structures to non-zero structures).
-/datum/mutation_upgrade/proc/on_mutation_enabled()
-	return
-
-/// Called whenever the mutation becomes disabled (going from non-zero structures to zero structures).
-/datum/mutation_upgrade/proc/on_mutation_disabled()
-	return
-
-/// Called whenever when the amount of structures has changed.
-/datum/mutation_upgrade/proc/on_structure_update(previous_amount, new_amount)
-	return
-
-/// Updates the status effect alert's name and description.
-/datum/mutation_upgrade/proc/handle_alert(new_amount)
-	alert.name = get_name_for_alert(new_amount)
-	alert.desc = get_desc_for_alert(new_amount)
+/// Updates the alert's name and description.
+/datum/mutation_upgrade/proc/update_alert()
+	alert.name = get_name_for_alert()
+	alert.desc = get_desc_for_alert()
 
 /// The name that the alert will have after updating.
-/datum/mutation_upgrade/proc/get_name_for_alert(new_amount)
+/datum/mutation_upgrade/proc/get_name_for_alert()
 	return name
 
-/// The desc that the alert will have after updating.
-/datum/mutation_upgrade/proc/get_desc_for_alert(new_amount)
-	if(!new_amount)
-		return "This mutation has no effect as there are are no active [category] structures!"
+/// The desc that the alert will have after updating. This should be more informative than the description (by providing meaningful values to compare with) or easier to understand (by using less words or dumbing down the language).
+/datum/mutation_upgrade/proc/get_desc_for_alert()
 	return desc
+
+
+/// Called when the mutation is gained by the xenomorph owner.
+/datum/mutation_upgrade/proc/on_gain()
+	return
+
+/// Called when the mutation is lost by the xenomorph owner.
+/datum/mutation_upgrade/proc/on_loss()
+	return
 
 /// Called whenever the xenomorph owner is upgraded (e.g. normal to primordial).
 /datum/mutation_upgrade/proc/on_xenomorph_upgrade()
-	return TRUE
+	return
 
-/// Gets the total amount of structures for the mutation.
-/datum/mutation_upgrade/proc/get_total_structures()
-	if(!xenomorph_owner || !required_structure)
-		return 0
-	switch(required_structure)
-		if(MUTATION_SHELL)
-			return clamp(length(xenomorph_owner.hive.shell_chambers), MUTATION_CHAMBER_MINIMUM, MUTATION_CHAMBER_MAXIMUM)
-		if(MUTATION_SPUR)
-			return clamp(length(xenomorph_owner.hive.spur_chambers), MUTATION_CHAMBER_MINIMUM, MUTATION_CHAMBER_MAXIMUM)
-		if(MUTATION_VEIL)
-			return clamp(length(xenomorph_owner.hive.veil_chambers), MUTATION_CHAMBER_MINIMUM, MUTATION_CHAMBER_MAXIMUM)
-
-/**
- * Shell
- */
 /datum/mutation_upgrade/shell
 	category = MUTATION_SHELL
-	required_structure = MUTATION_SHELL
 	alert_typepath = MUTATION_SHELL_ALERT
 
-
-/atom/movable/screen/alert/shell
-	name = "Shell Mutation"
-	desc = "Your Shell Mutation is taking effect."
-	icon_state = "xeno_mutation_shell"
-
-/**
- * Spur
- */
 /datum/mutation_upgrade/spur
 	category = MUTATION_SPUR
-	required_structure = MUTATION_SPUR
 	alert_typepath = MUTATION_SPUR_ALERT
 
-/atom/movable/screen/alert/spur
-	name = "Spur Mutation"
-	desc = "Your Spur Mutation is taking effect."
-	icon_state = "xeno_mutation_spur"
-
-/**
- * Veil
- */
 /datum/mutation_upgrade/veil
 	category = MUTATION_VEIL
-	required_structure = MUTATION_VEIL
 	alert_typepath = MUTATION_VEIL_ALERT
 
-/atom/movable/screen/alert/veil
-	name = "Veil Mutation"
-	desc = "Your Veil Mutation is taking effect."
+/atom/movable/screen/alert/shell_mutation
+	name = "shell mutation"
+	icon_state = "xeno_mutation_shell"
+
+/atom/movable/screen/alert/spur_mutation
+	name = "spur mutation"
+	icon_state = "xeno_mutation_spur"
+
+/atom/movable/screen/alert/veil_mutation
+	name = "veil mutation"
 	icon_state = "xeno_mutation_veil"
+
+
+/datum/mutation_upgrade/proc/on_structure_update(previous_amount, new_amount)
+	return // TODO: Depreciated. Switch over to `/on_gain` and `/on_loss` instead.
+
+/datum/mutation_upgrade/proc/get_total_structures(previous_amount, new_amount)
+	return 0 // TODO: Depreciated. Do not use this at all.
+

@@ -14,7 +14,7 @@
 		return ..()
 	return "Psychic Cure can now target yourself. Healing yourself is only [PERCENT(1 + get_self_heal_multiplier(new_amount))]% as effective."
 
-/datum/mutation_upgrade/shell/lone_healer/on_mutation_enabled()
+/datum/mutation_upgrade/shell/lone_healer/on_gain()
 	. = ..()
 	var/datum/action/ability/activable/xeno/psychic_cure/cure_ability = xenomorph_owner.actions_by_path[/datum/action/ability/activable/xeno/psychic_cure]
 	if(!cure_ability)
@@ -22,7 +22,7 @@
 	cure_ability.use_state_flags |= ABILITY_TARGET_SELF
 	cure_ability.self_heal_multiplier += get_self_heal_multiplier(0)
 
-/datum/mutation_upgrade/shell/lone_healer/on_mutation_disabled()
+/datum/mutation_upgrade/shell/lone_healer/on_loss()
 	. = ..()
 	var/datum/action/ability/activable/xeno/psychic_cure/cure_ability = xenomorph_owner.actions_by_path[/datum/action/ability/activable/xeno/psychic_cure]
 	if(!cure_ability)
@@ -54,14 +54,14 @@
 		return ..()
 	return "[PERCENT(get_rebound(new_amount))]% of the health restored from Psychic Cure is reapplied to you."
 
-/datum/mutation_upgrade/shell/shared_cure/on_mutation_enabled()
+/datum/mutation_upgrade/shell/shared_cure/on_gain()
 	. = ..()
 	var/datum/action/ability/activable/xeno/psychic_cure/cure_ability = xenomorph_owner.actions_by_path[/datum/action/ability/activable/xeno/psychic_cure]
 	if(!cure_ability)
 		return
 	cure_ability.rebound_percentage += get_rebound(0)
 
-/datum/mutation_upgrade/shell/shared_cure/on_mutation_disabled()
+/datum/mutation_upgrade/shell/shared_cure/on_loss()
 	. = ..()
 	var/datum/action/ability/activable/xeno/psychic_cure/cure_ability = xenomorph_owner.actions_by_path[/datum/action/ability/activable/xeno/psychic_cure]
 	if(!cure_ability)
@@ -92,14 +92,14 @@
 		return ..()
 	return "Psychic Cure now also applies the effects of resin jelly to you and your target for [get_duration(new_amount) / 10] seconds."
 
-/datum/mutation_upgrade/shell/resistant_cure/on_mutation_enabled()
+/datum/mutation_upgrade/shell/resistant_cure/on_gain()
 	. = ..()
 	var/datum/action/ability/activable/xeno/psychic_cure/cure_ability = xenomorph_owner.actions_by_path[/datum/action/ability/activable/xeno/psychic_cure]
 	if(!cure_ability)
 		return
 	cure_ability.resin_jelly_duration += get_duration(0)
 
-/datum/mutation_upgrade/shell/resistant_cure/on_mutation_disabled()
+/datum/mutation_upgrade/shell/resistant_cure/on_loss()
 	. = ..()
 	var/datum/action/ability/activable/xeno/psychic_cure/cure_ability = xenomorph_owner.actions_by_path[/datum/action/ability/activable/xeno/psychic_cure]
 	if(!cure_ability)
@@ -133,7 +133,7 @@
 		return ..()
 	return "Psychic Fling deals [PERCENT(get_multiplier(new_amount))]% damage equal to your melee damage, enables collusions, but no longer immediately stuns. If the target collides with a human, object, or wall: both are paralyzed and dealt damage again."
 
-/datum/mutation_upgrade/spur/smashing_fling/on_mutation_enabled()
+/datum/mutation_upgrade/spur/smashing_fling/on_gain()
 	. = ..()
 	var/datum/action/ability/activable/xeno/psychic_fling/fling_ability = xenomorph_owner.actions_by_path[/datum/action/ability/activable/xeno/psychic_fling]
 	if(!fling_ability)
@@ -143,7 +143,7 @@
 	fling_ability.collusion_paralyze_duration = 0.1 SECONDS // This is honestly flavor.
 	fling_ability.collusion_damage_multiplier += get_multiplier(0)
 
-/datum/mutation_upgrade/spur/smashing_fling/on_mutation_disabled()
+/datum/mutation_upgrade/spur/smashing_fling/on_loss()
 	. = ..()
 	var/datum/action/ability/activable/xeno/psychic_fling/fling_ability = xenomorph_owner.actions_by_path[/datum/action/ability/activable/xeno/psychic_fling]
 	if(!fling_ability)
@@ -179,7 +179,7 @@
 		return ..()
 	return "Unrelenting Force pulls things towards you then pushes them away. The distance they are thrown is increased by [get_distance(new_amount)]."
 
-/datum/mutation_upgrade/spur/gravity_tide/on_mutation_enabled()
+/datum/mutation_upgrade/spur/gravity_tide/on_gain()
 	. = ..()
 	var/datum/action/ability/activable/xeno/unrelenting_force/force_ability = xenomorph_owner.actions_by_path[/datum/action/ability/activable/xeno/unrelenting_force]
 	if(!force_ability)
@@ -187,7 +187,7 @@
 	force_ability.rebound_throwing = TRUE
 	force_ability.throwing_distance += get_distance(0)
 
-/datum/mutation_upgrade/spur/gravity_tide/on_mutation_disabled()
+/datum/mutation_upgrade/spur/gravity_tide/on_loss()
 	. = ..()
 	var/datum/action/ability/activable/xeno/unrelenting_force/force_ability = xenomorph_owner.actions_by_path[/datum/action/ability/activable/xeno/unrelenting_force]
 	if(!force_ability)
@@ -222,7 +222,7 @@
 		return ..()
 	return "Psychic Fling can be used on yourself and allied xenomorphs. Humans who are hit by a flung xenomorph are paralyzed for 2 seconds and dealt [PERCENT(get_multiplier(new_amount))]% of your slash damage."
 
-/datum/mutation_upgrade/spur/body_fling/on_mutation_enabled()
+/datum/mutation_upgrade/spur/body_fling/on_gain()
 	. = ..()
 	var/datum/action/ability/activable/xeno/psychic_fling/fling_ability = xenomorph_owner.actions_by_path[/datum/action/ability/activable/xeno/psychic_fling]
 	if(!fling_ability)
@@ -232,7 +232,7 @@
 	fling_ability.collusion_paralyze_duration += 2 SECONDS
 	fling_ability.collusion_xenos_only = TRUE
 
-/datum/mutation_upgrade/spur/body_fling/on_mutation_disabled()
+/datum/mutation_upgrade/spur/body_fling/on_loss()
 	. = ..()
 	var/datum/action/ability/activable/xeno/psychic_fling/fling_ability = xenomorph_owner.actions_by_path[/datum/action/ability/activable/xeno/psychic_fling]
 	if(!fling_ability)
@@ -269,14 +269,14 @@
 		return ..()
 	return "Psychic Heal grants slowdown immunity and delays all inbound stun, knockdown, and stagger effects caused to your target by [get_duration(new_amount) / 10] seconds. At the end of this duration, delayed status effects are reapplied."
 
-/datum/mutation_upgrade/veil/delayed_condition/on_mutation_enabled()
+/datum/mutation_upgrade/veil/delayed_condition/on_gain()
 	. = ..()
 	var/datum/action/ability/activable/xeno/psychic_cure/cure_ability = xenomorph_owner.actions_by_path[/datum/action/ability/activable/xeno/psychic_cure]
 	if(!cure_ability)
 		return
 	cure_ability.delayed_status_duration += get_duration(0)
 
-/datum/mutation_upgrade/veil/delayed_condition/on_mutation_disabled()
+/datum/mutation_upgrade/veil/delayed_condition/on_loss()
 	. = ..()
 	var/datum/action/ability/activable/xeno/psychic_cure/cure_ability = xenomorph_owner.actions_by_path[/datum/action/ability/activable/xeno/psychic_cure]
 	if(!cure_ability)
@@ -307,14 +307,14 @@
 		return ..()
 	return "Unrelenting Force now reflects all projectiles in its affected area. Reflecting more than 50 projectile damage resets Psychic Scream's cooldown to [PERCENT(get_multiplier(new_amount))]% of its original value."
 
-/datum/mutation_upgrade/veil/deflective_force/on_mutation_enabled()
+/datum/mutation_upgrade/veil/deflective_force/on_gain()
 	. = ..()
 	var/datum/action/ability/activable/xeno/unrelenting_force/force_ability = xenomorph_owner.actions_by_path[/datum/action/ability/activable/xeno/unrelenting_force]
 	if(!force_ability)
 		return
 	force_ability.projectile_cooldown_mulitplier += get_multiplier(0)
 
-/datum/mutation_upgrade/veil/deflective_force/on_mutation_disabled()
+/datum/mutation_upgrade/veil/deflective_force/on_loss()
 	. = ..()
 	var/datum/action/ability/activable/xeno/unrelenting_force/force_ability = xenomorph_owner.actions_by_path[/datum/action/ability/activable/xeno/unrelenting_force]
 	if(!force_ability)
@@ -346,7 +346,7 @@
 		return ..()
 	return "You lose the ability Psychic Fling in exchange for the ability Psychic Choke. Psychic Choke lets you paralyze a marine as long you channel it. The damage threshold to disrupt Psychic Choke is [get_threshold(new_amount)]."
 
-/datum/mutation_upgrade/veil/psychic_choke/on_mutation_enabled()
+/datum/mutation_upgrade/veil/psychic_choke/on_gain()
 	var/datum/action/ability/activable/xeno/psychic_fling/fling_ability = xenomorph_owner.actions_by_path[/datum/action/ability/activable/xeno/psychic_fling]
 	if(fling_ability)
 		fling_ability.remove_action(xenomorph_owner)
@@ -354,7 +354,7 @@
 	choke_ability.give_action(xenomorph_owner)
 	return ..()
 
-/datum/mutation_upgrade/veil/psychic_choke/on_mutation_disabled()
+/datum/mutation_upgrade/veil/psychic_choke/on_loss()
 	var/datum/action/ability/activable/xeno/psychic_choke/choke_ability = xenomorph_owner.actions_by_path[/datum/action/ability/activable/xeno/psychic_choke]
 	if(choke_ability)
 		choke_ability.remove_action(xenomorph_owner)

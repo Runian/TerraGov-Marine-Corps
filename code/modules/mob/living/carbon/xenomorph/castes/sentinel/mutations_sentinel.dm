@@ -14,14 +14,14 @@
 		return ..()
 	return "Toxic Slash will cause humans to passively heal you for [get_healing(new_amount)] health per stack of Intoxicated as long you are adjacent to them."
 
-/datum/mutation_upgrade/shell/comforting_acid/on_mutation_enabled()
+/datum/mutation_upgrade/shell/comforting_acid/on_gain()
 	. = ..()
 	var/datum/action/ability/xeno_action/toxic_slash/slash_ability = xenomorph_owner.actions_by_path[/datum/action/ability/xeno_action/toxic_slash]
 	if(!slash_ability)
 		return
 	slash_ability.healing_per_stack += get_healing(0)
 
-/datum/mutation_upgrade/shell/comforting_acid/on_mutation_disabled()
+/datum/mutation_upgrade/shell/comforting_acid/on_loss()
 	. = ..()
 	var/datum/action/ability/xeno_action/toxic_slash/slash_ability = xenomorph_owner.actions_by_path[/datum/action/ability/xeno_action/toxic_slash]
 	if(!slash_ability)
@@ -52,14 +52,14 @@
 		return ..()
 	return "Drain Sting now heals [PERCENT(1 + get_multiplier(new_amount))]% of its original value. Any leftover healing is converted to overheal health."
 
-/datum/mutation_upgrade/shell/healing_sting/on_mutation_enabled()
+/datum/mutation_upgrade/shell/healing_sting/on_gain()
 	. = ..()
 	var/datum/action/ability/activable/xeno/drain_sting/sting_ability = xenomorph_owner.actions_by_path[/datum/action/ability/activable/xeno/drain_sting]
 	if(!sting_ability)
 		return
 	sting_ability.heal_multiplier += get_multiplier(0)
 
-/datum/mutation_upgrade/shell/healing_sting/on_mutation_disabled()
+/datum/mutation_upgrade/shell/healing_sting/on_loss()
 	. = ..()
 	var/datum/action/ability/activable/xeno/drain_sting/sting_ability = xenomorph_owner.actions_by_path[/datum/action/ability/activable/xeno/drain_sting]
 	if(!sting_ability)
@@ -90,7 +90,7 @@
 		return ..()
 	return "Drain Sting always triggers Drain Surge. Drain Surge only gives [get_armor(new_amount)] soft armor for each Intoxicated stack."
 
-/datum/mutation_upgrade/shell/constant_surge/on_mutation_enabled()
+/datum/mutation_upgrade/shell/constant_surge/on_gain()
 	. = ..()
 	var/datum/action/ability/activable/xeno/drain_sting/sting_ability = xenomorph_owner.actions_by_path[/datum/action/ability/activable/xeno/drain_sting]
 	if(!sting_ability)
@@ -98,7 +98,7 @@
 	sting_ability.drain_surge_strength -= initial(sting_ability.drain_surge_strength)
 	sting_ability.drain_surge_armor_per += get_armor(0)
 
-/datum/mutation_upgrade/shell/constant_surge/on_mutation_disabled()
+/datum/mutation_upgrade/shell/constant_surge/on_loss()
 	. = ..()
 	var/datum/action/ability/activable/xeno/drain_sting/sting_ability = xenomorph_owner.actions_by_path[/datum/action/ability/activable/xeno/drain_sting]
 	if(!sting_ability)
@@ -135,12 +135,12 @@
 		return ..()
 	return "Your attack delay will be [(get_move_adjust(new_amount)) * 0.1]s faster and will always apply [get_intoxicated_stacks(intoxicated_stack_per_structure)] stacks of Intoxicated against humans, but all melee damage is reduced by [melee_damage_modifier * 100]%."
 
-/datum/mutation_upgrade/spur/acidic_slasher/on_mutation_enabled()
+/datum/mutation_upgrade/spur/acidic_slasher/on_gain()
 	RegisterSignal(xenomorph_owner, COMSIG_XENOMORPH_POSTATTACK_LIVING, PROC_REF(on_postattack))
 	xenomorph_owner.xeno_melee_damage_modifier -= melee_damage_modifier
 	return ..()
 
-/datum/mutation_upgrade/spur/acidic_slasher/on_mutation_disabled()
+/datum/mutation_upgrade/spur/acidic_slasher/on_loss()
 	UnregisterSignal(xenomorph_owner, COMSIG_XENOMORPH_POSTATTACK_LIVING)
 	xenomorph_owner.xeno_melee_damage_modifier += melee_damage_modifier
 	return ..()
@@ -181,7 +181,7 @@
 		return ..()
 	return "Drain Sting can be used at targets [range_initial] additional tile away. If the target is at maximum range, Drain Sting is [PERCENT(get_effectiveness(new_amount))]% effective."
 
-/datum/mutation_upgrade/spur/far_sting/on_mutation_enabled()
+/datum/mutation_upgrade/spur/far_sting/on_gain()
 	. = ..()
 	var/datum/action/ability/activable/xeno/drain_sting/sting_ability = xenomorph_owner.actions_by_path[/datum/action/ability/activable/xeno/drain_sting]
 	if(!sting_ability)
@@ -189,7 +189,7 @@
 	sting_ability.targetable_range += range_initial
 	sting_ability.ranged_effectiveness += get_effectiveness(0)
 
-/datum/mutation_upgrade/spur/far_sting/on_mutation_disabled()
+/datum/mutation_upgrade/spur/far_sting/on_loss()
 	. = ..()
 	var/datum/action/ability/activable/xeno/drain_sting/sting_ability = xenomorph_owner.actions_by_path[/datum/action/ability/activable/xeno/drain_sting]
 	if(!sting_ability)
@@ -221,7 +221,7 @@
 		return ..()
 	return "Drain Surge's armor is converted to a melee damage modifier. The melee damage modifier is further increased by [get_modifier(new_amount)]%."
 
-/datum/mutation_upgrade/spur/imbued_claws/on_mutation_enabled()
+/datum/mutation_upgrade/spur/imbued_claws/on_gain()
 	. = ..()
 	var/datum/action/ability/activable/xeno/drain_sting/sting_ability = xenomorph_owner.actions_by_path[/datum/action/ability/activable/xeno/drain_sting]
 	if(!sting_ability)
@@ -229,7 +229,7 @@
 	sting_ability.drain_surge_strength += get_modifier(0)
 	sting_ability.drain_surge_melee = TRUE
 
-/datum/mutation_upgrade/spur/imbued_claws/on_mutation_disabled()
+/datum/mutation_upgrade/spur/imbued_claws/on_loss()
 	. = ..()
 	var/datum/action/ability/activable/xeno/drain_sting/sting_ability = xenomorph_owner.actions_by_path[/datum/action/ability/activable/xeno/drain_sting]
 	if(!sting_ability)
@@ -262,7 +262,7 @@
 		return ..()
 	return "Every [get_amount(new_amount)]u of xeno-chemicals in your target will count as one stack of Intoxicated when calculating the the strength of your Drain Sting."
 
-/datum/mutation_upgrade/veil/toxic_compatibility/on_mutation_disabled()
+/datum/mutation_upgrade/veil/toxic_compatibility/on_loss()
 	. = ..()
 	var/datum/action/ability/activable/xeno/drain_sting/sting_ability = xenomorph_owner.actions_by_path[/datum/action/ability/activable/xeno/drain_sting]
 	if(!sting_ability)
@@ -298,11 +298,11 @@
 		return ..()
 	return "Every [get_damage_threshold(new_amount)] damage you take, [intoxicated_stacks_to_apply] stacks of Intoxicated will be applied to nearby humans."
 
-/datum/mutation_upgrade/veil/toxic_blood/on_mutation_enabled()
+/datum/mutation_upgrade/veil/toxic_blood/on_gain()
 	RegisterSignals(xenomorph_owner, list(COMSIG_XENOMORPH_BRUTE_DAMAGE, COMSIG_XENOMORPH_BURN_DAMAGE), PROC_REF(on_damage))
 	return ..()
 
-/datum/mutation_upgrade/veil/toxic_blood/on_mutation_disabled()
+/datum/mutation_upgrade/veil/toxic_blood/on_loss()
 	UnregisterSignal(xenomorph_owner, list(COMSIG_XENOMORPH_BRUTE_DAMAGE, COMSIG_XENOMORPH_BURN_DAMAGE, COMSIG_MOB_STAT_CHANGED))
 	return ..()
 
@@ -347,7 +347,7 @@
 		return ..()
 	return "Drain Sting starts at [get_stacks(new_amount)] Intoxication stacks. It is automatically used against slashed humans if there are [threshold_initial] Intoxication stacks or more."
 
-/datum/mutation_upgrade/veil/automatic_sting/on_mutation_enabled()
+/datum/mutation_upgrade/veil/automatic_sting/on_gain()
 	. = ..()
 	var/datum/action/ability/activable/xeno/drain_sting/sting_ability = xenomorph_owner.actions_by_path[/datum/action/ability/activable/xeno/drain_sting]
 	if(!sting_ability)
@@ -355,7 +355,7 @@
 	RegisterSignal(xenomorph_owner, COMSIG_XENOMORPH_POSTATTACK_LIVING, PROC_REF(on_postattack))
 	sting_ability.base_potency += get_stacks(0) * SENTINEL_DRAIN_MULTIPLIER
 
-/datum/mutation_upgrade/veil/automatic_sting/on_mutation_disabled()
+/datum/mutation_upgrade/veil/automatic_sting/on_loss()
 	. = ..()
 	var/datum/action/ability/activable/xeno/drain_sting/sting_ability = xenomorph_owner.actions_by_path[/datum/action/ability/activable/xeno/drain_sting]
 	if(!sting_ability)

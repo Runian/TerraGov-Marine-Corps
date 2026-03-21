@@ -42,13 +42,13 @@
 		return ..()
 	return "You can no longer be staggered by projectiles and gain [get_bullet_armor(new_amount)] bullet armor, but lose [-get_melee_armor(new_amount)] melee armor. Projectiles from pointblank range negate this bonus bullet armor."
 
-/datum/mutation_upgrade/shell/brittle_upclose/on_mutation_enabled()
+/datum/mutation_upgrade/shell/brittle_upclose/on_gain()
 	xenomorph_owner.soft_armor = xenomorph_owner.soft_armor.modifyRating(get_melee_armor(0), get_bullet_armor(0))
 	RegisterSignal(xenomorph_owner, COMSIG_XENO_PROJECTILE_HIT, PROC_REF(pre_projectile_hit))
 	ADD_TRAIT(xenomorph_owner, TRAIT_STAGGER_RESISTANT, MUTATION_TRAIT)
 	return ..()
 
-/datum/mutation_upgrade/shell/brittle_upclose/on_mutation_disabled()
+/datum/mutation_upgrade/shell/brittle_upclose/on_loss()
 	xenomorph_owner.soft_armor = xenomorph_owner.soft_armor.modifyRating(get_melee_armor(0), get_bullet_armor(0))
 	UnregisterSignal(xenomorph_owner, list(COMSIG_XENO_PROJECTILE_HIT))
 	REMOVE_TRAIT(xenomorph_owner, TRAIT_STAGGER_RESISTANT, MUTATION_TRAIT)
@@ -92,7 +92,7 @@
 		return ..()
 	return "Regenerate Skin additionally recovers [PERCENT(get_heal_multiplier(new_amount))]% of your maximum health, but will reduce all of your armor values by [armor_debuff_amount] for 6 seconds."
 
-/datum/mutation_upgrade/shell/carapace_regrowth/on_mutation_enabled()
+/datum/mutation_upgrade/shell/carapace_regrowth/on_gain()
 	var/datum/action/ability/xeno_action/regenerate_skin/regenerate_skin = xenomorph_owner.actions_by_path[/datum/action/ability/xeno_action/regenerate_skin]
 	if(!regenerate_skin)
 		return
@@ -100,7 +100,7 @@
 	regenerate_skin.armor_debuff_amount += armor_debuff_amount
 	return ..()
 
-/datum/mutation_upgrade/shell/carapace_regrowth/on_mutation_disabled()
+/datum/mutation_upgrade/shell/carapace_regrowth/on_loss()
 	var/datum/action/ability/xeno_action/regenerate_skin/regenerate_skin = xenomorph_owner.actions_by_path[/datum/action/ability/xeno_action/regenerate_skin]
 	if(!regenerate_skin)
 		return
@@ -137,7 +137,7 @@
 		return ..()
 	return "Tail Swipe deals stamina damage instead. It no longer paralyzes and deals [get_damage_multiplier(new_amount)]x more damage."
 
-/datum/mutation_upgrade/spur/breathtaking_spin/on_mutation_enabled()
+/datum/mutation_upgrade/spur/breathtaking_spin/on_gain()
 	var/datum/action/ability/xeno_action/tail_sweep/tail_sweep = xenomorph_owner.actions_by_path[/datum/action/ability/xeno_action/tail_sweep]
 	if(!tail_sweep)
 		return
@@ -146,7 +146,7 @@
 	tail_sweep.paralyze_duration -= initial(tail_sweep.paralyze_duration)
 	return ..()
 
-/datum/mutation_upgrade/spur/breathtaking_spin/on_mutation_disabled()
+/datum/mutation_upgrade/spur/breathtaking_spin/on_loss()
 	var/datum/action/ability/xeno_action/tail_sweep/tail_sweep = xenomorph_owner.actions_by_path[/datum/action/ability/xeno_action/tail_sweep]
 	if(!tail_sweep)
 		return
@@ -181,14 +181,14 @@
 		return ..()
 	return "Tail Swipe's knockback is increased by [knockback_amount] tile and staggers for [get_stagger_duration(new_amount) * 0.1] seconds."
 
-/datum/mutation_upgrade/spur/power_spin/on_mutation_enabled()
+/datum/mutation_upgrade/spur/power_spin/on_gain()
 	var/datum/action/ability/xeno_action/tail_sweep/tail_sweep = xenomorph_owner.actions_by_path[/datum/action/ability/xeno_action/tail_sweep]
 	if(!tail_sweep)
 		return
 	tail_sweep.knockback_distance += knockback_amount
 	return ..()
 
-/datum/mutation_upgrade/spur/power_spin/on_mutation_disabled()
+/datum/mutation_upgrade/spur/power_spin/on_loss()
 	var/datum/action/ability/xeno_action/tail_sweep/tail_sweep = xenomorph_owner.actions_by_path[/datum/action/ability/xeno_action/tail_sweep]
 	if(!tail_sweep)
 		return
@@ -223,11 +223,11 @@
 		return ..()
 	return "For each [sunder_repeating_threshold] sunder / missing armor, your melee damage multiplier is increased by [PERCENT(get_modifier(new_amount))]%."
 
-/datum/mutation_upgrade/spur/sharpening_claws/on_mutation_enabled()
+/datum/mutation_upgrade/spur/sharpening_claws/on_gain()
 	RegisterSignal(xenomorph_owner, COMSIG_XENOMORPH_SUNDER_CHANGE, PROC_REF(on_sunder_change))
 	return ..()
 
-/datum/mutation_upgrade/spur/sharpening_claws/on_mutation_disabled()
+/datum/mutation_upgrade/spur/sharpening_claws/on_loss()
 	UnregisterSignal(xenomorph_owner, COMSIG_XENOMORPH_SUNDER_CHANGE)
 	return ..()
 
@@ -290,7 +290,7 @@
 		return ..()
 	return "You are no longer immobilized during Fortify. However, your move delay is increased by [get_delay(new_amount) * 0.1] seconds while it is active."
 
-/datum/mutation_upgrade/veil/slow_and_steady/on_mutation_enabled()
+/datum/mutation_upgrade/veil/slow_and_steady/on_gain()
 	var/datum/action/ability/xeno_action/fortify/fortify = xenomorph_owner.actions_by_path[/datum/action/ability/xeno_action/fortify]
 	if(!fortify)
 		return
@@ -299,7 +299,7 @@
 	fortify.set_movement_delay(fortify.movement_delay + get_delay(0))
 	return ..()
 
-/datum/mutation_upgrade/veil/slow_and_steady/on_mutation_disabled()
+/datum/mutation_upgrade/veil/slow_and_steady/on_loss()
 	var/datum/action/ability/xeno_action/fortify/fortify = xenomorph_owner.actions_by_path[/datum/action/ability/xeno_action/fortify]
 	if(!fortify)
 		return

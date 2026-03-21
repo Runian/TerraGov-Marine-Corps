@@ -14,14 +14,14 @@
 		return ..()
 	return "If you are under the effect of Resin Jelly, all thrown huggers gain fire immunity. Each thrown hugger reduce the duration of the effect by [get_length(new_amount) / 10] seconds."
 
-/datum/mutation_upgrade/shell/shared_jelly/on_mutation_enabled()
+/datum/mutation_upgrade/shell/shared_jelly/on_gain()
 	var/datum/action/ability/activable/xeno/throw_hugger/hugger_ability = xenomorph_owner.actions_by_path[/datum/action/ability/activable/xeno/throw_hugger]
 	if(!hugger_ability)
 		return
 	hugger_ability.fire_immunity_transfer += get_length(0)
 	return ..()
 
-/datum/mutation_upgrade/shell/shared_jelly/on_mutation_disabled()
+/datum/mutation_upgrade/shell/shared_jelly/on_loss()
 	. = ..()
 	var/datum/action/ability/activable/xeno/throw_hugger/hugger_ability = xenomorph_owner.actions_by_path[/datum/action/ability/activable/xeno/throw_hugger]
 	if(!hugger_ability)
@@ -52,11 +52,11 @@
 		return ..()
 	return "While you have [get_threshold(new_amount)] or more stored huggers, you will automatically drop a larval hugger underneath you when you become staggered."
 
-/datum/mutation_upgrade/shell/hugger_overflow/on_mutation_enabled()
+/datum/mutation_upgrade/shell/hugger_overflow/on_gain()
 	RegisterSignal(xenomorph_owner, COMSIG_LIVING_STATUS_STAGGER, PROC_REF(on_staggered))
 	return ..()
 
-/datum/mutation_upgrade/shell/hugger_overflow/on_mutation_disabled()
+/datum/mutation_upgrade/shell/hugger_overflow/on_loss()
 	UnregisterSignal(xenomorph_owner, COMSIG_LIVING_STATUS_STAGGER)
 	return ..()
 
@@ -86,7 +86,7 @@
 		return ..()
 	return "If you're not resting, Carrier Panic will automatically attempt to activate when possible. The cooldown duration is to 20% of its original value. It only consumes [PERCENT(1 + get_multiplier(new_amount))]% of your maximum plasma."
 
-/datum/mutation_upgrade/shell/recurring_panic/on_mutation_enabled()
+/datum/mutation_upgrade/shell/recurring_panic/on_gain()
 	. = ..()
 	var/datum/action/ability/xeno_action/carrier_panic/panic_ability = xenomorph_owner.actions_by_path[/datum/action/ability/xeno_action/carrier_panic]
 	if(!panic_ability)
@@ -95,7 +95,7 @@
 	panic_ability.cooldown_duration -= initial(panic_ability.cooldown_duration) * 0.8
 	panic_ability.succeed_cost += get_multiplier(0)
 
-/datum/mutation_upgrade/shell/recurring_panic/on_mutation_disabled()
+/datum/mutation_upgrade/shell/recurring_panic/on_loss()
 	. = ..()
 	var/datum/action/ability/xeno_action/carrier_panic/panic_ability = xenomorph_owner.actions_by_path[/datum/action/ability/xeno_action/carrier_panic]
 	if(!panic_ability)
@@ -147,7 +147,7 @@
 		return ..()
 	return "Thrown huggers can now leap 1 tile at a time. All activation times are [1 + get_multiplier(new_amount)]x of their original value, but will never be faster than 0.5s."
 
-/datum/mutation_upgrade/spur/leapfrog/on_mutation_enabled()
+/datum/mutation_upgrade/spur/leapfrog/on_gain()
 	. = ..()
 	var/datum/action/ability/activable/xeno/throw_hugger/hugger_ability = xenomorph_owner.actions_by_path[/datum/action/ability/activable/xeno/throw_hugger]
 	if(!hugger_ability)
@@ -156,7 +156,7 @@
 	hugger_ability.leapping_range -= leap_range_modified
 	hugger_ability.activation_time_multiplier += get_multiplier(0)
 
-/datum/mutation_upgrade/spur/leapfrog/on_mutation_disabled()
+/datum/mutation_upgrade/spur/leapfrog/on_loss()
 	. = ..()
 	var/datum/action/ability/activable/xeno/throw_hugger/hugger_ability = xenomorph_owner.actions_by_path[/datum/action/ability/activable/xeno/throw_hugger]
 	if(!hugger_ability)
@@ -189,14 +189,14 @@
 		return ..()
 	return "Huggers from your eggs now have a reduced cast time against humans. The cast time is set to [PERCENT(1 + get_multiplier(new_amount))]% of its original value."
 
-/datum/mutation_upgrade/spur/claw_delivered/on_mutation_enabled()
+/datum/mutation_upgrade/spur/claw_delivered/on_gain()
 	. = ..()
 	var/datum/action/ability/xeno_action/lay_egg/egg_ability = xenomorph_owner.actions_by_path[/datum/action/ability/xeno_action/lay_egg]
 	if(!egg_ability)
 		return
 	egg_ability.hand_attach_time_multiplier += get_multiplier(0)
 
-/datum/mutation_upgrade/spur/claw_delivered/on_mutation_disabled()
+/datum/mutation_upgrade/spur/claw_delivered/on_loss()
 	. = ..()
 	var/datum/action/ability/xeno_action/lay_egg/egg_ability = xenomorph_owner.actions_by_path[/datum/action/ability/xeno_action/lay_egg]
 	if(!egg_ability)
@@ -227,14 +227,14 @@
 		return ..()
 	return "Thrown huggers will accompanied by a fake facehugger which will mimic their behavior. Their color will be changed to match [PERCENT(get_gradiant(new_amount))]% of the original hugger's color."
 
-/datum/mutation_upgrade/spur/fake_huggers/on_mutation_enabled()
+/datum/mutation_upgrade/spur/fake_huggers/on_gain()
 	. = ..()
 	var/datum/action/ability/activable/xeno/throw_hugger/hugger_ability = xenomorph_owner.actions_by_path[/datum/action/ability/activable/xeno/throw_hugger]
 	if(!hugger_ability)
 		return
 	hugger_ability.fake_hugger_gradiant_percentage += get_gradiant(0)
 
-/datum/mutation_upgrade/spur/fake_huggers/on_mutation_disabled()
+/datum/mutation_upgrade/spur/fake_huggers/on_loss()
 	. = ..()
 	var/datum/action/ability/activable/xeno/throw_hugger/hugger_ability = xenomorph_owner.actions_by_path[/datum/action/ability/activable/xeno/throw_hugger]
 	if(!hugger_ability)
@@ -268,7 +268,7 @@
 		return ..()
 	return "Egg Lay now creates eggs with your selected type of hugger inside. The plasma cost is set to [PERCENT(1 + get_multiplier(new_amount))]% of its their original value and its cooldown is set to 50% of its original value. You lose the ability, Spawn Huggers."
 
-/datum/mutation_upgrade/veil/oviposition/on_mutation_enabled()
+/datum/mutation_upgrade/veil/oviposition/on_gain()
 	var/datum/action/ability/xeno_action/lay_egg/egg_ability = xenomorph_owner.actions_by_path[/datum/action/ability/xeno_action/lay_egg]
 	if(!egg_ability)
 		return
@@ -280,7 +280,7 @@
 	egg_ability.ability_cost += initial(egg_ability.ability_cost) * get_multiplier(0)
 	return ..()
 
-/datum/mutation_upgrade/veil/oviposition/on_mutation_disabled()
+/datum/mutation_upgrade/veil/oviposition/on_loss()
 	var/datum/action/ability/xeno_action/lay_egg/egg_ability = xenomorph_owner.actions_by_path[/datum/action/ability/xeno_action/lay_egg]
 	if(!egg_ability)
 		return
@@ -322,7 +322,7 @@
 		return ..()
 	return "Spawn Facehugger's cooldown is set to 70% of its original value and costs zero plasma, but will deal [get_damage(new_amount)] true damage to you."
 
-/datum/mutation_upgrade/veil/life_for_life/on_mutation_enabled()
+/datum/mutation_upgrade/veil/life_for_life/on_gain()
 	var/datum/action/ability/xeno_action/spawn_hugger/hugger_ability = xenomorph_owner.actions_by_path[/datum/action/ability/xeno_action/spawn_hugger]
 	if(!hugger_ability)
 		return FALSE
@@ -331,7 +331,7 @@
 	hugger_ability.health_cost += get_damage(0)
 	return ..()
 
-/datum/mutation_upgrade/veil/life_for_life/on_mutation_disabled()
+/datum/mutation_upgrade/veil/life_for_life/on_loss()
 	. = ..()
 	var/datum/action/ability/xeno_action/spawn_hugger/hugger_ability = xenomorph_owner.actions_by_path[/datum/action/ability/xeno_action/spawn_hugger]
 	if(!hugger_ability)

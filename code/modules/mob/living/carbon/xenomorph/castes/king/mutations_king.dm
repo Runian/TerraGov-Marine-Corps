@@ -39,7 +39,7 @@
 		return ..()
 	return "Psychic Summon only affects minions. Upon summon completion, the summoned gain a [PERCENT(get_amount(new_amount))]% melee damage increase for 30 seconds."
 
-/datum/mutation_upgrade/spur/minion_king/on_mutation_enabled()
+/datum/mutation_upgrade/spur/minion_king/on_gain()
 	. = ..()
 	var/datum/action/ability/xeno_action/psychic_summon/summon_ability = xenomorph_owner.actions_by_path[/datum/action/ability/xeno_action/psychic_summon]
 	if(!summon_ability)
@@ -47,7 +47,7 @@
 	summon_ability.minions_only = TRUE
 	summon_ability.flat_damage_multiplier += get_amount(0)
 
-/datum/mutation_upgrade/spur/minion_king/on_mutation_disabled()
+/datum/mutation_upgrade/spur/minion_king/on_loss()
 	. = ..()
 	var/datum/action/ability/xeno_action/psychic_summon/summon_ability = xenomorph_owner.actions_by_path[/datum/action/ability/xeno_action/psychic_summon]
 	if(!summon_ability)
@@ -82,14 +82,14 @@
 		return ..()
 	return "Nightfall's range is increased by [get_range(new_amount)] tiles and its cooldown is increased by [cooldown_initial / 10] seconds."
 
-/datum/mutation_upgrade/veil/widefall/on_mutation_enabled()
+/datum/mutation_upgrade/veil/widefall/on_gain()
 	. = ..()
 	var/datum/action/ability/activable/xeno/nightfall/nightfall_ability = xenomorph_owner.actions_by_path[/datum/action/ability/activable/xeno/nightfall]
 	if(!nightfall_ability)
 		return
 	nightfall_ability.cooldown_duration += cooldown_initial
 
-/datum/mutation_upgrade/veil/widefall/on_mutation_disabled()
+/datum/mutation_upgrade/veil/widefall/on_loss()
 	. = ..()
 	var/datum/action/ability/activable/xeno/nightfall/nightfall_ability = xenomorph_owner.actions_by_path[/datum/action/ability/activable/xeno/nightfall]
 	if(!nightfall_ability)
@@ -124,7 +124,7 @@
 		return ..()
 	return "Nightfall's range is decreased by [-get_range(new_amount)] tiles. Nightfall will cause flares in its affected radius to lose [-PERCENT(get_flare_multiplier(new_amount))]% of their remaining duration."
 
-/datum/mutation_upgrade/veil/flarefall/on_mutation_enabled()
+/datum/mutation_upgrade/veil/flarefall/on_gain()
 	. = ..()
 	var/datum/action/ability/activable/xeno/nightfall/nightfall_ability = xenomorph_owner.actions_by_path[/datum/action/ability/activable/xeno/nightfall]
 	if(!nightfall_ability)
@@ -132,7 +132,7 @@
 	nightfall_ability.range += get_range(0)
 	nightfall_ability.flare_fuel_multiplier += get_flare_multiplier(0)
 
-/datum/mutation_upgrade/veil/flarefall/on_mutation_disabled()
+/datum/mutation_upgrade/veil/flarefall/on_loss()
 	. = ..()
 	var/datum/action/ability/activable/xeno/nightfall/nightfall_ability = xenomorph_owner.actions_by_path[/datum/action/ability/activable/xeno/nightfall]
 	if(!nightfall_ability)

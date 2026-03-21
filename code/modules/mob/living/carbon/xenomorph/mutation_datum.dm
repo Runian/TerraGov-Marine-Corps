@@ -32,9 +32,6 @@
 	. = ..()
 
 	var/mob/living/carbon/xenomorph/xenomorph_user = user
-	.["shell_chambers"] = length(xenomorph_user.hive.shell_chambers)
-	.["spur_chambers"] = length(xenomorph_user.hive.spur_chambers)
-	.["veil_chambers"] = length(xenomorph_user.hive.veil_chambers)
 	.["disks_completed"] = HAS_TRAIT(xenomorph_user, TRAIT_VALHALLA_XENO) ? 3 : length(completed_disk_colors)
 
 /datum/mutation_datum/ui_static_data(mob/user)
@@ -43,9 +40,6 @@
 	.["shell_mutations"] = list()
 	.["spur_mutations"] = list()
 	.["veil_mutations"] = list()
-	.["already_has_shell"] = has_any_mutation_in_category(xenomorph_user, MUTATION_SHELL)
-	.["already_has_spur"] = has_any_mutation_in_category(xenomorph_user, MUTATION_SPUR)
-	.["already_has_veil"] = has_any_mutation_in_category(xenomorph_user, MUTATION_VEIL)
 	for(var/datum/mutation_upgrade/mutation AS in all_mutation_upgrades)
 		if(!can_choose_mutation(xenomorph_user, mutation))
 			continue
@@ -60,6 +54,9 @@
 			"desc" = mutation.desc,
 			"owned" = has_mutation_by_typepath(xenomorph_user, mutation.type)
 		))
+	.["points_available"] = GLOB.hive_datums[xenomorph_user.hivenumber].mutation_points
+	.["points_used"] = length(xenomorph_user.owned_mutations)
+	.["points_maximum"] = MUTATION_MAXIMUM_POINTS
 
 /datum/mutation_datum/ui_act(action, params)
 	. = ..()
@@ -121,7 +118,7 @@
 	if(xenomorph_purchaser.fortify)
 		to_chat(xenomorph_purchaser, span_warning("You cannot buy mutations while fortified!"))
 		return FALSE
-	if(!HAS_TRAIT(xenomorph_purchaser, TRAIT_VALHALLA_XENO) && length(xenomorph_purchaser.owned_mutations) >= length(completed_disk_colors)) // Checking if buying another would put us over the completed disk count.
+	if(!HAS_TRAIT(xenomorph_purchaser, TRAIT_VALHALLA_XENO) && (length(xenomorph_purchaser.owned_mutations) >= length(completed_disk_colors) || length(xenomorph_purchaser.owned_mutations) > MUTATION_MAXIMUM_POINTS))
 		to_chat(xenomorph_purchaser, span_warning("The hive hasn't developed enough to get another mutation..."))
 		return FALSE
 	if(has_mutation_by_typepath(xenomorph_purchaser, mutation_typepath))
@@ -129,9 +126,6 @@
 		return FALSE
 	if(has_any_mutation_in_category(xenomorph_purchaser, mutation_typepath.category))
 		to_chat(xenomorph_purchaser, span_warning("You already have a mutation in this category!"))
-		return FALSE
-	if(!xenomorph_purchaser.hive.has_any_mutation_structures_in_category(mutation_typepath.required_structure))
-		to_chat(xenomorph_purchaser, span_warning("This mutation requires a [mutation_typepath.required_structure] chamber to exist!"))
 		return FALSE
 	for(var/datum/mutation_upgrade/owned_mutation AS in xenomorph_purchaser.owned_mutations)
 		if(!(mutation_typepath in owned_mutation.conflicting_mutation_types))

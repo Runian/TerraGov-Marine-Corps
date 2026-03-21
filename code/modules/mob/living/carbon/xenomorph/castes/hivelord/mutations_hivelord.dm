@@ -14,7 +14,7 @@
 		return ..()
 	return "Resin Walk increases all soft armor by [get_armor(new_amount)], but prevents you from regenerating plasma."
 
-/datum/mutation_upgrade/shell/hardened_travel/on_mutation_enabled()
+/datum/mutation_upgrade/shell/hardened_travel/on_gain()
 	. = ..()
 	var/datum/action/ability/xeno_action/toggle_speed/speed_ability = xenomorph_owner.actions_by_path[/datum/action/ability/xeno_action/toggle_speed]
 	if(!speed_ability)
@@ -22,7 +22,7 @@
 	speed_ability.set_plasma(FALSE)
 	speed_ability.set_armor(speed_ability.armor_amount + get_armor(0))
 
-/datum/mutation_upgrade/shell/hardened_travel/on_mutation_disabled()
+/datum/mutation_upgrade/shell/hardened_travel/on_loss()
 	. = ..()
 	var/datum/action/ability/xeno_action/toggle_speed/speed_ability = xenomorph_owner.actions_by_path[/datum/action/ability/xeno_action/toggle_speed]
 	if(!speed_ability)
@@ -54,14 +54,14 @@
 		return ..()
 	return "Resin Walk creates temporary weeds as you move. Each created weed consumes [get_plasma(new_amount)] plasma."
 
-/datum/mutation_upgrade/shell/costly_travel/on_mutation_enabled()
+/datum/mutation_upgrade/shell/costly_travel/on_gain()
 	. = ..()
 	var/datum/action/ability/xeno_action/toggle_speed/speed_ability = xenomorph_owner.actions_by_path[/datum/action/ability/xeno_action/toggle_speed]
 	if(!speed_ability)
 		return
 	speed_ability.weeding_cost += get_plasma(0)
 
-/datum/mutation_upgrade/shell/costly_travel/on_mutation_disabled()
+/datum/mutation_upgrade/shell/costly_travel/on_loss()
 	. = ..()
 	var/datum/action/ability/xeno_action/toggle_speed/speed_ability = xenomorph_owner.actions_by_path[/datum/action/ability/xeno_action/toggle_speed]
 	if(!speed_ability)
@@ -119,11 +119,11 @@
 		return ..()
 	return "Whenever you slash a human, [get_plasma(new_amount)] plasma is consumed to throw a sticky resin grenade at them. This can occur every 8 seconds."
 
-/datum/mutation_upgrade/spur/resin_splash/on_mutation_enabled()
+/datum/mutation_upgrade/spur/resin_splash/on_gain()
 	RegisterSignal(xenomorph_owner, COMSIG_XENOMORPH_ATTACK_HUMAN, PROC_REF(on_attack_human))
 	return ..()
 
-/datum/mutation_upgrade/spur/resin_splash/on_mutation_disabled()
+/datum/mutation_upgrade/spur/resin_splash/on_loss()
 	UnregisterSignal(xenomorph_owner, COMSIG_XENOMORPH_ATTACK_HUMAN)
 	return ..()
 
@@ -155,14 +155,14 @@
 		return ..()
 	return "Recovery Pylon's aura is replaced with one that increases melee damage modifier by [PERCENT(get_modifier(new_amount))]%. The aura's radius is increased by 3."
 
-/datum/mutation_upgrade/spur/hostile_pylon/on_mutation_enabled()
+/datum/mutation_upgrade/spur/hostile_pylon/on_gain()
 	. = ..()
 	var/datum/action/ability/xeno_action/place_recovery_pylon/pylon_ability = xenomorph_owner.actions_by_path[/datum/action/ability/xeno_action/place_recovery_pylon]
 	if(!pylon_ability)
 		return
 	pylon_ability.radius += 3
 
-/datum/mutation_upgrade/spur/hostile_pylon/on_mutation_disabled()
+/datum/mutation_upgrade/spur/hostile_pylon/on_loss()
 	. = ..()
 	var/datum/action/ability/xeno_action/place_recovery_pylon/pylon_ability = xenomorph_owner.actions_by_path[/datum/action/ability/xeno_action/place_recovery_pylon]
 	if(!pylon_ability)
@@ -199,7 +199,7 @@
 		return ..()
 	return "Healing Infusion now also applies the effects of resin jelly for [resin_jelly_length / 10] seconds. The plasma cost is now [1 + get_multiplier(new_amount)]x of the original cost."
 
-/datum/mutation_upgrade/veil/protective_light/on_mutation_enabled()
+/datum/mutation_upgrade/veil/protective_light/on_gain()
 	. = ..()
 	var/datum/action/ability/activable/xeno/healing_infusion/healing_ability = xenomorph_owner.actions_by_path[/datum/action/ability/activable/xeno/healing_infusion]
 	if(!healing_ability)
@@ -207,7 +207,7 @@
 	healing_ability.resin_jelly_duration += resin_jelly_length
 	healing_ability.ability_cost += initial(healing_ability.ability_cost) * get_multiplier(0)
 
-/datum/mutation_upgrade/veil/protective_light/on_mutation_disabled()
+/datum/mutation_upgrade/veil/protective_light/on_loss()
 	. = ..()
 	var/datum/action/ability/activable/xeno/healing_infusion/healing_ability = xenomorph_owner.actions_by_path[/datum/action/ability/activable/xeno/healing_infusion]
 	if(!healing_ability)
@@ -239,7 +239,7 @@
 		return ..()
 	return "Healing Infusion only lasts [PERCENT(1 + get_multiplier(new_amount))]% as long, but grants innate healing which allows healing off of weeds."
 
-/datum/mutation_upgrade/veil/forward_light/on_mutation_enabled()
+/datum/mutation_upgrade/veil/forward_light/on_gain()
 	. = ..()
 	var/datum/action/ability/activable/xeno/healing_infusion/healing_ability = xenomorph_owner.actions_by_path[/datum/action/ability/activable/xeno/healing_infusion]
 	if(!healing_ability)
@@ -247,7 +247,7 @@
 	healing_ability.innate_healing = TRUE
 	healing_ability.status_multiplier += get_multiplier(0)
 
-/datum/mutation_upgrade/veil/forward_light/on_mutation_disabled()
+/datum/mutation_upgrade/veil/forward_light/on_loss()
 	. = ..()
 	var/datum/action/ability/activable/xeno/healing_infusion/healing_ability = xenomorph_owner.actions_by_path[/datum/action/ability/activable/xeno/healing_infusion]
 	if(!healing_ability)
@@ -279,7 +279,7 @@
 		return ..()
 	return "Plant Weeds now costs [PERCENT(1 + get_multiplier(new_amount))]% of its initial value, but loses the option to select basic weeds."
 
-/datum/mutation_upgrade/veil/weed_specialist/on_mutation_enabled()
+/datum/mutation_upgrade/veil/weed_specialist/on_gain()
 	. = ..()
 	var/datum/action/ability/activable/xeno/plant_weeds/weed_ability = xenomorph_owner.actions_by_path[/datum/action/ability/activable/xeno/plant_weeds]
 	if(!weed_ability)
@@ -290,7 +290,7 @@
 		weed_ability.weed_type = pick(weed_ability.selectable_weed_typepaths)
 	weed_ability.cost_multiplier += get_multiplier(0)
 
-/datum/mutation_upgrade/veil/weed_specialist/on_mutation_disabled()
+/datum/mutation_upgrade/veil/weed_specialist/on_loss()
 	. = ..()
 	var/datum/action/ability/activable/xeno/plant_weeds/weed_ability = xenomorph_owner.actions_by_path[/datum/action/ability/activable/xeno/plant_weeds]
 	if(!weed_ability)

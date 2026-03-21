@@ -18,12 +18,12 @@
 		return ..()
 	return "If you are on fire, consume [get_cost(new_amount)] plasma to extinguish yourself and any fire under you. This only can occur every [timer_length * 0.1] second."
 
-/datum/mutation_upgrade/shell/acid_sweat/on_mutation_enabled()
+/datum/mutation_upgrade/shell/acid_sweat/on_gain()
 	RegisterSignal(xenomorph_owner, COMSIG_LIVING_IGNITED, PROC_REF(on_ignited))
 	try_extinguish()
 	return ..()
 
-/datum/mutation_upgrade/shell/acid_sweat/on_mutation_disabled()
+/datum/mutation_upgrade/shell/acid_sweat/on_loss()
 	UnregisterSignal(xenomorph_owner, COMSIG_LIVING_IGNITED)
 	if(timer_id)
 		deltimer(timer_id)
@@ -74,7 +74,7 @@
 		return ..()
 	return "Scatter Spit cast time is [PERCENT(1 + get_cast_multiplier(new_amount))]% of its original amount. It no longer deals bonus damage."
 
-/datum/mutation_upgrade/spur/hit_and_run/on_mutation_enabled()
+/datum/mutation_upgrade/spur/hit_and_run/on_gain()
 	var/datum/action/ability/activable/xeno/scatter_spit/scatter_ability = xenomorph_owner.actions_by_path[/datum/action/ability/activable/xeno/scatter_spit]
 	if(!scatter_ability)
 		return
@@ -82,7 +82,7 @@
 	scatter_ability.should_get_upgrade_bonus = FALSE
 	return ..()
 
-/datum/mutation_upgrade/spur/hit_and_run/on_mutation_disabled()
+/datum/mutation_upgrade/spur/hit_and_run/on_loss()
 	var/datum/action/ability/activable/xeno/scatter_spit/scatter_ability = xenomorph_owner.actions_by_path[/datum/action/ability/activable/xeno/scatter_spit]
 	if(!scatter_ability)
 		return
@@ -115,10 +115,10 @@
 		return ..()
 	return "Slashing humans will reduce their fire stacks by [-get_stacks(new_amount)]."
 
-/datum/mutation_upgrade/veil/wet_claws/on_mutation_enabled()
+/datum/mutation_upgrade/veil/wet_claws/on_gain()
 	RegisterSignal(xenomorph_owner, COMSIG_XENOMORPH_POSTATTACK_LIVING, PROC_REF(on_postattack_living))
 
-/datum/mutation_upgrade/veil/wet_claws/on_mutation_disabled()
+/datum/mutation_upgrade/veil/wet_claws/on_loss()
 	UnregisterSignal(xenomorph_owner, COMSIG_XENOMORPH_POSTATTACK_LIVING)
 
 /// Adjusts fire stacks of the hit target by a variable amount.

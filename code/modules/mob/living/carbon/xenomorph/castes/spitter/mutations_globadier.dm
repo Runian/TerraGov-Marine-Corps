@@ -14,7 +14,7 @@
 		return ..()
 	return "Toss Grenade can target yourself. Targeting yourself will toss the grenade under you and reduce the detonation time by [-get_duration(new_amount) * 0.1] seconds. The resulting detonation time can never go under 0.5 seconds."
 
-/datum/mutation_upgrade/shell/self_explosion/on_mutation_enabled()
+/datum/mutation_upgrade/shell/self_explosion/on_gain()
 	var/datum/action/ability/activable/xeno/toss_grenade/grenade_ability = xenomorph_owner.actions_by_path[/datum/action/ability/activable/xeno/toss_grenade]
 	if(!grenade_ability)
 		return
@@ -22,7 +22,7 @@
 	grenade_ability.bonus_self_detonation_time += get_duration(0)
 	return ..()
 
-/datum/mutation_upgrade/shell/self_explosion/on_mutation_disabled()
+/datum/mutation_upgrade/shell/self_explosion/on_loss()
 	var/datum/action/ability/activable/xeno/toss_grenade/grenade_ability = xenomorph_owner.actions_by_path[/datum/action/ability/activable/xeno/toss_grenade]
 	if(!grenade_ability)
 		return
@@ -57,14 +57,14 @@
 		return ..()
 	return "Toss Grenade will deal damage equal to [PERCENT(get_percentage(new_amount))]% of your maximum health and allow you to throw a non-healing grenade if you had none."
 
-/datum/mutation_upgrade/spur/blood_grenades/on_mutation_enabled()
+/datum/mutation_upgrade/spur/blood_grenades/on_gain()
 	var/datum/action/ability/activable/xeno/toss_grenade/grenade_ability = xenomorph_owner.actions_by_path[/datum/action/ability/activable/xeno/toss_grenade]
 	if(!grenade_ability)
 		return
 	grenade_ability.health_loss_percentage_per_grenade += get_percentage(0)
 	return ..()
 
-/datum/mutation_upgrade/spur/blood_grenades/on_mutation_disabled()
+/datum/mutation_upgrade/spur/blood_grenades/on_loss()
 	var/datum/action/ability/activable/xeno/toss_grenade/grenade_ability = xenomorph_owner.actions_by_path[/datum/action/ability/activable/xeno/toss_grenade]
 	if(!grenade_ability)
 		return

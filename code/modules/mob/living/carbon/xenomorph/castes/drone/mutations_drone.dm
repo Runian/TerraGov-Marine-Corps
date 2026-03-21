@@ -19,11 +19,11 @@
 	name = "Scout"
 	desc = "You now gain the speed bonus associated with being on weeds at all times."
 
-/datum/mutation_upgrade/shell/drone/scout/on_mutation_enabled()
+/datum/mutation_upgrade/shell/drone/scout/on_gain()
 	RegisterSignal(xenomorph_owner, COMSIG_MOVABLE_MOVED, PROC_REF(on_movement))
 	return ..()
 
-/datum/mutation_upgrade/shell/drone/scout/on_mutation_disabled()
+/datum/mutation_upgrade/shell/drone/scout/on_loss()
 	UnregisterSignal(xenomorph_owner, COMSIG_MOVABLE_MOVED)
 	return ..()
 
@@ -39,14 +39,14 @@
 	name = "Together In Claws"
 	desc = "While actively connected with your Essence Link partner, your partner's slash attacks heal you for 20% of the damage dealt."
 
-/datum/mutation_upgrade/spur/drone/together_in_claws/on_mutation_enabled()
+/datum/mutation_upgrade/spur/drone/together_in_claws/on_gain()
 	RegisterSignal(xenomorph_owner, COMSIG_XENO_ESSENCE_LINK_TOGGLED, PROC_REF(on_essence_link_toggle))
 	var/datum/action/ability/activable/xeno/essence_link/ability = xenomorph_owner.actions_by_path[/datum/action/ability/activable/xeno/essence_link]
 	if(ability?.existing_link && ability.existing_link.current_beam)
 		on_essence_link_toggle(xenomorph_owner, ability.existing_link.link_target, TRUE)
 	return ..()
 
-/datum/mutation_upgrade/spur/drone/together_in_claws/on_mutation_disabled()
+/datum/mutation_upgrade/spur/drone/together_in_claws/on_loss()
 	UnregisterSignal(xenomorph_owner, list(COMSIG_XENO_ESSENCE_LINK_TOGGLED))
 	var/datum/action/ability/activable/xeno/essence_link/ability = xenomorph_owner.actions_by_path[/datum/action/ability/activable/xeno/essence_link]
 	if(ability?.existing_link && ability.existing_link.current_beam)
@@ -70,14 +70,14 @@
 	name = "Emergency Repel"
 	desc = "While actively connected with your Essence Link partner, cancelling the link will heal 20% of your missing health per attunement bar and throws you towards your partner bypassing wired barricades."
 
-/datum/mutation_upgrade/spur/drone/emergency_repel/on_mutation_enabled()
+/datum/mutation_upgrade/spur/drone/emergency_repel/on_gain()
 	RegisterSignal(xenomorph_owner, COMSIG_XENO_ESSENCE_LINK_TOGGLED, PROC_REF(on_essence_link_toggle))
 	var/datum/action/ability/activable/xeno/essence_link/ability = xenomorph_owner.actions_by_path[/datum/action/ability/activable/xeno/essence_link]
 	if(ability?.existing_link && ability.existing_link.current_beam)
 		on_essence_link_toggle(xenomorph_owner, ability.existing_link.link_target, TRUE)
 	return ..()
 
-/datum/mutation_upgrade/spur/drone/emergency_repel/on_mutation_disabled()
+/datum/mutation_upgrade/spur/drone/emergency_repel/on_loss()
 	UnregisterSignal(xenomorph_owner, COMSIG_XENO_ESSENCE_LINK_TOGGLED)
 	var/datum/action/ability/activable/xeno/essence_link/ability = xenomorph_owner.actions_by_path[/datum/action/ability/activable/xeno/essence_link]
 	if(ability?.existing_link && ability.existing_link.current_beam)
@@ -118,11 +118,11 @@
 	/// The amount of deciseconds that the thin sticky resin will last for.
 	var/sticky_resin_duration = 8 SECONDS
 
-/datum/mutation_upgrade/spur/drone/combustive_jelly/on_mutation_enabled()
+/datum/mutation_upgrade/spur/drone/combustive_jelly/on_gain()
 	RegisterSignal(xenomorph_owner, COMSIG_MOB_THROW, PROC_REF(on_throw_anything))
 	return ..()
 
-/datum/mutation_upgrade/spur/drone/combustive_jelly/on_mutation_disabled()
+/datum/mutation_upgrade/spur/drone/combustive_jelly/on_loss()
 	UnregisterSignal(xenomorph_owner, COMSIG_MOB_THROW)
 	return ..()
 
@@ -168,14 +168,14 @@
 	/// The timer that resets the marked human (after a second).
 	var/timer_id
 
-/datum/mutation_upgrade/spur/drone/coordinated_slashes/on_mutation_enabled()
+/datum/mutation_upgrade/spur/drone/coordinated_slashes/on_gain()
 	RegisterSignal(xenomorph_owner, COMSIG_XENO_ESSENCE_LINK_TOGGLED, PROC_REF(on_essence_link_toggle))
 	var/datum/action/ability/activable/xeno/essence_link/ability = xenomorph_owner.actions_by_path[/datum/action/ability/activable/xeno/essence_link]
 	if(ability?.existing_link && ability.existing_link.current_beam)
 		on_essence_link_toggle(xenomorph_owner, ability.existing_link.link_target, TRUE)
 	return ..()
 
-/datum/mutation_upgrade/spur/drone/coordinated_slashes/on_mutation_disabled()
+/datum/mutation_upgrade/spur/drone/coordinated_slashes/on_loss()
 	UnregisterSignal(xenomorph_owner, COMSIG_XENO_ESSENCE_LINK_TOGGLED)
 	var/datum/action/ability/activable/xeno/essence_link/ability = xenomorph_owner.actions_by_path[/datum/action/ability/activable/xeno/essence_link]
 	if(ability?.existing_link && ability.existing_link.current_beam)
@@ -230,14 +230,14 @@
 	desc = "While actively connected with your Essence Link partner, your slash damage is increased up to 30% based on your partner's missing health. Critical health grants the maximum amount."
 	var/current_damage_multiplier = 0
 
-/datum/mutation_upgrade/spur/drone/aggressive_connection/on_mutation_enabled()
+/datum/mutation_upgrade/spur/drone/aggressive_connection/on_gain()
 	RegisterSignal(xenomorph_owner, COMSIG_XENO_ESSENCE_LINK_TOGGLED, PROC_REF(on_essence_link_toggle))
 	var/datum/action/ability/activable/xeno/essence_link/ability = xenomorph_owner.actions_by_path[/datum/action/ability/activable/xeno/essence_link]
 	if(ability?.existing_link && ability.existing_link.current_beam)
 		on_essence_link_toggle(xenomorph_owner, ability.existing_link.link_target, TRUE)
 	return ..()
 
-/datum/mutation_upgrade/spur/drone/aggressive_connection/on_mutation_disabled()
+/datum/mutation_upgrade/spur/drone/aggressive_connection/on_loss()
 	UnregisterSignal(xenomorph_owner, list(COMSIG_XENO_ESSENCE_LINK_TOGGLED))
 	var/datum/action/ability/activable/xeno/essence_link/ability = xenomorph_owner.actions_by_path[/datum/action/ability/activable/xeno/essence_link]
 	if(ability?.existing_link && ability.existing_link.current_beam)
@@ -286,14 +286,14 @@
 	name = "Sacrificial Salve"
 	desc = "Healing Salve can be toggled for additional effects. While toggled, healing will additionally transfer up to half of your current health to your target."
 
-/datum/mutation_upgrade/veil/drone/sacrificial_salve/on_mutation_enabled()
+/datum/mutation_upgrade/veil/drone/sacrificial_salve/on_gain()
 	var/datum/action/ability/activable/xeno/psychic_cure/acidic_salve/ability = xenomorph_owner.actions_by_path[/datum/action/ability/activable/xeno/psychic_cure/acidic_salve]
 	if(!ability)
 		return
 	ability.expeditious_salve_togglable = TRUE
 	return ..()
 
-/datum/mutation_upgrade/veil/drone/sacrificial_salve/on_mutation_disabled()
+/datum/mutation_upgrade/veil/drone/sacrificial_salve/on_loss()
 	var/datum/action/ability/activable/xeno/psychic_cure/acidic_salve/ability = xenomorph_owner.actions_by_path[/datum/action/ability/activable/xeno/psychic_cure/acidic_salve]
 	if(!ability)
 		return
@@ -306,7 +306,7 @@
 	name = "Saving Grace"
 	desc = "Acidic Salve has no cast time on your Essence Link partner. The maximum health threshold to qualify for bonus heal potency on your Essence Link partner is raised from 10% to 30%."
 
-/datum/mutation_upgrade/veil/drone/saving_grace/on_mutation_enabled()
+/datum/mutation_upgrade/veil/drone/saving_grace/on_gain()
 	var/datum/action/ability/activable/xeno/psychic_cure/acidic_salve/ability = xenomorph_owner.actions_by_path[/datum/action/ability/activable/xeno/psychic_cure/acidic_salve]
 	if(!ability)
 		return
@@ -314,7 +314,7 @@
 	ability.bonus_heal_maximum_health_threshold += 0.2
 	return ..()
 
-/datum/mutation_upgrade/veil/drone/saving_grace/on_mutation_disabled()
+/datum/mutation_upgrade/veil/drone/saving_grace/on_loss()
 	var/datum/action/ability/activable/xeno/psychic_cure/acidic_salve/ability = xenomorph_owner.actions_by_path[/datum/action/ability/activable/xeno/psychic_cure/acidic_salve]
 	if(!ability)
 		return
@@ -326,14 +326,14 @@
 	name = "Self Sufficiency"
 	desc = "Acidic Salve can be self-casted at 75% efficiency."
 
-/datum/mutation_upgrade/veil/drone/self_sufficiency/on_mutation_enabled()
+/datum/mutation_upgrade/veil/drone/self_sufficiency/on_gain()
 	var/datum/action/ability/activable/xeno/psychic_cure/acidic_salve/ability = xenomorph_owner.actions_by_path[/datum/action/ability/activable/xeno/psychic_cure/acidic_salve]
 	if(!ability)
 		return
 	ability.use_state_flags |= ABILITY_TARGET_SELF // Ability handles the efficiency.
 	return ..()
 
-/datum/mutation_upgrade/veil/drone/self_sufficiency/on_mutation_disabled()
+/datum/mutation_upgrade/veil/drone/self_sufficiency/on_loss()
 	var/datum/action/ability/activable/xeno/psychic_cure/acidic_salve/ability = xenomorph_owner.actions_by_path[/datum/action/ability/activable/xeno/psychic_cure/acidic_salve]
 	if(!ability)
 		return

@@ -14,7 +14,7 @@
 		return ..()
 	return "Psychic Shield will attempt to detonate if it was canceled while the shield is intact. The detonation cost is now [PERCENT(1 + get_multiplier(new_amount))]% of its original cost."
 
-/datum/mutation_upgrade/shell/cautious_mind/on_mutation_enabled()
+/datum/mutation_upgrade/shell/cautious_mind/on_gain()
 	. = ..()
 	var/datum/action/ability/activable/xeno/psychic_shield/shield_ability = xenomorph_owner.actions_by_path[/datum/action/ability/activable/xeno/psychic_shield]
 	if(!shield_ability)
@@ -22,7 +22,7 @@
 	shield_ability.detonates_on_cancel = TRUE
 	shield_ability.detonation_cost += initial(shield_ability.detonation_cost) * get_multiplier(0)
 
-/datum/mutation_upgrade/shell/cautious_mind/on_mutation_disabled()
+/datum/mutation_upgrade/shell/cautious_mind/on_loss()
 	. = ..()
 	var/datum/action/ability/activable/xeno/psychic_shield/shield_ability = xenomorph_owner.actions_by_path[/datum/action/ability/activable/xeno/psychic_shield]
 	if(!shield_ability)
@@ -55,14 +55,14 @@
 		return ..()
 	return "Psychic Blast now switch to a different type of beam called Psychic Drain; it deals 0.7x stamina damage, briefly knockdowns on direct impact, and knockback on non-direct impact. Psychic Drain's cooldown is [PERCENT(1 + get_multiplier(new_amount))]% of its original cooldown."
 
-/datum/mutation_upgrade/spur/draining_blast/on_mutation_enabled()
+/datum/mutation_upgrade/spur/draining_blast/on_gain()
 	. = ..()
 	var/datum/action/ability/activable/xeno/psy_blast/blast_ability = xenomorph_owner.actions_by_path[/datum/action/ability/activable/xeno/psy_blast]
 	if(!blast_ability)
 		return
 	blast_ability.selectable_ammo_types += /datum/ammo/energy/xeno/psy_blast/psy_drain
 
-/datum/mutation_upgrade/spur/draining_blast/on_mutation_disabled()
+/datum/mutation_upgrade/spur/draining_blast/on_loss()
 	. = ..()
 	var/datum/action/ability/activable/xeno/psy_blast/blast_ability = xenomorph_owner.actions_by_path[/datum/action/ability/activable/xeno/psy_blast]
 	if(!blast_ability)
@@ -96,7 +96,7 @@
 		return ..()
 	return "Psychic Shield no longer forces you to remain still to keep the shield up. However, the shield sizzles out when manually detonating and slows you down by [get_movespeed(new_amount)] while it is active."
 
-/datum/mutation_upgrade/veil/mobile_mind/on_mutation_enabled()
+/datum/mutation_upgrade/veil/mobile_mind/on_gain()
 	. = ..()
 	var/datum/action/ability/activable/xeno/psychic_shield/shield_ability = xenomorph_owner.actions_by_path[/datum/action/ability/activable/xeno/psychic_shield]
 	if(!shield_ability)
@@ -105,7 +105,7 @@
 	shield_ability.can_manually_detonate = FALSE
 	shield_ability.movement_speed_modifier += get_movespeed(0)
 
-/datum/mutation_upgrade/veil/mobile_mind/on_mutation_disabled()
+/datum/mutation_upgrade/veil/mobile_mind/on_loss()
 	. = ..()
 	var/datum/action/ability/activable/xeno/psychic_shield/shield_ability = xenomorph_owner.actions_by_path[/datum/action/ability/activable/xeno/psychic_shield]
 	if(!shield_ability)

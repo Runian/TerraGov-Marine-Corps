@@ -12,14 +12,14 @@
 		return ..()
 	return "The effects of Jab from Conqueror's Will is replaced. It will instead heal you for [PERCENT(get_percentage(new_amount))]% of your maximum health."
 
-/datum/mutation_upgrade/shell/healing_jab/on_mutation_enabled()
+/datum/mutation_upgrade/shell/healing_jab/on_gain()
 	. = ..()
 	var/datum/action/ability/activable/xeno/conqueror_will/will_ability = xenomorph_owner.actions_by_path[/datum/action/ability/activable/xeno/conqueror_will]
 	if(!will_ability)
 		return
 	will_ability.jab_damage_multiplier = 0
 
-/datum/mutation_upgrade/shell/healing_jab/on_mutation_disabled()
+/datum/mutation_upgrade/shell/healing_jab/on_loss()
 	. = ..()
 	var/datum/action/ability/activable/xeno/conqueror_will/will_ability = xenomorph_owner.actions_by_path[/datum/action/ability/activable/xeno/conqueror_will]
 	if(!will_ability)
@@ -55,7 +55,7 @@
 		return ..()
 	return "Domination's radius is reduced by [-radius_initial], but knocked down for [get_duration(new_amount) / 10] seconds longer."
 
-/datum/mutation_upgrade/spur/telefrag/on_mutation_enabled()
+/datum/mutation_upgrade/spur/telefrag/on_gain()
 	. = ..()
 	var/datum/action/ability/activable/xeno/conqueror_domination/domination_ability = xenomorph_owner.actions_by_path[/datum/action/ability/activable/xeno/conqueror_domination]
 	if(!domination_ability)
@@ -63,7 +63,7 @@
 	domination_ability.radius += radius_initial
 	domination_ability.knockdown_duration += get_duration(0)
 
-/datum/mutation_upgrade/spur/telefrag/on_mutation_disabled()
+/datum/mutation_upgrade/spur/telefrag/on_loss()
 	. = ..()
 	var/datum/action/ability/activable/xeno/conqueror_domination/domination_ability = xenomorph_owner.actions_by_path[/datum/action/ability/activable/xeno/conqueror_domination]
 	if(!domination_ability)
@@ -99,14 +99,14 @@
 		return ..()
 	return "Dash can be activated at will as long it has charges. It can store up to [get_dashes(new_amount)] charges which are given at the rate of [PERCENT(cooldown_multiplier_initial)]% of the ability's original cooldown."
 
-/datum/mutation_upgrade/veil/dasher/on_mutation_enabled()
+/datum/mutation_upgrade/veil/dasher/on_gain()
 	. = ..()
 	var/datum/action/ability/xeno_action/conqueror_dash/dash_ability = xenomorph_owner.actions_by_path[/datum/action/ability/xeno_action/conqueror_dash]
 	if(!dash_ability)
 		return
 	dash_ability.cooldown_duration = 0.1 SECONDS
 
-/datum/mutation_upgrade/veil/dasher/on_mutation_disabled()
+/datum/mutation_upgrade/veil/dasher/on_loss()
 	. = ..()
 	var/datum/action/ability/xeno_action/conqueror_dash/dash_ability = xenomorph_owner.actions_by_path[/datum/action/ability/xeno_action/conqueror_dash]
 	if(!dash_ability)

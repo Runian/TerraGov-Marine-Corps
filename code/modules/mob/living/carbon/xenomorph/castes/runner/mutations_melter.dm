@@ -16,14 +16,14 @@
 		return ..()
 	return "Upon entering critical, release stunning acid in a radius of [get_radius(new_amount)] tiles. This resets upon reaching full health."
 
-/datum/mutation_upgrade/shell/acid_release/on_mutation_enabled()
+/datum/mutation_upgrade/shell/acid_release/on_gain()
 	RegisterSignals(xenomorph_owner, list(COMSIG_XENOMORPH_BRUTE_DAMAGE, COMSIG_XENOMORPH_BURN_DAMAGE), PROC_REF(on_damage))
 	RegisterSignal(xenomorph_owner, COMSIG_MOB_STAT_CHANGED, PROC_REF(on_stat_changed))
 	if(xenomorph_owner.health >= xenomorph_owner.maxHealth)
 		can_be_activated = TRUE
 	return ..()
 
-/datum/mutation_upgrade/shell/acid_release/on_mutation_disabled()
+/datum/mutation_upgrade/shell/acid_release/on_loss()
 	UnregisterSignal(xenomorph_owner, list(COMSIG_XENOMORPH_BRUTE_DAMAGE, COMSIG_XENOMORPH_BURN_DAMAGE, COMSIG_MOB_STAT_CHANGED))
 	can_be_activated = FALSE
 	return ..()
@@ -63,7 +63,7 @@
 		return ..()
 	return "All of your stash damage is burn damage and is now checked against acid. You inflict [get_stacks(new_amount)] additional melting acid stacks."
 
-/datum/mutation_upgrade/spur/fully_acid/on_mutation_enabled()
+/datum/mutation_upgrade/spur/fully_acid/on_gain()
 	if(!isxenomelter(xenomorph_owner))
 		return
 	var/mob/living/carbon/xenomorph/runner/melter/melter_owner = xenomorph_owner
@@ -71,7 +71,7 @@
 	melter_owner.second_damage_armor = ACID
 	return ..()
 
-/datum/mutation_upgrade/spur/fully_acid/on_mutation_disabled()
+/datum/mutation_upgrade/spur/fully_acid/on_loss()
 	if(!isxenomelter(xenomorph_owner))
 		return
 	var/mob/living/carbon/xenomorph/runner/melter/melter_owner = xenomorph_owner

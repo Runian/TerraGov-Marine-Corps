@@ -16,12 +16,12 @@
 		return ..()
 	return "If you are ontop of fire, you gain [get_armor(new_amount)] in all categories."
 
-/datum/mutation_upgrade/shell/flame_cloak/on_mutation_enabled()
+/datum/mutation_upgrade/shell/flame_cloak/on_gain()
 	. = ..()
 	RegisterSignal(xenomorph_owner, COMSIG_MOVABLE_MOVED, PROC_REF(on_movement))
 	grant_armor(get_fire_in_turf(get_turf(xenomorph_owner)))
 
-/datum/mutation_upgrade/shell/flame_cloak/on_mutation_disabled()
+/datum/mutation_upgrade/shell/flame_cloak/on_loss()
 	UnregisterSignal(xenomorph_owner, COMSIG_MOVABLE_MOVED)
 	revoke_armor()
 	return ..()
@@ -108,7 +108,7 @@
 		return ..()
 	return "Fire Charge deals no damage, does not consume melting fire stacks, and pierces humans. Humans who are hit get [stacks_per_structure * new_amount] melting fire stacks."
 
-/datum/mutation_upgrade/spur/only_fire/on_mutation_enabled()
+/datum/mutation_upgrade/spur/only_fire/on_gain()
 	var/datum/action/ability/activable/xeno/charge/fire_charge/charge_ability = xenomorph_owner.actions_by_path[/datum/action/ability/activable/xeno/charge/fire_charge]
 	if(!charge_ability)
 		return
@@ -118,7 +118,7 @@
 	charge_ability.pierces_mobs = TRUE
 	return ..()
 
-/datum/mutation_upgrade/spur/only_fire/on_mutation_disabled()
+/datum/mutation_upgrade/spur/only_fire/on_loss()
 	var/datum/action/ability/activable/xeno/charge/fire_charge/charge_ability = xenomorph_owner.actions_by_path[/datum/action/ability/activable/xeno/charge/fire_charge]
 	if(!charge_ability)
 		return
@@ -156,14 +156,14 @@
 		return ..()
 	return "Melting fire stacks you inflict cause [PERCENT(get_percentage(new_amount))]% healing reduction against brute and burn."
 
-/datum/mutation_upgrade/veil/burnt_wounds/on_mutation_enabled()
+/datum/mutation_upgrade/veil/burnt_wounds/on_gain()
 	if(!isxenopyrogen(xenomorph_owner))
 		return
 	var/mob/living/carbon/xenomorph/pyrogen/pyrogen_owner = xenomorph_owner
 	pyrogen_owner.melting_fire_healing_reduction += get_percentage(0)
 	return ..()
 
-/datum/mutation_upgrade/veil/burnt_wounds/on_mutation_disabled()
+/datum/mutation_upgrade/veil/burnt_wounds/on_loss()
 	if(!isxenopyrogen(xenomorph_owner))
 		return
 	var/mob/living/carbon/xenomorph/pyrogen/pyrogen_owner = xenomorph_owner

@@ -19,37 +19,20 @@ type Upgrade = {
 };
 
 type MutationBarData = {
-  already_has_shell: BooleanLike;
-  already_has_spur: BooleanLike;
-  already_has_veil: BooleanLike;
-  disks_completed: number;
+  points_available: number;
+  points_used: number;
+  points_maximum: number;
 };
 
 type MutationData = {
   shell_mutations: Upgrade[];
   spur_mutations: Upgrade[];
   veil_mutations: Upgrade[];
-  already_has_shell: BooleanLike;
-  already_has_spur: BooleanLike;
-  already_has_veil: BooleanLike;
-  shell_chambers: number;
-  spur_chambers: number;
-  veil_chambers: number;
 };
 
 export const MutationSelector = (_props: any) => {
   const { data } = useBackend<MutationData>();
-  const {
-    shell_mutations,
-    spur_mutations,
-    veil_mutations,
-    already_has_shell,
-    already_has_spur,
-    already_has_veil,
-    shell_chambers,
-    spur_chambers,
-    veil_chambers,
-  } = data;
+  const { shell_mutations, spur_mutations, veil_mutations } = data;
 
   return (
     <Window theme="xeno" width={500} height={600}>
@@ -57,24 +40,9 @@ export const MutationSelector = (_props: any) => {
         <Section title="Mutation Evolution" key="Mutation Evolution">
           <MutationBar />
         </Section>
-        <MutationSection
-          category_name="Shell"
-          mutations={shell_mutations}
-          already_has={already_has_shell}
-          chambers={shell_chambers}
-        />
-        <MutationSection
-          category_name="Spur"
-          mutations={spur_mutations}
-          already_has={already_has_spur}
-          chambers={spur_chambers}
-        />
-        <MutationSection
-          category_name="Veil"
-          mutations={veil_mutations}
-          already_has={already_has_veil}
-          chambers={veil_chambers}
-        />
+        <MutationSection category_name="Shell" mutations={shell_mutations} />
+        <MutationSection category_name="Spur" mutations={spur_mutations} />
+        <MutationSection category_name="Veil" mutations={veil_mutations} />
       </Window.Content>
     </Window>
   );
@@ -82,28 +50,12 @@ export const MutationSelector = (_props: any) => {
 
 const MutationBar = (_props: any) => {
   const { data } = useBackend<MutationBarData>();
-  const {
-    already_has_shell,
-    already_has_spur,
-    already_has_veil,
-    disks_completed,
-  } = data;
-
-  let mutationsCount = 0;
-  if (already_has_shell) {
-    mutationsCount += 1;
-  }
-  if (already_has_spur) {
-    mutationsCount += 1;
-  }
-  if (already_has_veil) {
-    mutationsCount += 1;
-  }
+  const { points_available, points_used, points_maximum } = data;
 
   let tooltipContent = 'You are ready to buy another mutation.';
-  if (mutationsCount === 3) {
+  if (points_maximum === 3) {
     tooltipContent = 'You have the maximum amount of mutations!';
-  } else if (mutationsCount >= disks_completed) {
+  } else if (points_used >= points_available) {
     tooltipContent = "You can't buy another mutation yet...";
   }
 
@@ -111,8 +63,8 @@ const MutationBar = (_props: any) => {
     <Tooltip content={tooltipContent}>
       <Flex mb={1}>
         <Flex.Item grow>
-          <ProgressBar color="green" value={disks_completed / 3}>
-            {`${disks_completed} / 3 `}
+          <ProgressBar color="green" value={points_available / points_maximum}>
+            {`${points_available} / ${points_maximum} `}
           </ProgressBar>
         </Flex.Item>
       </Flex>
@@ -123,31 +75,13 @@ const MutationBar = (_props: any) => {
 const MutationSection = (props: {
   category_name: string;
   mutations: Upgrade[];
-  already_has: BooleanLike;
-  chambers: number;
 }) => {
   const { act, data } = useBackend<MutationBarData>();
-  const {
-    already_has_shell,
-    already_has_spur,
-    already_has_veil,
-    disks_completed,
-  } = data;
-
-  let mutationsCount = 0;
-  if (already_has_shell) {
-    mutationsCount += 1;
-  }
-  if (already_has_spur) {
-    mutationsCount += 1;
-  }
-  if (already_has_veil) {
-    mutationsCount += 1;
-  }
+  const { points_available, points_used } = data;
 
   return (
     <Collapsible
-      title={`${props.category_name} Mutations | ${props.category_name} Chambers: ${props.chambers}/3`}
+      title={`${props.category_name} Mutations | ${props.category_name}`}
     >
       {props.mutations &&
         props.mutations.map((mutation) => (
@@ -160,11 +94,7 @@ const MutationSection = (props: {
                 content={`Buy`}
                 key={mutation.name}
                 onClick={() => act('purchase', { upgrade_type: mutation.type })}
-                disabled={
-                  mutationsCount >= disks_completed ||
-                  props.chambers === 0 ||
-                  props.already_has
-                }
+                disabled={points_used >= points_available || mutation.owned}
                 selected={mutation.owned}
               />
             }

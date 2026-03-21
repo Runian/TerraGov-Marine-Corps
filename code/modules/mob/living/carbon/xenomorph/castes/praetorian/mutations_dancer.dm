@@ -16,7 +16,7 @@
 		return ..()
 	return "If you are on fire, Tail Trip and Tail Hook will extinguishes you and inflict nearby humans with an equal amount of melting fire. Your fire armor is reduced by [-get_armor(new_amount)]."
 
-/datum/mutation_upgrade/shell/flame_dance/on_mutation_enabled()
+/datum/mutation_upgrade/shell/flame_dance/on_gain()
 	. = ..()
 	var/datum/action/ability/activable/xeno/tail_trip/trip_ability = xenomorph_owner.actions_by_path[/datum/action/ability/activable/xeno/tail_trip]
 	if(!trip_ability)
@@ -30,7 +30,7 @@
 		attached_armor = getArmor(fire = get_armor(0))
 		xenomorph_owner.soft_armor = xenomorph_owner.soft_armor.attachArmor(attached_armor)
 
-/datum/mutation_upgrade/shell/flame_dance/on_mutation_disabled()
+/datum/mutation_upgrade/shell/flame_dance/on_loss()
 	. = ..()
 	var/datum/action/ability/activable/xeno/tail_trip/trip_ability = xenomorph_owner.actions_by_path[/datum/action/ability/activable/xeno/tail_trip]
 	if(!trip_ability)
@@ -70,14 +70,14 @@
 		return ..()
 	return "Tail Hook now pushes humans away instead of pulling them in. It deals [get_damage(new_amount)] additional damage."
 
-/datum/mutation_upgrade/spur/bob_and_weave/on_mutation_enabled()
+/datum/mutation_upgrade/spur/bob_and_weave/on_gain()
 	. = ..()
 	var/datum/action/ability/activable/xeno/tail_hook/hook_ability = xenomorph_owner.actions_by_path[/datum/action/ability/activable/xeno/tail_hook]
 	if(!hook_ability)
 		return
 	hook_ability.pull_distance *= -1 // Makes it negative (pushes them away).
 
-/datum/mutation_upgrade/spur/bob_and_weave/on_mutation_disabled()
+/datum/mutation_upgrade/spur/bob_and_weave/on_loss()
 	. = ..()
 	var/datum/action/ability/activable/xeno/tail_hook/hook_ability = xenomorph_owner.actions_by_path[/datum/action/ability/activable/xeno/tail_hook]
 	if(!hook_ability)
@@ -111,7 +111,7 @@
 		return ..()
 	return "Dodge now lets you walk over structures such as tables and window frames. It now costs [1 + get_multiplier(new_amount)]x of its original cost."
 
-/datum/mutation_upgrade/veil/eb_and_flow/on_mutation_enabled()
+/datum/mutation_upgrade/veil/eb_and_flow/on_gain()
 	. = ..()
 	var/datum/action/ability/xeno_action/dodge/dodge_ability = xenomorph_owner.actions_by_path[/datum/action/ability/xeno_action/dodge]
 	if(!dodge_ability)
@@ -122,7 +122,7 @@
 	dodge_ability.dodge_pass_flags |= PASS_LOW_STRUCTURE
 	dodge_ability.ability_cost += initial(dodge_ability.ability_cost) * get_multiplier(0)
 
-/datum/mutation_upgrade/veil/eb_and_flow/on_mutation_disabled()
+/datum/mutation_upgrade/veil/eb_and_flow/on_loss()
 	. = ..()
 	var/datum/action/ability/xeno_action/dodge/dodge_ability = xenomorph_owner.actions_by_path[/datum/action/ability/xeno_action/dodge]
 	if(!dodge_ability)
