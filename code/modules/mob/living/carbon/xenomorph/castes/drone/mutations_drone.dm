@@ -17,7 +17,7 @@
 
 /datum/mutation_upgrade/defense/drone/scout
 	name = "Scout"
-	desc = "While on non-weeds, you gain the weed speed bonus while on non-weeds."
+	desc = "While on non-weeds, you gain the weed speed bonus as if you were on weeds."
 
 /datum/mutation_upgrade/defense/drone/scout/on_gain()
 	RegisterSignal(xenomorph_owner, COMSIG_MOVABLE_MOVED, PROC_REF(on_movement))
