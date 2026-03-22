@@ -71,7 +71,35 @@
 
 /datum/mutation_upgrade/offense/toxic_claws
 	name = "Toxic Claws"
-	desc = "Toxic Slash is togglable, but consumes 30 plasma per slash."
+	desc = "You no longer have access to Toxic Slash. While you have at least 30 plasma, slashing a human will consume that amount of plasma and apply 5 Intoxicated stacks."
+
+/datum/mutation_upgrade/offense/toxic_claws/on_gain()
+	RegisterSignal(xenomorph_owner, COMSIG_XENOMORPH_POSTATTACK_LIVING, PROC_REF(on_postattack))
+	var/datum/action/ability/xeno_action/toxic_slash/ability = xenomorph_owner.actions_by_path[/datum/action/ability/xeno_action/toxic_slash]
+	if(ability)
+		ability.remove_action(xenomorph_owner)
+
+/datum/mutation_upgrade/offense/toxic_claws/on_loss()
+	UnregisterSignal(xenomorph_owner, COMSIG_XENOMORPH_POSTATTACK_LIVING)
+	var/datum/action/ability/xeno_action/toxic_slash/ability = new()
+	ability.give_action(xenomorph_owner)
+
+/datum/mutation_upgrade/offense/toxic_claws/on_xenomorph_upgrade()
+	var/datum/action/ability/xeno_action/toxic_slash/ability = xenomorph_owner.actions_by_path[/datum/action/ability/xeno_action/toxic_slash]
+	if(ability)
+		ability.remove_action(xenomorph_owner)
+
+/// Applies a variable amount of Intoxicated stacks to those that they attack.
+/datum/mutation_upgrade/offense/toxic_claws/proc/on_postattack(mob/living/source, mob/living/target, damage)
+	SIGNAL_HANDLER
+	if(xenomorph_owner.plasma_stored < 30)
+		return
+	xenomorph_owner.use_plasma(30)
+	var/datum/status_effect/stacking/intoxicated/debuff = target.has_status_effect(STATUS_EFFECT_INTOXICATED)
+	if(!debuff)
+		target.apply_status_effect(STATUS_EFFECT_INTOXICATED, 5)
+		return
+	debuff.add_stacks(5)
 
 /datum/mutation_upgrade/offense/claw_surge
 	name = "Claw Surge"
@@ -93,13 +121,13 @@
 	name = "Toxic Compatibility"
 	desc = "Drain Sting's potency is increased by the amount of xeno-affiliated reagents in your target. Each unit counts as a third of an Intoxicated stack."
 
-/datum/mutation_upgrade/offense/toxic_compatibility/on_gain()
+/datum/mutation_upgrade/utility/toxic_compatibility/on_gain()
 	var/datum/action/ability/activable/xeno/drain_sting/ability = xenomorph_owner.actions_by_path[/datum/action/ability/activable/xeno/drain_sting]
 	if(!ability)
 		return
 	ability.potency_per_xenochemical = SENTINEL_DRAIN_MULTIPLIER / 3
 
-/datum/mutation_upgrade/offense/toxic_compatibility/on_loss()
+/datum/mutation_upgrade/utility/toxic_compatibility/on_loss()
 	var/datum/action/ability/activable/xeno/drain_sting/ability = xenomorph_owner.actions_by_path[/datum/action/ability/activable/xeno/drain_sting]
 	if(!ability)
 		return
@@ -112,3 +140,15 @@
 /datum/mutation_upgrade/utility/baton_surge
 	name = "Baton Surge"
 	desc = "Drain Sting can target xenomorphs. When used on xenomorphs, it immediately grants them Drain Surge."
+
+/datum/mutation_upgrade/utility/baton_surge/on_gain()
+	var/datum/action/ability/activable/xeno/drain_sting/ability = xenomorph_owner.actions_by_path[/datum/action/ability/activable/xeno/drain_sting]
+	if(!ability)
+		return
+	ability.can_target_allies = TRUE
+
+/datum/mutation_upgrade/utility/baton_surge/on_loss()
+	var/datum/action/ability/activable/xeno/drain_sting/ability = xenomorph_owner.actions_by_path[/datum/action/ability/activable/xeno/drain_sting]
+	if(!ability)
+		return
+	ability.can_target_allies = initial(ability.can_target_allies)

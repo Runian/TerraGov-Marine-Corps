@@ -159,21 +159,23 @@
 		if(!silent)
 			A.balloon_alert(owner, "cannot sting!")
 		return FALSE
-	var/mob/living/carbon/human/human_target = A
-	if(!owner.Adjacent(human_target) || !line_of_sight(owner, human_target))
+	var/mob/living/carbon/carbon_target = A
+	if(!owner.Adjacent(carbon_target) || !line_of_sight(owner, carbon_target))
 		if(!silent)
-			human_target.balloon_alert(owner, "Cannot reach")
+			carbon_target.balloon_alert(owner, "cannot reach!")
 		return FALSE
-	if(HAS_TRAIT(human_target, TRAIT_INTOXICATION_IMMUNE))
-		human_target.balloon_alert(owner, "Immune to intoxication")
+	if(HAS_TRAIT(carbon_target, TRAIT_INTOXICATION_IMMUNE))
+		carbon_target.balloon_alert(owner, "immune to intoxication!")
 		return FALSE
-	if(!human_target.has_status_effect(STATUS_EFFECT_INTOXICATED))
-		human_target.balloon_alert(owner, "Not intoxicated")
+	if(!carbon_target.has_status_effect(STATUS_EFFECT_INTOXICATED))
+		carbon_target.balloon_alert(owner, "not intoxicated!")
 		return FALSE
 
 /datum/action/ability/activable/xeno/drain_sting/use_ability(atom/A)
 	if(isxeno(A))
 		var/mob/living/carbon/xenomorph/xenomorph_target = A
+		apply_drain_surge(xenomorph_target)
+		new /obj/effect/temp_visual/drain_sting_crit(get_turf(xenomorph_target))
 	else
 		var/mob/living/carbon/human/human_target = A
 		var/datum/status_effect/stacking/intoxicated/debuff = human_target.has_status_effect(STATUS_EFFECT_INTOXICATED)
@@ -190,7 +192,6 @@
 		HEAL_XENO_DAMAGE(xeno_owner, health_to_heal, FALSE)
 		xeno_owner.gain_plasma(potency * 3.5)
 		debuff.add_stacks(-round(debuff.stacks * 0.7))
-
 	xeno_owner.do_attack_animation(A, ATTACK_EFFECT_DRAIN_STING)
 	playsound(owner.loc, 'sound/effects/alien/tail_swipe1.ogg', 30)
 	xeno_owner.visible_message(message = span_xenowarning("\A [xeno_owner] stings [A]!"), self_message = span_xenowarning("We sting [A]!"))
