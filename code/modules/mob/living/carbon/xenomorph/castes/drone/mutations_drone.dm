@@ -21,11 +21,9 @@
 
 /datum/mutation_upgrade/defense/drone/scout/on_gain()
 	RegisterSignal(xenomorph_owner, COMSIG_MOVABLE_MOVED, PROC_REF(on_movement))
-	return ..()
 
 /datum/mutation_upgrade/defense/drone/scout/on_loss()
 	UnregisterSignal(xenomorph_owner, COMSIG_MOVABLE_MOVED)
-	return ..()
 
 /// Upon moving onto a loc without weeds, adds the weed speed modifier to their next movement.
 /datum/mutation_upgrade/defense/drone/scout/proc/on_movement(datum/source, atom/old_loc, movement_dir, forced, list/old_locs)
@@ -37,21 +35,19 @@
 
 /datum/mutation_upgrade/defense/drone/together_in_claws
 	name = "Together In Claws"
-	desc = "While actively linked with your Essence Link partner, their slash attacks heal you for 20% of damage dealt."
+	desc = "While actively linked with your Essence Link partner, their slash attacks heal you for 50% of damage dealt."
 
 /datum/mutation_upgrade/defense/drone/together_in_claws/on_gain()
 	RegisterSignal(xenomorph_owner, COMSIG_XENO_ESSENCE_LINK_TOGGLED, PROC_REF(on_essence_link_toggle))
 	var/datum/action/ability/activable/xeno/essence_link/ability = xenomorph_owner.actions_by_path[/datum/action/ability/activable/xeno/essence_link]
 	if(ability?.existing_link && ability.existing_link.current_beam)
 		on_essence_link_toggle(xenomorph_owner, ability.existing_link.link_target, TRUE)
-	return ..()
 
 /datum/mutation_upgrade/defense/drone/together_in_claws/on_loss()
 	UnregisterSignal(xenomorph_owner, list(COMSIG_XENO_ESSENCE_LINK_TOGGLED))
 	var/datum/action/ability/activable/xeno/essence_link/ability = xenomorph_owner.actions_by_path[/datum/action/ability/activable/xeno/essence_link]
 	if(ability?.existing_link && ability.existing_link.current_beam)
 		on_essence_link_toggle(xenomorph_owner, ability.existing_link.link_target, FALSE)
-	return ..()
 
 /datum/mutation_upgrade/defense/drone/together_in_claws/proc/on_essence_link_toggle(datum/source, mob/living/carbon/xenomorph/link_partner, toggled)
 	SIGNAL_HANDLER
@@ -63,7 +59,7 @@
 /// Heals the owner for a portion of damage dealt by the Essence Link partner's slash attacks.
 /datum/mutation_upgrade/defense/drone/together_in_claws/proc/on_postattack_living(datum/source, mob/living/attacked_target, damage_dealt, list/damage_modifiers)
 	SIGNAL_HANDLER
-	var/damage_to_heal = damage_dealt * 0.2 // 20%
+	var/damage_to_heal = damage_dealt * 0.5 // 50%
 	HEAL_XENO_DAMAGE(xenomorph_owner, damage_to_heal, FALSE)
 
 /datum/mutation_upgrade/defense/drone/emergency_repel
@@ -75,14 +71,12 @@
 	var/datum/action/ability/activable/xeno/essence_link/ability = xenomorph_owner.actions_by_path[/datum/action/ability/activable/xeno/essence_link]
 	if(ability?.existing_link && ability.existing_link.current_beam)
 		on_essence_link_toggle(xenomorph_owner, ability.existing_link.link_target, TRUE)
-	return ..()
 
 /datum/mutation_upgrade/defense/drone/emergency_repel/on_loss()
 	UnregisterSignal(xenomorph_owner, COMSIG_XENO_ESSENCE_LINK_TOGGLED)
 	var/datum/action/ability/activable/xeno/essence_link/ability = xenomorph_owner.actions_by_path[/datum/action/ability/activable/xeno/essence_link]
 	if(ability?.existing_link && ability.existing_link.current_beam)
 		on_essence_link_toggle(xenomorph_owner, ability.existing_link.link_target, FALSE)
-	return ..()
 
 /// Handles signal registration for when Essence Link begins to end.
 /datum/mutation_upgrade/defense/drone/emergency_repel/proc/on_essence_link_toggle(datum/source, mob/living/carbon/xenomorph/link_partner, toggled)
@@ -120,11 +114,9 @@
 
 /datum/mutation_upgrade/offense/drone/combustive_jelly/on_gain()
 	RegisterSignal(xenomorph_owner, COMSIG_MOB_THROW, PROC_REF(on_throw_anything))
-	return ..()
 
 /datum/mutation_upgrade/offense/drone/combustive_jelly/on_loss()
 	UnregisterSignal(xenomorph_owner, COMSIG_MOB_THROW)
-	return ..()
 
 /// Registers various throw signals for the thrown item if it is resin jelly.
 /datum/mutation_upgrade/offense/drone/combustive_jelly/proc/on_throw_anything(atom/movable/thrower, target, thrown_thing, list/throw_modifiers)
@@ -160,47 +152,45 @@
 	playsound(jelly_item.loc, SFX_ALIEN_RESIN_BUILD, 50, 1)
 	qdel(source)
 
-/datum/mutation_upgrade/offense/drone/coordinated_slashes
-	name = "Coordinated Slashes"
+/datum/mutation_upgrade/offense/drone/tag_team
+	name = "Tag Team"
 	desc = "While actively linked with your Essence Link partner, your partner's slash attacks will create an outline on their target. When you slash that target, your damage against them is amplified by 20%. Only one outline can exist at a time and disappears after a second."
 	/// The latest human that was slashed.
 	var/mob/living/carbon/human/latest_marked_human
 	/// The timer that resets the marked human (after a second).
 	var/timer_id
 
-/datum/mutation_upgrade/offense/drone/coordinated_slashes/on_gain()
+/datum/mutation_upgrade/offense/drone/tag_team/on_gain()
 	RegisterSignal(xenomorph_owner, COMSIG_XENO_ESSENCE_LINK_TOGGLED, PROC_REF(on_essence_link_toggle))
 	var/datum/action/ability/activable/xeno/essence_link/ability = xenomorph_owner.actions_by_path[/datum/action/ability/activable/xeno/essence_link]
 	if(ability?.existing_link && ability.existing_link.current_beam)
 		on_essence_link_toggle(xenomorph_owner, ability.existing_link.link_target, TRUE)
-	return ..()
 
-/datum/mutation_upgrade/offense/drone/coordinated_slashes/on_loss()
+/datum/mutation_upgrade/offense/drone/tag_team/on_loss()
 	UnregisterSignal(xenomorph_owner, COMSIG_XENO_ESSENCE_LINK_TOGGLED)
 	var/datum/action/ability/activable/xeno/essence_link/ability = xenomorph_owner.actions_by_path[/datum/action/ability/activable/xeno/essence_link]
 	if(ability?.existing_link && ability.existing_link.current_beam)
 		on_essence_link_toggle(xenomorph_owner, ability.existing_link.link_target, FALSE)
 	remove_mark()
-	return ..()
 
 /// Resets everything related to the marked human.
-/datum/mutation_upgrade/offense/drone/coordinated_slashes/proc/remove_mark()
+/datum/mutation_upgrade/offense/drone/tag_team/proc/remove_mark()
 	if(!latest_marked_human || !timer_id)
 		return
-	latest_marked_human.remove_filter("coordinated_slashes_outline")
+	latest_marked_human.remove_filter("tag_team_outline")
 	latest_marked_human = null
 	deltimer(timer_id)
 	timer_id = null
 
 /// Sets everything related to the marked human.
-/datum/mutation_upgrade/offense/drone/coordinated_slashes/proc/set_marked(mob/living/carbon/human/next_marked_human)
+/datum/mutation_upgrade/offense/drone/tag_team/proc/set_marked(mob/living/carbon/human/next_marked_human)
 	remove_mark()
 	latest_marked_human = next_marked_human
-	latest_marked_human.add_filter("coordinated_slashes_outline", 2, outline_filter(1, COLOR_LIGHT_ORANGE))
+	latest_marked_human.add_filter("tag_team_outline", 2, outline_filter(1, COLOR_LIGHT_ORANGE))
 	timer_id = addtimer(CALLBACK(src, PROC_REF(remove_mark)), 1 SECONDS, TIMER_UNIQUE|TIMER_STOPPABLE)
 
 /// Handles signal registration for attacking living beings.
-/datum/mutation_upgrade/offense/drone/coordinated_slashes/proc/on_essence_link_toggle(datum/source, mob/living/carbon/xenomorph/link_partner, toggled)
+/datum/mutation_upgrade/offense/drone/tag_team/proc/on_essence_link_toggle(datum/source, mob/living/carbon/xenomorph/link_partner, toggled)
 	if(toggled)
 		RegisterSignal(xenomorph_owner, COMSIG_XENOMORPH_ATTACK_LIVING, PROC_REF(on_attack_living_owner))
 		RegisterSignal(link_partner, COMSIG_XENOMORPH_ATTACK_LIVING, PROC_REF(on_attack_living_partner))
@@ -209,7 +199,7 @@
 	UnregisterSignal(link_partner, COMSIG_XENOMORPH_ATTACK_LIVING)
 
 /// For the owner, sets the marked human or resets the duration if they are already marked.
-/datum/mutation_upgrade/offense/drone/coordinated_slashes/proc/on_attack_living_owner(datum/source, mob/living/target, damage, list/damage_mod, list/armor_mod)
+/datum/mutation_upgrade/offense/drone/tag_team/proc/on_attack_living_owner(datum/source, mob/living/target, damage, list/damage_mod, list/armor_mod)
 	if(!ishuman(target))
 		return
 	if(latest_marked_human == target && timer_id)
@@ -219,7 +209,7 @@
 	set_marked(target)
 
 /// For the partner, deal bonus damage if it is the marked human.
-/datum/mutation_upgrade/offense/drone/coordinated_slashes/proc/on_attack_living_partner(datum/source, mob/living/target, damage, list/damage_mod, list/armor_mod)
+/datum/mutation_upgrade/offense/drone/tag_team/proc/on_attack_living_partner(datum/source, mob/living/target, damage, list/damage_mod, list/armor_mod)
 	if(!latest_marked_human || !ishuman(target) || latest_marked_human != target)
 		return
 	damage_mod += damage * 0.2
@@ -234,14 +224,12 @@
 	var/datum/action/ability/activable/xeno/essence_link/ability = xenomorph_owner.actions_by_path[/datum/action/ability/activable/xeno/essence_link]
 	if(ability?.existing_link && ability.existing_link.current_beam)
 		on_essence_link_toggle(xenomorph_owner, ability.existing_link.link_target, TRUE)
-	return ..()
 
 /datum/mutation_upgrade/offense/drone/aggressive_connection/on_loss()
 	UnregisterSignal(xenomorph_owner, list(COMSIG_XENO_ESSENCE_LINK_TOGGLED))
 	var/datum/action/ability/activable/xeno/essence_link/ability = xenomorph_owner.actions_by_path[/datum/action/ability/activable/xeno/essence_link]
 	if(ability?.existing_link && ability.existing_link.current_beam)
 		on_essence_link_toggle(xenomorph_owner, ability.existing_link.link_target, FALSE)
-	return ..()
 
 /// Sets the owner's melee damage modifier relative to what it was previously set as.
 /datum/mutation_upgrade/offense/drone/aggressive_connection/proc/set_damage_multiplier(new_damage_multiplier)
@@ -290,7 +278,6 @@
 	if(!ability)
 		return
 	ability.expeditious_salve_togglable = TRUE
-	return ..()
 
 /datum/mutation_upgrade/utility/drone/sacrificial_salve/on_loss()
 	var/datum/action/ability/activable/xeno/psychic_cure/acidic_salve/ability = xenomorph_owner.actions_by_path[/datum/action/ability/activable/xeno/psychic_cure/acidic_salve]
@@ -299,7 +286,6 @@
 	if(ability.expeditious_salve_toggled)
 		ability.alternate_action_activate()
 	ability.expeditious_salve_togglable = initial(ability.expeditious_salve_togglable)
-	return ..()
 
 /datum/mutation_upgrade/utility/drone/saving_grace
 	name = "Saving Grace"
@@ -311,7 +297,6 @@
 		return
 	ability.bypass_cast_time_for_partner = TRUE
 	ability.bonus_heal_maximum_health_threshold += 0.2
-	return ..()
 
 /datum/mutation_upgrade/utility/drone/saving_grace/on_loss()
 	var/datum/action/ability/activable/xeno/psychic_cure/acidic_salve/ability = xenomorph_owner.actions_by_path[/datum/action/ability/activable/xeno/psychic_cure/acidic_salve]
@@ -319,7 +304,6 @@
 		return
 	ability.bypass_cast_time_for_partner = initial(ability.bypass_cast_time_for_partner)
 	ability.bonus_heal_maximum_health_threshold -= 0.2
-	return ..()
 
 /datum/mutation_upgrade/utility/drone/self_sufficiency
 	name = "Self Sufficiency"
@@ -330,11 +314,9 @@
 	if(!ability)
 		return
 	ability.use_state_flags |= ABILITY_TARGET_SELF // Ability handles the efficiency.
-	return ..()
 
 /datum/mutation_upgrade/utility/drone/self_sufficiency/on_loss()
 	var/datum/action/ability/activable/xeno/psychic_cure/acidic_salve/ability = xenomorph_owner.actions_by_path[/datum/action/ability/activable/xeno/psychic_cure/acidic_salve]
 	if(!ability)
 		return
 	ability.use_state_flags &= ~(ABILITY_TARGET_SELF)
-	return ..()

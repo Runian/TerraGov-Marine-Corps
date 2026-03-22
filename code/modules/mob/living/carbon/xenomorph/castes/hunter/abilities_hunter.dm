@@ -310,7 +310,7 @@
 	/// The range of this ability.
 	var/pounce_range = HUNTER_POUNCE_RANGE
 	/// The stun duration (inflicted to mob) on successful tackle.
-	var/stun_duration = XENO_POUNCE_STUN_DURATION
+	var/target_stun_duration = XENO_POUNCE_STUN_DURATION
 	/// The immobilize duration (inflicted to self) on successful tackle.
 	var/self_immobilize_duration = XENO_POUNCE_STANDBY_DURATION
 	/// Should they attack/slash once as part of the pounce effects?
@@ -375,7 +375,7 @@
 	playsound(get_turf(living_target), 'sound/voice/alien/pounce.ogg', 25, TRUE)
 	xeno_owner.Immobilize(self_immobilize_duration)
 	xeno_owner.forceMove(get_turf(living_target))
-	living_target.Knockdown(stun_duration)
+	living_target.Knockdown(target_stun_duration)
 	if(attack_on_pounce)
 		living_target.attack_alien_harm(xeno_owner)
 	GLOB.round_statistics.runner_pounce_victims++

@@ -117,6 +117,7 @@
 #define CONQUEROR_ENDURANCE_TRAIT "conqueror_endurance_trait"
 #define CONQUEROR_OBLITERATION_TRAIT "conqueror_obliteration_trait"
 #define HEATRAY_BEAM_ABILITY_TRAIT "heatray_ability_trait"
+#define RUNNER_ABILITY_TRAIT "runner_ability_trait"
 #define DRAGON_ABILITY_TRAIT "dragon_ability_trait"
 #define HIVELORD_ABILITY_TRAIT "hivelord_ability_trait"
 #define SHRIKE_ABILITY_TRAIT "shrike_ability_trait"

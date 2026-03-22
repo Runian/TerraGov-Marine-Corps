@@ -15,24 +15,22 @@
 		KEYBINDING_ALTERNATE = COMSIG_XENOABILITY_TOGGLE_SAVAGE,
 	)
 	pounce_range = RUNNER_POUNCE_RANGE
-/// The turf that the ability was started on.
+	/// The turf that the ability was started on.
 	var/turf/starting_turf
-	/// The multiplier to add as bonus damage if the Pounce was started in dim light.
-	var/dim_bonus_multiplier = 0
-	/// The multiplier to add as bonus damage which scales downward based on distance traveled. 100% = 0-1, 80/60/40/20% = 2-5, 0% = 6+
-	var/upclose_bonus_multiplier = 0
 	/// Whether Savage is active or not.
 	var/savage_activated = TRUE
 	/// The multiplier used to find Savage damage based on how much stored plasma there is. If it is higher than initial, Savage will consume all plasma.
 	var/savage_plasma_conversion_rate = RUNNER_SAVAGE_PLASMA_CONVERSION_RATE
 	/// If this is greater than 0, Savage damage won't be applied and will grant a temporary melee damage multiplier based on this amount.
 	var/savage_damage_conversion_rate = 0
-	/// The amount of deciseconds that confusion will last and the potency of the blurriness.
-	var/savage_debuff_amount = 0
+	/// The amount of deciseconds that various status effect buffs will last. Confusion is converted 1-1. Blurriness is converted 5-1.
+	var/savage_debuff_amount = 0 SECONDS
 	/// The timer ID for the timer that will reverse the temporary melee damage multiplier.
 	var/savage_buff_timer_id
 	/// The amount of melee damage multiplier that was given (and will be taken away).
 	var/savage_buff_amount
+	/// If the starting turf is considered to be in darkness, should Savage activate regardless of cooldown?
+	var/savage_activates_in_darkness = FALSE
 	/// Savage's cooldown.
 	COOLDOWN_DECLARE(savage_cooldown)
 
@@ -65,13 +63,8 @@
 
 /datum/action/ability/activable/xeno/pounce/runner/trigger_pounce_effect(mob/living/living_target)
 	. = ..()
-	if(starting_turf)
-		if(dim_bonus_multiplier && starting_turf.get_lumcount() <= 0.2)
-			living_target.attack_alien_harm(xeno_owner, xeno_owner.xeno_caste.melee_damage * dim_bonus_multiplier)
-		if(upclose_bonus_multiplier)
-			var/upclose_bonus_multiplier_final = max(0, upclose_bonus_multiplier - (get_dist(starting_turf, living_target) * upclose_bonus_multiplier/5))
-			if(upclose_bonus_multiplier_final)
-				living_target.attack_alien_harm(xeno_owner, xeno_owner.xeno_caste.melee_damage * upclose_bonus_multiplier_final)
+	if(savage_activates_in_darkness && starting_turf?.get_lumcount() <= 0.2)
+		readies_savage(TRUE)
 	if(!savage_activated)
 		return
 	if(!COOLDOWN_FINISHED(src, savage_cooldown))
@@ -87,11 +80,10 @@
 	else
 		living_target.attack_alien_harm(xeno_owner, savage_damage)
 	if(savage_debuff_amount)
-		living_target.adjust_blurriness(savage_debuff_amount * 0.2) // Blurriness goes away at a decent speed when nothing else keeps adding to it.
-		living_target.AdjustConfused(savage_debuff_amount)
+		living_target.blur_eyes(savage_debuff_amount / 5) // Limited to a maximum to prevent complete misery of the eyes.
+		living_target.apply_status_effect(STATUS_EFFECT_CONFUSED, savage_debuff_amount)
 	xeno_owner.use_plasma(savage_plasma_conversion_rate > RUNNER_SAVAGE_PLASMA_CONVERSION_RATE ? xeno_owner.plasma_stored : savage_cost)
-	COOLDOWN_START(src, savage_cooldown, RUNNER_SAVAGE_COOLDOWN)
-	START_PROCESSING(SSprocessing, src)
+	readies_savage()
 	GLOB.round_statistics.runner_savage_attacks++
 	SSblackbox.record_feedback("tally", "round_statistics", 1, "runner_savage_attacks")
 
@@ -100,11 +92,27 @@
 	starting_turf = null
 
 /datum/action/ability/activable/xeno/pounce/runner/process()
+	handle_button_overlays()
+	if(!COOLDOWN_FINISHED(src, savage_cooldown))
+		return
+	readies_savage()
+
+/datum/action/ability/activable/xeno/pounce/runner/proc/unreadies_savage(silent = FALSE)
+	COOLDOWN_START(src, savage_cooldown, RUNNER_SAVAGE_COOLDOWN)
+	if(!(datum_flags & DF_ISPROCESSING))
+		START_PROCESSING(SSprocessing, src)
+
+/datum/action/ability/activable/xeno/pounce/runner/proc/readies_savage(silent = FALSE)
+	if(!COOLDOWN_FINISHED(src, savage_cooldown))
+		COOLDOWN_RESET(src, savage_cooldown)
+	owner.balloon_alert(owner, "Savage ready")
+	owner.playsound_local(owner, 'sound/effects/alien/new_larva.ogg', 25, 0, 1)
+	if(datum_flags & DF_ISPROCESSING)
+		STOP_PROCESSING(SSprocessing, src)
+
+/datum/action/ability/activable/xeno/pounce/runner/proc/handle_button_overlays()
 	if(COOLDOWN_FINISHED(src, savage_cooldown))
 		button.cut_overlay(visual_references[VREF_MUTABLE_SAVAGE_COOLDOWN])
-		owner.balloon_alert(owner, "Savage ready")
-		owner.playsound_local(owner, 'sound/effects/alien/new_larva.ogg', 25, 0, 1)
-		STOP_PROCESSING(SSprocessing, src)
 		return
 	button.cut_overlay(visual_references[VREF_MUTABLE_SAVAGE_COOLDOWN])
 	var/mutable_appearance/cooldown = visual_references[VREF_MUTABLE_SAVAGE_COOLDOWN]
@@ -152,26 +160,29 @@
 		KEYBINDING_NORMAL = COMSIG_XENOABILITY_EVASION,
 		KEYBINDING_ALTERNATE = COMSIG_XENOABILITY_AUTO_EVASION,
 	)
-	/// Whether Evasion is currently active.
-	var/evade_active = FALSE
-	/// How long our Evasion will last in seconds.
-	var/evasion_duration = 0
-	/// The starting duration of Evasion in seconds.
-	var/evasion_starting_duration = RUNNER_EVASION_DURATION
-	/// Current amount of Evasion stacks.
-	var/evasion_stacks = 0
-	/// Whether Auto Evasion is on or off.
-	var/auto_evasion = TRUE
-	/// Whether Auto Evasion can be toggled to on.
-	var/auto_evasion_togglable = TRUE
-	/// Should they gain/loss passthrough when Evade is active?
-	var/evasion_passthrough = FALSE
-	/// Were they already given passthrough?
-	var/has_passthrough = FALSE
-	/// The amount of deciseconds of confusion should be applied to humans that are passed through, if applicable.
-	var/passthrough_confusion_length = 0
-	/// A list of humans that were touched / affected while the owner had passthrough. Used to prevent applying confusion more than once.
-	var/list/mob/living/carbon/human/touched_humans = list()
+	/// Is the ability currently active?
+	var/active = FALSE
+	/// The remaining amount of seconds that the ability will remain active.
+	var/remaining_duration = 0
+	/// The starting amount of seconds that the ability will be active for.
+	var/starting_duration = RUNNER_EVASION_DURATION
+	/// While the ability is active, will they be prevented from making slash attacks?
+	var/attacking_disabled = TRUE
+	/// While the ability is active, the amount of stacks gained so far.
+	var/stacks = 0
+	/// While the ability is active, should the ability reactivate when the stock count reaches RUNNER_EVASION_COOLDOWN_REFRESH_THRESHOLD?
+	var/automatic_refresh_toggled = TRUE
+	/// Can automatic refresh be toggled via alternative use?
+	var/automatic_refresh_togglable = TRUE
+	/// If a projectile has traveled this amount of distance or less, it will bypass the ability. Only functional when greater than zero.
+	var/dodge_prevention_range = 0
+	/// While the ability is active, should they get any pass flags? If so, what pass flags?
+	var/pass_flags = NONE
+
+/datum/action/ability/xeno_action/evasion/Destroy()
+	if(active)
+		evasion_deactivate()
+	return ..()
 
 /datum/action/ability/xeno_action/evasion/on_cooldown_finish()
 	. = ..()
@@ -186,17 +197,14 @@
 		return FALSE
 
 /datum/action/ability/xeno_action/evasion/alternate_action_activate()
-	if(!auto_evasion_togglable && !auto_evasion)
+	if(!automatic_refresh_togglable)
 		return
-	auto_evasion = !auto_evasion
-	owner.balloon_alert(owner, "Auto Evasion [auto_evasion ? "activated" : "deactivated"]")
-	action_icon_state = "evasion_[auto_evasion? "on" : "off"]"
-	update_button_icon()
+	toggle_automatic_refresh()
 
 /datum/action/ability/xeno_action/evasion/action_activate()
 	//Since both the button and the evasion extension call this proc directly, check if the cooldown timer exists
 	//The evasion extension removes the cooldown before calling this proc again, so use that to differentiate if it was the player trying to cancel
-	if(evade_active && cooldown_timer)
+	if(active && cooldown_timer)
 		if(TIMER_COOLDOWN_RUNNING(src, COOLDOWN_EVASION_ACTIVATION))
 			return
 		evasion_deactivate()
@@ -205,20 +213,19 @@
 	use_state_flags = ABILITY_IGNORE_COOLDOWN|ABILITY_IGNORE_PLASMA	//To allow the ability button to be clicked while on cooldown for deactivation purposes
 	succeed_activate()
 	add_cooldown()
-	if(evade_active)
-		evasion_stacks = 0
-		evasion_duration = min(evasion_duration + evasion_starting_duration, RUNNER_EVASION_MAX_DURATION)
-		owner.balloon_alert(owner, "Extended evasion: [evasion_duration]s.")
+	if(active)
+		stacks = 0
+		remaining_duration = min(remaining_duration + starting_duration, RUNNER_EVASION_MAX_DURATION)
+		owner.balloon_alert(owner, "Extended evasion: [remaining_duration]s.")
 		return
-	evade_active = TRUE
-	if(evasion_passthrough && !has_passthrough)
-		xeno_owner.allow_pass_flags |= PASS_MOB
-		xeno_owner.add_pass_flags(PASS_MOB, type)
-		has_passthrough = TRUE
-		RegisterSignal(xeno_owner, COMSIG_MOVABLE_MOVED, PROC_REF(on_passthrough_move))
-
-	evasion_duration = evasion_starting_duration
-	owner.balloon_alert(owner, "Begin evasion: [evasion_duration]s.")
+	active = TRUE
+	if(pass_flags)
+		xeno_owner.allow_pass_flags |= pass_flags
+		xeno_owner.add_pass_flags(pass_flags, type)
+	if(attacking_disabled)
+		ADD_TRAIT(xeno_owner, TRAIT_HANDS_BLOCKED, RUNNER_ABILITY_TRAIT)
+	remaining_duration = starting_duration
+	owner.balloon_alert(owner, "Begin evasion: [remaining_duration]s.")
 	to_chat(owner, span_userdanger("We take evasive action, making us impossible to hit."))
 	START_PROCESSING(SSprocessing, src)
 	RegisterSignals(owner, list(COMSIG_LIVING_STATUS_STUN,
@@ -245,13 +252,20 @@
 	return (hp_left_percent < 0.5)
 
 /datum/action/ability/xeno_action/evasion/process()
-	hud_set_evasion(evasion_duration)
-	if(evasion_duration <= 0)
+	hud_set_evasion(remaining_duration)
+	if(remaining_duration <= 0)
 		evasion_deactivate()
 		return
-	evasion_duration--
+	remaining_duration--
 
-///Sets the evasion duration hud
+/datum/action/ability/xeno_action/evasion/proc/toggle_automatic_refresh(silent = FALSE)
+	automatic_refresh_toggled = !automatic_refresh_toggled
+	if(!silent)
+		owner.balloon_alert(owner, "Auto Evasion [automatic_refresh_toggled ? "activated" : "deactivated"]")
+	action_icon_state = "evasion_[automatic_refresh_toggled ? "on" : "off"]"
+	update_button_icon()
+
+/// Sets the evasion duration hud.
 /datum/action/ability/xeno_action/evasion/proc/hud_set_evasion(duration)
 	var/image/holder = xeno_owner.hud_list[XENO_EVASION_HUD]
 	if(!holder)
@@ -274,10 +288,10 @@
 	SIGNAL_HANDLER
 	if(!(proj.ammo.ammo_behavior_flags & AMMO_FLAME))
 		return
-	evasion_stacks = max(0, evasion_stacks - proj.damage) // We lose evasion stacks equal to the burn damage.
-	if(evasion_stacks)
+	stacks = max(0, stacks - proj.damage) // We lose evasion stacks equal to the burn damage.
+	if(stacks)
 		owner.balloon_alert(owner, "Evasion reduced, damaged")
-		to_chat(owner, span_danger("The searing fire compromises our ability to dodge![RUNNER_EVASION_COOLDOWN_REFRESH_THRESHOLD - evasion_stacks > 0 ? " We must dodge [RUNNER_EVASION_COOLDOWN_REFRESH_THRESHOLD - evasion_stacks] more projectile damage before Evasion's cooldown refreshes." : ""]"))
+		to_chat(owner, span_danger("The searing fire compromises our ability to dodge![RUNNER_EVASION_COOLDOWN_REFRESH_THRESHOLD - stacks > 0 ? " We must dodge [RUNNER_EVASION_COOLDOWN_REFRESH_THRESHOLD - stacks] more projectile damage before Evasion's cooldown refreshes." : ""]"))
 	else // If we have no stacks left, disable Evasion.
 		evasion_deactivate()
 
@@ -287,7 +301,7 @@
 */
 /datum/action/ability/xeno_action/evasion/proc/evasion_debuff_check(datum/source, amount)
 	SIGNAL_HANDLER
-	if(!(amount > 0) || !evade_active)
+	if(!(amount > 0) || !active)
 		return
 	evasion_deactivate()
 
@@ -307,38 +321,37 @@
 		COMSIG_PRE_MOVABLE_IMPACT,
 		COMSIG_ATOM_BULLET_ACT
 		))
-	evade_active = FALSE
-	evasion_stacks = 0
-	evasion_duration = 0
-	if(has_passthrough)
-		xeno_owner.allow_pass_flags &= ~PASS_MOB
-		xeno_owner.remove_pass_flags(PASS_MOB, type)
-		has_passthrough = FALSE
-		touched_humans.Cut()
-		UnregisterSignal(xeno_owner, COMSIG_MOVABLE_MOVED)
+	active = FALSE
+	if(attacking_disabled)
+		REMOVE_TRAIT(xeno_owner, TRAIT_HANDS_BLOCKED, RUNNER_ABILITY_TRAIT)
+	stacks = 0
+	remaining_duration = 0
+	if(pass_flags)
+		xeno_owner.allow_pass_flags &= pass_flags
+		xeno_owner.remove_pass_flags(pass_flags, type)
 	owner.balloon_alert(owner, "Evasion ended")
 	owner.playsound_local(owner, 'sound/voice/hiss5.ogg', 50)
-	hud_set_evasion(evasion_duration)
+	hud_set_evasion(remaining_duration)
 
 /// Determines whether or not a thrown object is dodged while the Evasion ability is active.
 /datum/action/ability/xeno_action/evasion/proc/evasion_throw_dodge(datum/source, atom/movable/thrown_atom)
 	SIGNAL_HANDLER
 	if(!isobj(thrown_atom))
 		return NONE
-	if(!evade_active) //If evasion is not active we don't dodge
+	if(!active) //If evasion is not active we don't dodge
 		return NONE
 	if((xeno_owner.last_move_time < (world.time - RUNNER_EVASION_RUN_DELAY))) //Gotta keep moving to benefit from evasion!
 		return NONE
 	if(isitem(thrown_atom))
 		var/obj/item/thrown_item = thrown_atom
-		evasion_stacks += thrown_item.throwforce //Add to evasion stacks for the purposes of determining whether or not our cooldown refreshes equal to the thrown force
+		stacks += thrown_item.throwforce //Add to evasion stacks for the purposes of determining whether or not our cooldown refreshes equal to the thrown force
 	evasion_dodge_fx(thrown_atom)
 	return COMPONENT_PRE_MOVABLE_IMPACT_DODGED
 
-/// This is where the dodgy magic happens
+/// This is where the dodgy magic happens.
 /datum/action/ability/xeno_action/evasion/proc/evasion_dodge(datum/source, atom/movable/projectile/proj, cardinal_move, uncrossing)
 	SIGNAL_HANDLER
-	if(!evade_active) //If evasion is not active we don't dodge
+	if(!active) //If evasion is not active we don't dodge
 		return FALSE
 	if((xeno_owner.last_move_time < (world.time - RUNNER_EVASION_RUN_DELAY))) //Gotta keep moving to benefit from evasion!
 		return FALSE
@@ -348,21 +361,23 @@
 		return FALSE
 	if(proj.original_target == xeno_owner && proj.distance_travelled < 2) //Pointblank shot.
 		return FALSE
+	if(dodge_prevention_range && dodge_prevention_range >= proj.distance_travelled)
+		return FALSE
 	if(!xeno_owner.fire_stacks)
-		evasion_stacks += proj.damage //Add to evasion stacks for the purposes of determining whether or not our cooldown refreshes, fire negates this
+		stacks += proj.damage //Add to evasion stacks for the purposes of determining whether or not our cooldown refreshes, fire negates this
 	evasion_dodge_fx(proj)
 	return COMPONENT_PROJECTILE_DODGE
 
 /// Handles dodge effects and visuals for the Evasion ability.
 /datum/action/ability/xeno_action/evasion/proc/evasion_dodge_fx(atom/movable/proj)
 	xeno_owner.visible_message(span_warning("[xeno_owner] effortlessly dodges the [proj.name]!"), \
-	span_xenodanger("We effortlessly dodge the [proj.name]![(RUNNER_EVASION_COOLDOWN_REFRESH_THRESHOLD - evasion_stacks) > 0 && evasion_stacks > 0 ? " We must dodge [RUNNER_EVASION_COOLDOWN_REFRESH_THRESHOLD - evasion_stacks] more projectile damage before [src]'s cooldown refreshes." : ""]"))
+	span_xenodanger("We effortlessly dodge the [proj.name]![(RUNNER_EVASION_COOLDOWN_REFRESH_THRESHOLD - stacks) > 0 && stacks > 0 ? " We must dodge [RUNNER_EVASION_COOLDOWN_REFRESH_THRESHOLD - stacks] more projectile damage before [src]'s cooldown refreshes." : ""]"))
 	xeno_owner.add_filter("runner_evasion", 2, gauss_blur_filter(5))
 	addtimer(CALLBACK(xeno_owner, TYPE_PROC_REF(/datum, remove_filter), "runner_evasion"), 0.5 SECONDS)
 	xeno_owner.do_jitter_animation(4000)
-	if(evasion_stacks >= RUNNER_EVASION_COOLDOWN_REFRESH_THRESHOLD && cooldown_remaining() && auto_evasion_togglable) // We have more evasion stacks than needed to refresh our cooldown, while being on cooldown.
+	if(stacks >= RUNNER_EVASION_COOLDOWN_REFRESH_THRESHOLD && cooldown_remaining() && automatic_refresh_togglable) // We have more evasion stacks than needed to refresh our cooldown, while being on cooldown.
 		clear_cooldown()
-		if(auto_evasion && xeno_owner.plasma_stored >= ability_cost)
+		if(automatic_refresh_toggled && xeno_owner.plasma_stored >= ability_cost)
 			action_activate()
 	var/turf/current_turf = get_turf(xeno_owner) //location of after image SFX
 	playsound(current_turf, pick('sound/effects/throw.ogg','sound/effects/alien/tail_swipe1.ogg', 'sound/effects/alien/tail_swipe2.ogg'), 25, 1) //sound effects
@@ -374,11 +389,7 @@
 /datum/action/ability/xeno_action/evasion/proc/on_passthrough_move()
 	SIGNAL_HANDLER
 	for(var/mob/living/carbon/human/human_right_here in get_turf(xeno_owner))
-		if(human_right_here in touched_humans)
-			continue
-		touched_humans += human_right_here
-		human_right_here.AdjustConfused(passthrough_confusion_length)
-
+		human_right_here.apply_status_effect(STATUS_EFFECT_GUN_SKILL_ACCURACY_DEBUFF, 3 SECONDS)
 
 // ***************************************
 // *********** Snatch

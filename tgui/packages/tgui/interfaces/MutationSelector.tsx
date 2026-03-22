@@ -25,14 +25,14 @@ type MutationBarData = {
 };
 
 type MutationData = {
-  shell_mutations: Upgrade[];
-  spur_mutations: Upgrade[];
-  veil_mutations: Upgrade[];
+  defense_mutations: Upgrade[];
+  offense_mutations: Upgrade[];
+  utility_mutations: Upgrade[];
 };
 
 export const MutationSelector = (_props: any) => {
   const { data } = useBackend<MutationData>();
-  const { shell_mutations, spur_mutations, veil_mutations } = data;
+  const { defense_mutations, offense_mutations, utility_mutations } = data;
 
   return (
     <Window theme="xeno" width={500} height={600}>
@@ -40,9 +40,18 @@ export const MutationSelector = (_props: any) => {
         <Section title="Mutation Evolution" key="Mutation Evolution">
           <MutationBar />
         </Section>
-        <MutationSection category_name="Defense" mutations={shell_mutations} />
-        <MutationSection category_name="Offense" mutations={spur_mutations} />
-        <MutationSection category_name="Utility" mutations={veil_mutations} />
+        <MutationSection
+          category_name="Defense"
+          mutations={defense_mutations}
+        />
+        <MutationSection
+          category_name="Offense"
+          mutations={offense_mutations}
+        />
+        <MutationSection
+          category_name="Utility"
+          mutations={utility_mutations}
+        />
       </Window.Content>
     </Window>
   );

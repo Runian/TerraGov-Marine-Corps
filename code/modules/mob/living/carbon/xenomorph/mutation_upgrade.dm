@@ -32,7 +32,7 @@
 		return
 	xenomorph_owner = new_xenomorph_owner
 	xenomorph_owner.owned_mutations += src
-	alert = xenomorph_owner.throw_alert("mutation_[REF(src)]", alert_typepath)
+	alert = xenomorph_owner.throw_alert("mutation_[initial(name)]", alert_typepath)
 	update_alert()
 	RegisterSignal(xenomorph_owner, COMSIG_XENOMORPH_ABILITY_ON_UPGRADE, TYPE_PROC_REF(/datum/mutation_upgrade, on_xenomorph_upgrade))
 	on_gain()
@@ -42,7 +42,7 @@
 	if(!xenomorph_owner)
 		return ..()
 	if(alert)
-		xenomorph_owner.clear_alert("mutation_[REF(src)]")
+		xenomorph_owner.clear_alert("mutation_[initial(name)]")
 	if(xenomorph_owner.owned_mutations.Find(src))
 		xenomorph_owner.owned_mutations -= src
 	UnregisterSignal(xenomorph_owner, COMSIG_XENOMORPH_ABILITY_ON_UPGRADE)

@@ -48,7 +48,7 @@
 			if(MUTATION_DEFENSE)
 				list_name = "defense_mutations"
 			if(MUTATION_OFFENSE)
-				list_name = "defense_mutations"
+				list_name = "offense_mutations"
 			if(MUTATION_UTILITY)
 				list_name = "utility_mutations"
 		if(!list_name)

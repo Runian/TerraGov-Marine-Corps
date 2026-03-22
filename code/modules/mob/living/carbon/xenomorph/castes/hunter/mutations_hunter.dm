@@ -257,7 +257,7 @@
 	if(!pounce_ability)
 		return
 	pounce_ability.cooldown_duration += initial(pounce_ability.cooldown_duration) * get_multiplier(0)
-	pounce_ability.stun_duration -= initial(pounce_ability.stun_duration)
+	pounce_ability.target_stun_duration -= initial(pounce_ability.target_stun_duration)
 	pounce_ability.self_immobilize_duration -= initial(pounce_ability.self_immobilize_duration)
 	pounce_ability.attack_on_pounce = TRUE
 
@@ -267,7 +267,7 @@
 	if(!pounce_ability)
 		return
 	pounce_ability.cooldown_duration -= initial(pounce_ability.cooldown_duration) * get_multiplier(0)
-	pounce_ability.stun_duration += initial(pounce_ability.stun_duration)
+	pounce_ability.target_stun_duration += initial(pounce_ability.target_stun_duration)
 	pounce_ability.self_immobilize_duration += initial(pounce_ability.self_immobilize_duration)
 	pounce_ability.attack_on_pounce = FALSE
 
