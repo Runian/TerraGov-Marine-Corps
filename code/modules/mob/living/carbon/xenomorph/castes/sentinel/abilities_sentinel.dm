@@ -82,8 +82,6 @@
 	var/datum/status_effect/stacking/intoxicated/debuff = xeno_target.has_status_effect(STATUS_EFFECT_INTOXICATED)
 	if(debuff)
 		debuff.add_stacks(intoxication_stacks)
-		debuff.xenomorph_to_heal = xeno_owner
-		debuff.healing_per_stack = healing_per_stack
 	else
 		xeno_target.apply_status_effect(STATUS_EFFECT_INTOXICATED, intoxication_stacks, xeno_owner, healing_per_stack)
 	remaining_slashes-- //Decrement the toxic slash count
@@ -140,33 +138,29 @@
 	keybinding_signals = list(
 		KEYBINDING_NORMAL = COMSIG_XENOABILITY_DRAIN_STING,
 	)
-	/// How far can the target be in order for the ability to work?
-	var/targetable_range = 1
-	/// If the ability was used from afar, what amount should the potency be multiplied by?
-	var/ranged_effectiveness = 0
-	/// How much should the healing be multiplied by? If this value is above 1, extra health is converted to Overheal.
-	var/heal_multiplier = 1
-	/// How much potency is one unit of xeno-chemicals?
-	var/chemical_potency = 0
-	/// What amount of potency do we start at? This is after adjusting for SENTINEL_DRAIN_MULTIPLIER.
-	var/base_potency = 0
-	/// The amount of armor to be given when Drain Surge is activated.
+	/// The strength of Drain Surge. By default, this is the amount of soft armor granted during Drain Surge.
 	var/drain_surge_strength = SENTINEL_DRAIN_SURGE_ARMOR_MOD
-	/// Should the armor from Drain Surge be converted to melee damage modifier? 20 armor = 20% melee damage modifier.
-	var/drain_surge_melee = FALSE
-	/// Does Drain Surge activate regardless of potency? If yes, how much armor should be given for each set of SENTINEL_DRAIN_MULTIPLIER?
-	var/drain_surge_armor_per = 0
+	/// How long in deciseconds will Drain Surge last?
+	var/drain_surge_duration = 10 SECONDS
+	/// Should Drain Surge apply a heal over time? The amount healed per second will be equal to the strength.
+	var/drain_surge_heals_overtime = FALSE
+	/// Should Drain Surge provide a melee damage modifier instead of armor? The melee damage modifier will be equal to the strength.
+	var/drain_surge_modifier_instead = FALSE
+	/// How much potency is one unit of any xeno-affiliated chemical? This should be relative to the amount of SENTINEL_DRAIN_MULTIPLIER.
+	var/potency_per_xenochemical = 0
+	/// Can this ability be used on allies?
+	var/can_target_allies = FALSE
 
 /datum/action/ability/activable/xeno/drain_sting/can_use_ability(atom/A, silent = FALSE, override_flags)
 	. = ..()
 	if(!.)
 		return FALSE
-	if(!ishuman(A))
+	if(!ishuman(A) && (!can_target_allies && isxeno(A)))
 		if(!silent)
-			A.balloon_alert(owner, "Cannot sting")
+			A.balloon_alert(owner, "cannot sting!")
 		return FALSE
 	var/mob/living/carbon/human/human_target = A
-	if((get_dist(owner, human_target) > targetable_range) || !line_of_sight(owner, human_target))
+	if(!owner.Adjacent(human_target) || !line_of_sight(owner, human_target))
 		if(!silent)
 			human_target.balloon_alert(owner, "Cannot reach")
 		return FALSE
@@ -178,28 +172,28 @@
 		return FALSE
 
 /datum/action/ability/activable/xeno/drain_sting/use_ability(atom/A)
-	var/mob/living/carbon/human/human_target = A
-	var/datum/status_effect/stacking/intoxicated/debuff = human_target.has_status_effect(STATUS_EFFECT_INTOXICATED)
+	if(isxeno(A))
+		var/mob/living/carbon/xenomorph/xenomorph_target = A
+	else
+		var/mob/living/carbon/human/human_target = A
+		var/datum/status_effect/stacking/intoxicated/debuff = human_target.has_status_effect(STATUS_EFFECT_INTOXICATED)
 
-	var/potency = get_potency(human_target)
-	var/potency_in_sets = round(potency / SENTINEL_DRAIN_MULTIPLIER)
-	if(drain_surge_armor_per || (potency_in_sets > debuff.max_stacks - 10))
-		human_target.emote("scream")
-		var/strength = drain_surge_strength + (drain_surge_armor_per * potency_in_sets)
-		xeno_owner.apply_status_effect(STATUS_EFFECT_DRAIN_SURGE, drain_surge_melee ? 0 : strength, drain_surge_melee ? (strength / 100) : 0)
-		new /obj/effect/temp_visual/drain_sting_crit(get_turf(human_target))
-	human_target.adjustFireLoss(potency / 5)
-	human_target.AdjustKnockdown(max(0.1 SECONDS, potency_in_sets - 10))
-	var/health_to_heal = potency * heal_multiplier
-	HEAL_XENO_DAMAGE(xeno_owner, health_to_heal, FALSE)
-	if(heal_multiplier > 1 && health_to_heal)
-		xeno_owner.adjustOverheal(health_to_heal) // Leftover healing goes to overheal.
-	xeno_owner.gain_plasma(potency * 3.5)
-	debuff.add_stacks(-round(debuff.stacks * 0.7))
+		var/potency = get_potency(human_target)
+		var/potency_in_sets = round(potency / SENTINEL_DRAIN_MULTIPLIER)
+		if(potency_in_sets > debuff.max_stacks - 10)
+			human_target.emote("scream")
+			apply_drain_surge(xeno_owner)
+			new /obj/effect/temp_visual/drain_sting_crit(get_turf(human_target))
+		human_target.adjustFireLoss(potency / 5)
+		human_target.AdjustKnockdown(max(0.1 SECONDS, potency_in_sets - 10))
+		var/health_to_heal = potency
+		HEAL_XENO_DAMAGE(xeno_owner, health_to_heal, FALSE)
+		xeno_owner.gain_plasma(potency * 3.5)
+		debuff.add_stacks(-round(debuff.stacks * 0.7))
 
-	xeno_owner.do_attack_animation(human_target, ATTACK_EFFECT_DRAIN_STING)
+	xeno_owner.do_attack_animation(A, ATTACK_EFFECT_DRAIN_STING)
 	playsound(owner.loc, 'sound/effects/alien/tail_swipe1.ogg', 30)
-	xeno_owner.visible_message(message = span_xenowarning("\A [xeno_owner] stings [human_target]!"), self_message = span_xenowarning("We sting [human_target]!"))
+	xeno_owner.visible_message(message = span_xenowarning("\A [xeno_owner] stings [A]!"), self_message = span_xenowarning("We sting [A]!"))
 	GLOB.round_statistics.sentinel_drain_stings++
 	SSblackbox.record_feedback("tally", "round_statistics", 1, "sentinel_drain_stings")
 	succeed_activate()
@@ -213,13 +207,18 @@
 /// Returns the potency of Drain Sting which accounts for: base potency, Intoxicated stacks, xeno-chemicals, and range effectiveness.
 /datum/action/ability/activable/xeno/drain_sting/proc/get_potency(mob/living/carbon/human/human_target)
 	var/datum/status_effect/stacking/intoxicated/debuff = human_target.has_status_effect(STATUS_EFFECT_INTOXICATED)
-	var/potency = base_potency + (debuff.stacks * SENTINEL_DRAIN_MULTIPLIER)
-	if(chemical_potency)
-		for(var/datum/reagent/target_reagent AS in human_target.reagents.reagent_list)
-			if(!is_type_in_typecache(target_reagent, GLOB.defiler_toxins_typecache_list))
-				continue
-			chemical_potency += human_target.reagents.get_reagent_amount(target_reagent) * chemical_potency
-	return potency * (xeno_owner.Adjacent(human_target) ? 1 : ranged_effectiveness)
+	var/potency = debuff.stacks * SENTINEL_DRAIN_MULTIPLIER
+	if(!potency_per_xenochemical)
+		return potency
+	for(var/datum/reagent/target_reagent AS in human_target.reagents.reagent_list)
+		if(!is_type_in_typecache(target_reagent, GLOB.defiler_toxins_typecache_list))
+			continue
+		potency += human_target.reagents.get_reagent_amount(target_reagent) * potency_per_xenochemical
+	return potency
+
+/// Applies the Drain Surge status effect to an xenomorph.
+/datum/action/ability/activable/xeno/drain_sting/proc/apply_drain_surge(mob/living/carbon/xenomorph/xenomorph_target)
+	xenomorph_target.apply_status_effect(STATUS_EFFECT_DRAIN_SURGE, drain_surge_duration, drain_surge_modifier_instead ? 0 : drain_surge_strength, drain_surge_modifier_instead ? drain_surge_strength : 0, drain_surge_heals_overtime ? drain_surge_strength : 0)
 
 /obj/effect/temp_visual/drain_sting_crit
 	name = "drain_sting"

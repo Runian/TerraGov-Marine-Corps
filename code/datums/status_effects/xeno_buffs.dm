@@ -734,46 +734,61 @@
 /datum/status_effect/drain_surge
 	id = "drain surge"
 	duration = 10 SECONDS
-	tick_interval = 2 SECONDS
+	tick_interval = 1 SECONDS
 	status_type = STATUS_EFFECT_REPLACE
 	alert_type = null
 	/// The amount of soft armor to add/remove from the owner.
 	var/armor_modifier = SENTINEL_DRAIN_SURGE_ARMOR_MOD
 	/// The amount of melee damage modifier to add/remove from the owner.
 	var/damage_modifier = 0
+	/// The amount healed every tick.
+	var/heal_per_tick = 0
+
 	/// Used for particles. Holds the particles instead of the mob. See particle_holder for documentation.
 	var/obj/effect/abstract/particle_holder/particle_holder
 
-/datum/status_effect/drain_surge/on_creation(mob/living/new_owner, new_armor_modifier, new_damage_modifier)
+/datum/status_effect/drain_surge/on_creation(mob/living/new_owner, new_duration, new_armor_modifier, new_damage_modifier, new_heal_per_tick)
+	if(new_duration)
+		duration = new_duration
 	if(new_armor_modifier)
 		armor_modifier = new_armor_modifier
 	if(new_damage_modifier)
 		damage_modifier = new_damage_modifier
+	if(new_heal_per_tick)
+		heal_per_tick = new_heal_per_tick
 	return ..()
 
 /datum/status_effect/drain_surge/on_apply()
 	if(!isxeno(owner))
 		return FALSE
-	var/mob/living/carbon/xenomorph/X = owner
-	X.soft_armor = X.soft_armor.modifyAllRatings(armor_modifier)
-	X.xeno_melee_damage_modifier += damage_modifier
-	X.visible_message(span_danger("[X]'s [armor_modifier ? "chitin" : "claws"] glows with a vicious green!"), \
+	var/mob/living/carbon/xenomorph/xenomorph_owner = owner
+	xenomorph_owner.soft_armor = xenomorph_owner.soft_armor.modifyAllRatings(armor_modifier)
+	xenomorph_owner.xeno_melee_damage_modifier += damage_modifier
+	xenomorph_owner.visible_message(span_danger("[xenomorph_owner]'s [armor_modifier ? "chitin" : "claws"] glows with a vicious green!"), \
 	span_notice("You imbue your [armor_modifier ? "chitinous armor" : "claws"] with the toxins of your victim!"), null, 5)
-	X.color = "#7FFF00"
-	particle_holder = new(X, /particles/drain_surge)
+	xenomorph_owner.color = "#7FFF00"
+	particle_holder = new(xenomorph_owner, /particles/drain_surge)
 	particle_holder.pixel_x = 11
 	particle_holder.pixel_y = 12
 	return TRUE
 
 /datum/status_effect/drain_surge/on_remove()
-	var/mob/living/carbon/xenomorph/X = owner
-	X.soft_armor = X.soft_armor.modifyAllRatings(-armor_modifier)
-	X.xeno_melee_damage_modifier -= damage_modifier
-	X.visible_message(span_danger("[X]'s [armor_modifier ? "chitin" : "claws"] loses its green glow..."), \
+	var/mob/living/carbon/xenomorph/xenomorph_owner = owner
+	xenomorph_owner.soft_armor = xenomorph_owner.soft_armor.modifyAllRatings(-armor_modifier)
+	xenomorph_owner.xeno_melee_damage_modifier -= damage_modifier
+	xenomorph_owner.visible_message(span_danger("[xenomorph_owner]'s [armor_modifier ? "chitin" : "claws"] loses its green glow..."), \
 	span_notice("Your [armor_modifier ? "chitinous armor" : "claws"] loses its glow."), null, 5)
-	X.color = "#FFFFFF"
+	xenomorph_owner.color = "#FFFFFF"
 	QDEL_NULL(particle_holder)
 	return ..()
+
+/datum/status_effect/drain_surge/process(delta_time)
+	. = ..()
+	if(QDELETED(src) || !heal_per_tick)
+		return
+	var/mob/living/carbon/xenomorph/xenomorph_owner = owner
+	var/amount_to_heal = heal_per_tick
+	HEAL_XENO_DAMAGE(xenomorph_owner, amount_to_heal, TRUE)
 
 /particles/drain_surge
 	icon = 'icons/effects/particles/generic_particles.dmi'
