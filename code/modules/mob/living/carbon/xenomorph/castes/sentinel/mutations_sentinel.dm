@@ -93,13 +93,13 @@
 	name = "Toxic Compatibility"
 	desc = "Drain Sting's potency is increased by the amount of xeno-affiliated reagents in your target. Each unit counts as a third of an Intoxicated stack."
 
-/datum/mutation_upgrade/offense/toxic_blood/on_gain()
+/datum/mutation_upgrade/offense/toxic_compatibility/on_gain()
 	var/datum/action/ability/activable/xeno/drain_sting/ability = xenomorph_owner.actions_by_path[/datum/action/ability/activable/xeno/drain_sting]
 	if(!ability)
 		return
 	ability.potency_per_xenochemical = SENTINEL_DRAIN_MULTIPLIER / 3
 
-/datum/mutation_upgrade/offense/toxic_blood/on_loss()
+/datum/mutation_upgrade/offense/toxic_compatibility/on_loss()
 	var/datum/action/ability/activable/xeno/drain_sting/ability = xenomorph_owner.actions_by_path[/datum/action/ability/activable/xeno/drain_sting]
 	if(!ability)
 		return
