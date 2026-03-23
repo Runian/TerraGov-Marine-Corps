@@ -57,18 +57,6 @@
 		/datum/action/ability/activable/xeno/drain_sting,
 	)
 
-	mutations = list(
-		/datum/mutation_upgrade/defense/comforting_acid,
-		/datum/mutation_upgrade/defense/healing_sting,
-		/datum/mutation_upgrade/defense/constant_surge,
-		/datum/mutation_upgrade/offense/acidic_slasher,
-		/datum/mutation_upgrade/offense/far_sting,
-		/datum/mutation_upgrade/offense/imbued_claws,
-		/datum/mutation_upgrade/utility/toxic_compatibility,
-		/datum/mutation_upgrade/utility/toxic_blood,
-		/datum/mutation_upgrade/utility/automatic_sting,
-	)
-
 /datum/xeno_caste/sentinel/normal
 	upgrade = XENO_UPGRADE_NORMAL
 
