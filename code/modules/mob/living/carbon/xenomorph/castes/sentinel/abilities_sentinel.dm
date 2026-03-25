@@ -148,6 +148,12 @@
 	var/drain_surge_modifier_instead = FALSE
 	/// How much potency is one unit of any xeno-affiliated chemical? This should be relative to the amount of SENTINEL_DRAIN_MULTIPLIER.
 	var/potency_per_xenochemical = 0
+	/// The amount to multiply the regular heal by.
+	var/healing_multiplier = 1
+	/// Should any excess health from the regular heal become overheal?
+	var/healing_overheals = FALSE
+	/// Should it create acid smoke ontop of the target? Range and opaque will vary based on potency.
+	var/creates_smoke = FALSE
 	/// Can this ability be used on allies?
 	var/can_target_allies = FALSE
 
@@ -172,25 +178,31 @@
 		return FALSE
 
 /datum/action/ability/activable/xeno/drain_sting/use_ability(atom/A)
+	var/target_turf = get_turf(A)
 	if(isxeno(A))
 		var/mob/living/carbon/xenomorph/xenomorph_target = A
+		new /obj/effect/temp_visual/drain_sting_crit(target_turf)
 		apply_drain_surge(xenomorph_target)
-		new /obj/effect/temp_visual/drain_sting_crit(get_turf(xenomorph_target))
 	else
 		var/mob/living/carbon/human/human_target = A
 		var/datum/status_effect/stacking/intoxicated/debuff = human_target.has_status_effect(STATUS_EFFECT_INTOXICATED)
-
-		var/potency = get_potency(human_target)
-		var/potency_in_sets = round(potency / SENTINEL_DRAIN_MULTIPLIER)
-		if(potency_in_sets > debuff.max_stacks - 10)
+		var/potency = get_potency(A)
+		var/potency_as_stacks = round(potency / SENTINEL_DRAIN_MULTIPLIER)
+		if(potency_as_stacks > debuff.max_stacks - 10)
 			human_target.emote("scream")
 			apply_drain_surge(xeno_owner)
-			new /obj/effect/temp_visual/drain_sting_crit(get_turf(human_target))
+			new /obj/effect/temp_visual/drain_sting_crit(target_turf)
 		human_target.adjustFireLoss(potency / 5)
-		human_target.AdjustKnockdown(max(0.1 SECONDS, potency_in_sets - 10))
-		var/health_to_heal = potency
+		human_target.AdjustKnockdown(max(0.1 SECONDS, potency_as_stacks - 10))
+		var/health_to_heal = potency * healing_multiplier
 		HEAL_XENO_DAMAGE(xeno_owner, health_to_heal, FALSE)
+		if(healing_overheals && health_to_heal)
+			xeno_owner.adjustOverheal(health_to_heal)
 		xeno_owner.gain_plasma(potency * 3.5)
+		if(creates_smoke)
+			var/datum/effect_system/smoke_spread/smoke = potency_as_stacks >= debuff.max_stacks ? new /datum/effect_system/smoke_spread/xeno/acid/opaque(target_turf) : new /datum/effect_system/smoke_spread/xeno/acid(target_turf)
+			smoke.set_up(potency_as_stacks >= debuff.max_stacks / 2 ? 2 : 1, target_turf, 2)
+			smoke.start()
 		debuff.add_stacks(-round(debuff.stacks * 0.7))
 	xeno_owner.do_attack_animation(A, ATTACK_EFFECT_DRAIN_STING)
 	playsound(owner.loc, 'sound/effects/alien/tail_swipe1.ogg', 30)
@@ -205,9 +217,11 @@
 	owner.balloon_alert(owner, "Drain Sting ready")
 	return ..()
 
-/// Returns the potency of Drain Sting which accounts for: base potency, Intoxicated stacks, xeno-chemicals, and range effectiveness.
+/// Returns the potency of Drain Sting which accounts for.
 /datum/action/ability/activable/xeno/drain_sting/proc/get_potency(mob/living/carbon/human/human_target)
 	var/datum/status_effect/stacking/intoxicated/debuff = human_target.has_status_effect(STATUS_EFFECT_INTOXICATED)
+	if(!debuff)
+		return
 	var/potency = debuff.stacks * SENTINEL_DRAIN_MULTIPLIER
 	if(!potency_per_xenochemical)
 		return potency

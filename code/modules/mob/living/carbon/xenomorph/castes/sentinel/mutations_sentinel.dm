@@ -20,6 +20,24 @@
 	ability.drain_surge_strength = initial(ability.drain_surge_strength)
 	ability.drain_surge_duration = initial(ability.drain_surge_duration)
 
+/datum/mutation_upgrade/defense/healing_sting
+	name = "Healing Sting"
+	desc = "Drain Surge heals twice as much and can overheal."
+
+/datum/mutation_upgrade/defense/healing_sting/on_gain()
+	var/datum/action/ability/activable/xeno/drain_sting/ability = xenomorph_owner.actions_by_path[/datum/action/ability/activable/xeno/drain_sting]
+	if(!ability)
+		return
+	ability.healing_multiplier = 2
+	ability.healing_overheals = TRUE
+
+/datum/mutation_upgrade/defense/healing_sting/on_loss()
+	var/datum/action/ability/activable/xeno/drain_sting/ability = xenomorph_owner.actions_by_path[/datum/action/ability/activable/xeno/drain_sting]
+	if(!ability)
+		return
+	ability.healing_multiplier = initial(ability.healing_multiplier)
+	ability.healing_overheals = initial(ability.healing_overheals)
+
 /datum/mutation_upgrade/defense/healing_surge
 	name = "Healing Surge"
 	desc = "Drain Surge heals over time. Every second, it heals equal to the amount of bonus armor it gives."
@@ -135,7 +153,19 @@
 
 /datum/mutation_upgrade/utility/vaporous_toxins
 	name = "Vaporous Toxins"
-	desc = "Drain Sting creates a small cloud of acidic gas ontop your target. If Drain Sting is at half potency or above, its radius increases. If Drain Sting is at maximum potency, it becomes opaque."
+	desc = "Drain Sting creates a small cloud of acidic smoke ontop your target. If Drain Sting is at half potency or above, its radius increases. If Drain Sting is at maximum potency, it becomes opaque."
+
+/datum/mutation_upgrade/utility/vaporous_toxins/on_gain()
+	var/datum/action/ability/activable/xeno/drain_sting/ability = xenomorph_owner.actions_by_path[/datum/action/ability/activable/xeno/drain_sting]
+	if(!ability)
+		return
+	ability.creates_smoke = TRUE
+
+/datum/mutation_upgrade/utility/vaporous_toxins/on_loss()
+	var/datum/action/ability/activable/xeno/drain_sting/ability = xenomorph_owner.actions_by_path[/datum/action/ability/activable/xeno/drain_sting]
+	if(!ability)
+		return
+	ability.creates_smoke = initial(ability.creates_smoke)
 
 /datum/mutation_upgrade/utility/baton_surge
 	name = "Baton Surge"
