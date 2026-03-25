@@ -1,3 +1,55 @@
+
+//*********************//
+//        Base        //
+//*********************//
+
+/datum/mutation_upgrade/defense/defender
+	allowed_caste_names = list(/datum/xeno_caste/defender)
+
+/datum/mutation_upgrade/offense/defender
+	allowed_caste_names = list(/datum/xeno_caste/defender)
+
+/datum/mutation_upgrade/utility/defender
+	allowed_caste_names = list(/datum/xeno_caste/defender)
+
+//*********************//
+//       Defense       //
+//*********************//
+
+/datum/mutation_upgrade/defense/defender/carapace_waxing
+	name = "Carapace Waxing"
+	desc = "Regenerate Skin removes various debuffs currently applied to you."
+
+/datum/mutation_upgrade/defense/defender/brittle_upclose
+	name = "Brittle Upclose"
+	desc = "You are immune to stagger caused by projectiles, but take 10% more damage from projectiles at pointblank range."
+
+/datum/mutation_upgrade/defense/defender/carapace_regrowth
+	name = "Carapace Regrowth"
+	desc = "Regenerate Skin heals you for a total of 60% of your maximum health, but temporarily reduces your soft armor by 30 for 6 seconds."
+
+//*********************//
+//       Offense       //
+//*********************//
+
+//*********************//
+//       Utility       //
+//*********************//
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 //*********************//
 //        Shell        //
 //*********************//
