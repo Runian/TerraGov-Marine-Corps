@@ -182,28 +182,3 @@
 		return
 	ability.set_immobilize(initial(ability.should_immobilize))
 	ability.set_movement_delay(initial(ability.movement_delay))
-
-
-/datum/mutation_upgrade/utility/defender/deflective_fortification
-	name = "Deflective Fortification"
-	desc = "When a projectile hits you and have 100 or more of its armor type, it will be deflected. Damage and sunder is applied before this calculation."
-
-/datum/mutation_upgrade/utility/defender/deflective_fortification/on_gain()
-	RegisterSignal(xenomorph_owner, COMSIG_XENO_PROJECTILE_HIT, PROC_REF(on_projectile_hit))
-
-/datum/mutation_upgrade/utility/defender/deflective_fortification/on_loss()
-	UnregisterSignal(xenomorph_owner, COMSIG_XENO_PROJECTILE_HIT, PROC_REF(on_projectile_hit))
-
-/datum/mutation_upgrade/utility/defender/deflective_fortification/proc/on_projectile_hit(datum/source, atom/movable/projectile/proj, cardinal_move, uncrossing)
-	SIGNAL_HANDLER
-	if(!proj.damage)
-		return NONE
-	var/damage_before_ap = xenomorph_owner.modify_by_armor(proj.damage, proj.ammo.armor_type, max(1, proj.sundering))
-	if(damage_before_ap)
-		return NONE
-	xenomorph_owner.adjust_sunder(max(1, proj.sundering))
-	xenomorph_owner.apply_damage(proj.damage, proj.ammo.damage_type, proj.def_zone, updating_health = TRUE, attacker = proj.firer)
-	if(xenomorph_owner.InCritical())
-		return NONE // TODO: What if they enter critical? They already took the damage... double damage = bad?
-	// TODO: Dereflect code here!
-	return COMPONENT_PROJECTILE_DODGE
