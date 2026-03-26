@@ -148,8 +148,6 @@
 	// *** Defender Abilities *** //
 	///modifying amount to the crest defense ability for defenders. Positive integers only.
 	var/crest_defense_armor = 0
-	///modifying amount to the fortify ability for defenders. Positive integers only.
-	var/fortify_armor = 0
 	///amount of slowdown to apply when the crest defense is active. trading defense for speed. Positive numbers makes it slower.
 	var/crest_defense_slowdown = 0
 

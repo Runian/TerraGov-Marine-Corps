@@ -48,6 +48,10 @@
 // DEBUFFS //
 /////////////
 
+#define STATUS_EFFECT_NO_PLASMA_REGEN /datum/status_effect/noplasmaregen // prevents plasma regeneration
+
+#define STATUS_EFFECT_PLASMA_DRAIN /datum/status_effect/plasmadrain // consumes 10% maximum plasma per tick
+
 #define STATUS_EFFECT_STAGGER /datum/status_effect/incapacitating/stagger //reduces human gun damage or impairs xeno ability use
 
 #define STATUS_EFFECT_STUN /datum/status_effect/incapacitating/stun //the affected is unable to move or use items

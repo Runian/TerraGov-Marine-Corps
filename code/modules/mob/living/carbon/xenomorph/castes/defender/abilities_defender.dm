@@ -263,29 +263,14 @@
 	keybinding_signals = list(
 		KEYBINDING_NORMAL = COMSIG_XENOABILITY_FORTIFY,
 	)
-	/// The amount of armor to be given when this ability is active.
-	var/last_fortify_bonus = 0
-	/// Should TRAIT_IMMOBILE be given while this ability is active.
+	/// The armor that was given to the owner, if any.
+	var/datum/armor/armor_modifier
+	/// While the ability is active, the amount of soft armor to give. This is doubled for bomb armor.
+	var/armor_modifier_amount = 50
+	/// When the ability is active, should TRAIT_IMMOBILE be given? Do not set this directly: use `set_immobilize` instead.
 	var/should_immobilize = TRUE
-	/// If they were to move somehow while this ability is active, how many deciseconds should be added to their next move? Do not set this directly. Use `set_movement_delay` instead.
+	/// While the ability is active, how many deciseconds should be added to their next move if they ever move? Do not set this directly: use `set_movement_delay` instead.
 	var/movement_delay = 0 SECONDS
-
-/datum/action/ability/xeno_action/fortify/give_action()
-	. = ..()
-	last_fortify_bonus = xeno_owner.xeno_caste.fortify_armor
-
-/datum/action/ability/xeno_action/fortify/on_xeno_upgrade()
-	. = ..()
-	if(xeno_owner.fortify)
-		xeno_owner.soft_armor = xeno_owner.soft_armor.modifyAllRatings(-last_fortify_bonus)
-		xeno_owner.soft_armor = xeno_owner.soft_armor.modifyRating(BOMB = -last_fortify_bonus)
-
-		last_fortify_bonus = xeno_owner.xeno_caste.fortify_armor
-
-		xeno_owner.soft_armor = xeno_owner.soft_armor.modifyAllRatings(last_fortify_bonus)
-		xeno_owner.soft_armor = xeno_owner.soft_armor.modifyRating(BOMB = last_fortify_bonus)
-	else
-		last_fortify_bonus = xeno_owner.xeno_caste.fortify_armor
 
 /datum/action/ability/xeno_action/fortify/on_cooldown_finish()
 	to_chat(xeno_owner, span_notice("We can [xeno_owner.fortify ? "stand up" : "fortify"] again."))
@@ -317,6 +302,9 @@
 /datum/action/ability/xeno_action/fortify/proc/set_fortify(on, silent = FALSE)
 	GLOB.round_statistics.defender_fortifiy_toggles++
 	SSblackbox.record_feedback("tally", "round_statistics", 1, "defender_fortifiy_toggles")
+	if(armor_modifier)
+		xeno_owner.soft_armor = xeno_owner.soft_armor.detachArmor(armor_modifier)
+		armor_modifier = null
 	if(on)
 		if(should_immobilize)
 			ADD_TRAIT(xeno_owner, TRAIT_IMMOBILE, FORTIFY_TRAIT)
@@ -325,25 +313,33 @@
 		ADD_TRAIT(xeno_owner, TRAIT_STOPS_TANK_COLLISION, FORTIFY_TRAIT)
 		if(!silent)
 			to_chat(xeno_owner, span_xenowarning("We tuck ourselves into a defensive stance."))
-		xeno_owner.soft_armor = xeno_owner.soft_armor.modifyAllRatings(last_fortify_bonus)
-		xeno_owner.soft_armor = xeno_owner.soft_armor.modifyRating(BOMB = last_fortify_bonus) //double bomb bonus for explosion immunity
+		armor_modifier = xeno_owner.soft_armor.modifyRating(armor_modifier_amount, armor_modifier_amount, armor_modifier_amount, armor_modifier_amount, armor_modifier_amount * 2, armor_modifier_amount, armor_modifier_amount, armor_modifier_amount)
+		xeno_owner.soft_armor = xeno_owner.soft_armor.attachArmor(armor_modifier)
 	else
-		if(!silent)
-			to_chat(xeno_owner, span_xenowarning("We resume our normal stance."))
-		xeno_owner.soft_armor = xeno_owner.soft_armor.modifyAllRatings(-last_fortify_bonus)
-		xeno_owner.soft_armor = xeno_owner.soft_armor.modifyRating(BOMB = -last_fortify_bonus)
 		if(should_immobilize)
 			REMOVE_TRAIT(xeno_owner, TRAIT_IMMOBILE, FORTIFY_TRAIT)
 		if(movement_delay)
 			UnregisterSignal(xeno_owner, COMSIG_MOVABLE_MOVED)
 		REMOVE_TRAIT(xeno_owner, TRAIT_STOPS_TANK_COLLISION, FORTIFY_TRAIT)
-
+		if(!silent)
+			to_chat(xeno_owner, span_xenowarning("We resume our normal stance."))
 	xeno_owner.fortify = on
 	xeno_owner.anchored = on
 	playsound(xeno_owner.loc, 'sound/effects/stonedoor_openclose.ogg', 30, TRUE)
 	xeno_owner.update_icons()
 
-/// Sets the movement delay. Will register or unregister the signals accordingly.
+/// Sets the immobilize variable. Will give the immobile trait accordingly.
+/datum/action/ability/xeno_action/fortify/proc/set_immobilize(value)
+	if(should_immobilize == value)
+		return
+	if(xeno_owner.fortify)
+		if(should_immobilize && !value)
+			ADD_TRAIT(xeno_owner, TRAIT_IMMOBILE, FORTIFY_TRAIT)
+		if(!should_immobilize && value)
+			REMOVE_TRAIT(xeno_owner, TRAIT_IMMOBILE, FORTIFY_TRAIT)
+	should_immobilize = value
+
+/// Sets the movement delay variable. Will register or unregister the signals accordingly.
 /datum/action/ability/xeno_action/fortify/proc/set_movement_delay(new_movement_delay)
 	if(xeno_owner.fortify)
 		if(!movement_delay && new_movement_delay)
@@ -374,20 +370,18 @@
 	keybinding_signals = list(
 		KEYBINDING_NORMAL = COMSIG_XENOABILITY_REGENERATE_SKIN,
 	)
-	/// The amount to multiply the owner's maximum health by & to heal with.
-	var/heal_multiplier = 0.12
-	/// The amount of stacks to reduce (negative) status effects by. For non-stacking status effects, this reduces 2x as seconds instead.
-	var/debuff_removal_amount = 0
-	/// The duration in deciseconds of the Resin Jelly status effect that the owner will get. This will also set nearby humans on fire (if appliable).
+	/// The percentage (as decimal) of the owner's maximum health to heal by.
+	var/maximum_health_percentage_to_heal = 0.12
+	/// Should it remove all debuffs?
+	var/removes_all_debuffs = FALSE
+	/// The duration in deciseconds of the Resin Jelly status effect that the owner will get. Will also extinguish them.
 	var/resin_jelly_duration = 0 SECONDS
-	/// The amount to multiply the nearest allied xenomorph's sunder by & to heal with.
-	var/ally_unsunder_multiplier = 0
 	/// The armor that was given to the owner, if any.
-	var/datum/armor/armor_debuff
+	var/datum/armor/armor_modifier
 	/// Should a temporary soft armor debuff be applied? If so, how much soft armor should be taken away?
-	var/armor_debuff_amount
+	var/armor_modifier_amount
 	/// ID of the timer that will revert the armor given.
-	var/armor_debuff_timer_id
+	var/armor_modifier_timer_id
 
 /datum/action/ability/xeno_action/regenerate_skin/on_cooldown_finish()
 	to_chat(xeno_owner, span_notice("We feel we are ready to shred our skin and grow another."))
@@ -407,66 +401,46 @@
 
 	xeno_owner.do_jitter_animation(1000)
 	xeno_owner.set_sunder(0)
-	if(heal_multiplier)
-		var/health_to_heal = heal_multiplier * xeno_owner.xeno_caste.max_health
+	if(maximum_health_percentage_to_heal)
+		var/health_to_heal = maximum_health_percentage_to_heal * xeno_owner.xeno_caste.max_health
 		HEAL_XENO_DAMAGE(xeno_owner, health_to_heal, FALSE)
 		xeno_owner.updatehealth()
-	if(debuff_removal_amount)
-		var/list/datum/status_effect/status_effects_to_decrease_or_remove = list(
+	if(removes_all_debuffs)
+		if(xeno_owner.IsSlowed())
+			xeno_owner.set_slowdown(0)
+		if(xeno_owner.IsStaggered())
+			xeno_owner.set_stagger(0)
+		var/list/datum/status_effect/status_effects_to_remove = list(
+			STATUS_EFFECT_MELTING,
+			STATUS_EFFECT_MICROWAVE,
 			STATUS_EFFECT_SHATTER,
-			STATUS_EFFECT_MICROWAVE
+			STATUS_EFFECT_NO_PLASMA_REGEN,
+			STATUS_EFFECT_PLASMA_DRAIN
 		)
-		for(var/datum/status_effect/status_effect in status_effects_to_decrease_or_remove)
+		for(var/datum/status_effect/status_effect in status_effects_to_remove)
 			if(!xeno_owner.has_status_effect(status_effect))
 				continue
-			if(istype(status_effect, /datum/status_effect/stacking))
-				var/datum/status_effect/stacking/stacking_status_effect = status_effect
-				stacking_status_effect.add_stacks(-debuff_removal_amount)
-				continue
-			if(status_effect.duration == -1)
-				continue
-			status_effect.duration -= debuff_removal_amount * 2 SECONDS
-			status_effect.check_duration()
+			qdel(status_effect)
 	if(resin_jelly_duration)
 		xeno_owner.apply_status_effect(STATUS_EFFECT_RESIN_JELLY_COATING, resin_jelly_duration)
-		if(xeno_owner.on_fire)
-			for (var/mob/living/carbon/human/nearby_human in orange(1, xeno_owner))
-				if(nearby_human.stat == DEAD || !xeno_owner.Adjacent(nearby_human))
-					continue
-				nearby_human.adjust_fire_stacks(xeno_owner.fire_stacks)
-				nearby_human.IgniteMob()
-			xeno_owner.ExtinguishMob()
-	if(ally_unsunder_multiplier)
-		var/mob/living/carbon/xenomorph/ideal_xenomorph_target
-		for(var/mob/living/carbon/xenomorph/nearby_xenomorph in orange(1, xeno_owner))
-			if(nearby_xenomorph.stat == DEAD || !xeno_owner.Adjacent(nearby_xenomorph))
-				continue
-			if(!xeno_owner.issamexenohive(nearby_xenomorph))
-				continue
-			if(!ideal_xenomorph_target || nearby_xenomorph.sunder > ideal_xenomorph_target.sunder)
-				ideal_xenomorph_target = nearby_xenomorph
-				continue
-		if(ideal_xenomorph_target)
-			ideal_xenomorph_target.adjust_sunder(ideal_xenomorph_target.sunder * -ally_unsunder_multiplier)
-			ideal_xenomorph_target.do_jitter_animation(1000)
-	if(armor_debuff_amount)
-		reverse_armor_debuff()
-		armor_debuff = getArmor()
-		armor_debuff = armor_debuff.modifyAllRatings(-armor_debuff_amount)
-		xeno_owner.soft_armor = xeno_owner.soft_armor.attachArmor(armor_debuff)
-		armor_debuff_timer_id = addtimer(CALLBACK(src, PROC_REF(reverse_armor_debuff)), 6 SECONDS, TIMER_UNIQUE|TIMER_STOPPABLE)
+		xeno_owner.ExtinguishMob() // Checks if they are on fire anyways.
+	if(armor_modifier_amount != 0)
+		reverse_armor_modifier()
+		armor_modifier = getArmor(armor_modifier_amount, armor_modifier_amount, armor_modifier_amount, armor_modifier_amount, armor_modifier_amount, armor_modifier_amount, armor_modifier_amount, armor_modifier_amount)
+		xeno_owner.soft_armor = xeno_owner.soft_armor.attachArmor(armor_modifier)
+		armor_modifier_timer_id = addtimer(CALLBACK(src, PROC_REF(reverse_armor_modifier)), 6 SECONDS, TIMER_UNIQUE|TIMER_STOPPABLE)
 	add_cooldown()
 	return succeed_activate()
 
-/// Reverses the armor debuff, if any.
-/datum/action/ability/xeno_action/regenerate_skin/proc/reverse_armor_debuff()
-	if(!armor_debuff)
+/// Reverses the armor modifier, if any.
+/datum/action/ability/xeno_action/regenerate_skin/proc/reverse_armor_modifier()
+	if(!armor_modifier)
 		return
-	if(armor_debuff_timer_id)
-		deltimer(armor_debuff_timer_id)
-		armor_debuff_timer_id = null
-	xeno_owner.soft_armor = xeno_owner.soft_armor.detachArmor(armor_debuff)
-	armor_debuff = null
+	if(armor_modifier_timer_id)
+		deltimer(armor_modifier_timer_id)
+		armor_modifier_timer_id = null
+	xeno_owner.soft_armor = xeno_owner.soft_armor.detachArmor(armor_modifier)
+	armor_modifier = null
 
 // ***************************************
 // *********** Centrifugal force
