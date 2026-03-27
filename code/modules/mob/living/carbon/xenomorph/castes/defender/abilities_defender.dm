@@ -328,7 +328,7 @@
 	playsound(xeno_owner.loc, 'sound/effects/stonedoor_openclose.ogg', 30, TRUE)
 	xeno_owner.update_icons()
 
-/// Sets the immobilize variable. Will give the immobile trait accordingly.
+/// Sets the immobilize variable. Will give or remove the immobile trait accordingly.
 /datum/action/ability/xeno_action/fortify/proc/set_immobilize(value)
 	if(should_immobilize == value)
 		return
