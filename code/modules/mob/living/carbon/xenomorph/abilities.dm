@@ -902,44 +902,46 @@ GLOBAL_LIST_INIT(xeno_resin_costs, list(
 		button.cut_overlay(mutable_appearance('icons/Xeno/actions/general.dmi', "selected_purple_frame", ACTION_LAYER_ACTION_ICON_STATE, null, FLOAT_PLANE))
 
 
-//Neurotox Sting
 /datum/action/ability/activable/xeno/neurotox_sting
 	name = "Neurotoxin Sting"
 	action_icon_state = "neuro_sting"
 	action_icon = 'icons/Xeno/actions/sentinel.dmi'
-	desc = "A channeled melee attack that injects the target with neurotoxin over a few seconds, temporarily stunning them."
+	desc = "A channeled melee attack that injects the target with neurotoxin over a few seconds."
 	cooldown_duration = 12 SECONDS
 	ability_cost = 150
 	keybinding_signals = list(
-		KEYBINDING_NORMAL = COMSIG_XENOABILITY_NEUROTOX_STING,
+		KEYBINDING_NORMAL = COMSIG_XENOABILITY_NEUROTOX_STING
 	)
 	target_flags = ABILITY_MOB_TARGET
 	use_state_flags = ABILITY_USE_BUCKLED
-	/// Whatever our victim is injected with.
-	var/sting_chemical = /datum/reagent/toxin/xeno_neurotoxin
-	/// The amount of reagents injected for each recurring injection.
-	var/sting_amount = XENO_NEURO_AMOUNT_RECURRING
+	/// The reagent to inject the target with.
+	var/datum/reagent/injected_reagent = /datum/reagent/toxin/xeno_neurotoxin
+	/// The amount of units to inject per channel.
+	var/injected_amount = XENO_NEURO_AMOUNT_RECURRING
+	/// The total amount of injection attempts that can occur.
+	var/injection_count = 4
+	/// The amount of deciseconds that must be waited between injections.
+	var/cast_delay = XENO_NEURO_CHANNEL_TIME
 	/// The type of gas that is emitted, if any. This only occurs on the first injection.
-	var/datum/effect_system/smoke_spread/sting_gas
+	var/datum/effect_system/smoke_spread/gas_type
 	/// The range of the gas emitted, if any.
-	var/sting_gas_range = 0
+	var/gas_range = 0
 
 /datum/action/ability/activable/xeno/neurotox_sting/can_use_ability(atom/A, silent = FALSE, override_flags)
 	. = ..()
 	if(!.)
 		return FALSE
-
 	if(!A?.can_sting())
 		if(!silent)
 			to_chat(owner, span_warning("Our sting won't affect this target!"))
 		return FALSE
 	if(!owner.Adjacent(A))
-		if(!silent && world.time > (xeno_owner.recent_notice + xeno_owner.notice_delay)) //anti-notice spam
+		if(!silent && world.time > (xeno_owner.recent_notice + xeno_owner.notice_delay)) // Anti-notice spam.
 			to_chat(xeno_owner, span_warning("We can't reach this target!"))
-			xeno_owner.recent_notice = world.time //anti-notice spam
+			xeno_owner.recent_notice = world.time
 		return FALSE
-	var/mob/living/carbon/C = A
-	if (isnestedhost(C))
+	var/mob/living/carbon/target_carbon = A
+	if(isnestedhost(target_carbon))
 		if(!silent)
 			to_chat(owner, span_warning("Ashamed, we reconsider bullying the poor, nested host with our stinger."))
 		return FALSE
@@ -951,18 +953,31 @@ GLOBAL_LIST_INIT(xeno_resin_costs, list(
 
 /datum/action/ability/activable/xeno/neurotox_sting/use_ability(atom/A)
 	succeed_activate()
-
 	add_cooldown()
-	xeno_owner.recurring_injection(A, sting_chemical, XENO_NEURO_CHANNEL_TIME, sting_amount, gas_type = sting_gas, gas_range = sting_gas_range)
-
+	var/mob/living/carbon/target_carbon = A
+	if(!do_after(owner, cast_delay, NONE, target_carbon, BUSY_ICON_HOSTILE, extra_checks = CALLBACK(src, PROC_REF(can_use_ability), target_carbon, TRUE, ABILITY_USE_BUSY|ABILITY_IGNORE_PLASMA)))
+		return
+	to_chat(owner, span_xenowarning("Our stinger injects our victim with [initial(injected_reagent.name)]!"))
+	to_chat(target_carbon, span_danger("You feel a tiny prick."))
+	playsound(target_carbon, 'sound/effects/spray3.ogg', 15, TRUE)
+	playsound(target_carbon, SFX_ALIEN_DROOL, 15, TRUE)
+	if(gas_type && gas_range)
+		var/datum/effect_system/smoke_spread/smoke_system = new gas_type()
+		smoke_system.set_up(gas_range, get_turf(target_carbon))
+		smoke_system.start()
+	var/i = 1
+	do
+		owner.face_atom(target_carbon)
+		owner.do_attack_animation(target_carbon)
+		target_carbon.reagents.add_reagent(injected_reagent, injected_amount)
+	while(i++ < injection_count && do_after(owner, cast_delay, NONE, target_carbon, BUSY_ICON_HOSTILE, extra_checks = CALLBACK(src, PROC_REF(can_use_ability), target_carbon, TRUE, ABILITY_USE_BUSY|ABILITY_IGNORE_PLASMA)))
 	track_stats()
 
-///Adds ability tally to the end-round statistics.
+/// Increments the end-round statistic for this ability.
 /datum/action/ability/activable/xeno/neurotox_sting/proc/track_stats()
 	GLOB.round_statistics.sentinel_neurotoxin_stings++
 	SSblackbox.record_feedback("tally", "round_statistics", 1, "sentinel_neurotoxin_stings")
 
-//Ozelomelyn Sting
 /datum/action/ability/activable/xeno/neurotox_sting/ozelomelyn
 	name = "Ozelomelyn Sting"
 	action_icon_state = "drone_sting"
@@ -973,12 +988,7 @@ GLOBAL_LIST_INIT(xeno_resin_costs, list(
 		KEYBINDING_NORMAL = COMSIG_XENOABILITY_OZELOMELYN_STING,
 	)
 	ability_cost = 100
-	sting_chemical = /datum/reagent/toxin/xeno_ozelomelyn
-
-///Adds ability tally to the end-round statistics.
-/datum/action/ability/activable/xeno/neurotox_sting/ozelomelyn/track_stats()
-	GLOB.round_statistics.ozelomelyn_stings++
-	SSblackbox.record_feedback("tally", "round_statistics", 1, "ozelomelyn_stings")
+	injected_reagent = /datum/reagent/toxin/xeno_ozelomelyn
 
 // ***************************************
 // *********** Psychic Whisper

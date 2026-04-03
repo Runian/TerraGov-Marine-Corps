@@ -122,7 +122,7 @@
 	var/datum/action/ability/activable/xeno/neurotox_sting/neurotox_ability = xenomorph_owner.actions_by_path[/datum/action/ability/activable/xeno/neurotox_sting]
 	if(!neurotox_ability)
 		return
-	neurotox_ability.sting_amount += initial(neurotox_ability.sting_amount) * get_multiplier(new_amount - previous_amount)
+	neurotox_ability.injected_amount += initial(neurotox_ability.injected_amount) * get_multiplier(new_amount - previous_amount)
 
 /datum/mutation_upgrade/spur/alternative_sting/on_xenomorph_upgrade()
 	var/datum/action/ability/activable/xeno/neurotox_sting/ozelomelyn/ozelomelyn_ability = xenomorph_owner.actions_by_path[/datum/action/ability/activable/xeno/neurotox_sting/ozelomelyn]

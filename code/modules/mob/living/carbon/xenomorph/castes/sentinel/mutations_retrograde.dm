@@ -123,18 +123,18 @@
 	var/datum/action/ability/activable/xeno/neurotox_sting/sting_ability = xenomorph_owner.actions_by_path[/datum/action/ability/activable/xeno/neurotox_sting]
 	if(!sting_ability)
 		return
-	sting_ability.sting_amount *= injection_multiplier
-	sting_ability.sting_gas = /datum/effect_system/smoke_spread/xeno/neuro/light
-	sting_ability.sting_gas_range += get_range(0)
+	sting_ability.injected_amount *= injection_multiplier
+	sting_ability.gas_type = /datum/effect_system/smoke_spread/xeno/neuro/light
+	sting_ability.gas_range += get_range(0)
 	return ..()
 
 /datum/mutation_upgrade/veil/toxic_spillage/on_mutation_disabled()
 	var/datum/action/ability/activable/xeno/neurotox_sting/sting_ability = xenomorph_owner.actions_by_path[/datum/action/ability/activable/xeno/neurotox_sting]
 	if(!sting_ability)
 		return
-	sting_ability.sting_amount /= injection_multiplier
-	sting_ability.sting_gas = initial(sting_ability.sting_gas)
-	sting_ability.sting_gas_range -= get_range(0)
+	sting_ability.injected_amount /= injection_multiplier
+	sting_ability.gas_type = initial(sting_ability.gas_type)
+	sting_ability.gas_range -= get_range(0)
 	return ..()
 
 /datum/mutation_upgrade/veil/toxic_spillage/on_structure_update(previous_amount, new_amount)
@@ -142,7 +142,7 @@
 	var/datum/action/ability/activable/xeno/neurotox_sting/sting_ability = xenomorph_owner.actions_by_path[/datum/action/ability/activable/xeno/neurotox_sting]
 	if(!sting_ability)
 		return
-	sting_ability.sting_gas_range += get_range(new_amount - previous_amount, FALSE)
+	sting_ability.gas_range += get_range(new_amount - previous_amount, FALSE)
 
 /// Returns the range in which gas spreads to.
 /datum/mutation_upgrade/veil/toxic_spillage/proc/get_range(structure_count, include_initial = TRUE)
