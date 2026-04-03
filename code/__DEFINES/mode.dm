@@ -72,6 +72,8 @@
 #define MODE_MUTATIONS_OBTAINABLE (1<<17)
 /// Should marines have access to quickbuild?
 #define MODE_ALLOW_MARINE_QUICKBUILD (1<<18)
+/// Should Area Power Controllers have no access restrictions
+#define MODE_APC_ALL_ACCESS (1<<19)
 
 #define MODE_INFESTATION_X_MAJOR "Xenomorph Major Victory"
 #define MODE_INFESTATION_M_MAJOR "Marine Major Victory"
@@ -148,7 +150,7 @@
 #define RESIN_SILO_PRICE 800
 #define EVOLUTION_TOWER_PRICE 300
 #define PSYCHIC_RELAY_PRICE 300
-#define PHEROMONE_TOWER_PRICE 300
+#define PHEROMONE_TOWER_PRICE 150
 #define SPAWNER_PRICE 400
 #define ACID_POOL_PRICE 200
 #define ACID_JAWS_PRICE 450
