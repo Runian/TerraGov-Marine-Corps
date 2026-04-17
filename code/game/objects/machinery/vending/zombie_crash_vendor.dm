@@ -11,6 +11,7 @@
 #define CAT_WEAPONS "WEAPONS"
 #define CAT_FUN "FUN"
 #define CAT_MECH "MECH"
+#define CAT_SENTRY "SENTRY"
 
 /obj/machinery/marine_selector/zombie_crash
 	name = "progression rewards vendor"
@@ -87,7 +88,20 @@
 		/obj/item/mecha_parts/mecha_equipment/weapon/ballistic/shotgun  = list(CAT_MECH, "Shotgun", 10, "mech-weapon"),
 		/obj/item/mecha_ammo/vendable/shotgun = list(CAT_MECH, "Shotgun ammo", 5, "mech-ammo"),
 		/obj/item/mecha_parts/mecha_equipment/laser_sword = list(CAT_MECH, "Laser sword", 10, "mech-weapon"),
-
+		// Turrets
+		/obj/item/weapon/gun/sentry/big_sentry = list(CAT_SENTRY, "ST-571 Sentry", 30, "turret-big"),
+		/obj/item/ammo_magazine/sentry = list(CAT_SENTRY, "ST-571 Sentry Ammo", 12, "turret-big"),
+		/obj/item/weapon/gun/sentry/mini = list(CAT_SENTRY, "ST-580 PD Sentry", 24, "turret-mini"), // Cheap since we want to encourage marines to go outside and move around.
+		/obj/item/ammo_magazine/minisentry = list(CAT_SENTRY, "ST-580 PD Sentry Ammo", 8, "turret-mini"),
+		/obj/item/weapon/gun/sentry/sniper_sentry = list(CAT_SENTRY, "SST-574 Sentry", 24, "turret-sniper"),
+		/obj/item/ammo_magazine/sentry/sniper = list(CAT_SENTRY, "SST-574 Sentry Ammo", 6, "turret-sniper"),
+		/obj/item/weapon/gun/sentry/shotgun_sentry = list(CAT_SENTRY, "SHT-573 Sentry", 24, "turret-shotgun"), // Excellent cade siege repellant, but very ammo hungry.
+		/obj/item/ammo_magazine/sentry/shotgun = list(CAT_SENTRY, "SHT-573 Sentry Ammo", 6, "turret-shotgun"),
+		/obj/item/weapon/gun/sentry/flamer_sentry = list(CAT_SENTRY, "SFT-575 Sentry", 15, "turret-flamer"), // Cheap since Build-A-Sentry flamethrower is easier to maintain and more flexible.
+		/obj/item/ammo_magazine/sentry/flamer = list(CAT_SENTRY, "SFT-575 Sentry Ammo", 6, "turret-flamer"),
+		/obj/item/weapon/gun/sentry/laser_sentry = list(CAT_SENTRY, "SLT-576 Sentry", 30, "turret-laser"),
+		/obj/item/ammo_magazine/sentry/laser = list(CAT_SENTRY, "SLT-576 Sentry Ammo", 12, "turret-laser"),
+		/obj/item/attachable/buildasentry = list(CAT_SENTRY, "Build-A-Sentry Attachment", 30, "attachment"), // Can be obtained normally via roboticists with 50% chance.
 		// Emplacements
 		/obj/item/weapon/gun/energy/lasgun/lasrifle/heavy_laser/deployable = list(CAT_EMPLACEMENTS, "\"TE-9001\" Emplacement", 10, "emplacement-laser"),
 		/obj/item/cell/lasgun/heavy_laser = list(CAT_EMPLACEMENTS, "\"TE-9001\" Laser Ammo", 6, "emplacement-laser"), // Cheap due to low ammo capacity.
@@ -271,6 +285,7 @@
 #undef CAT_WEAPONS
 #undef CAT_FUN
 #undef CAT_MECH
+#undef CAT_SENTRY
 
 /obj/effect/vendor_bundle/mimir_two_modules
 	desc = "Designed for mounting on modular armor. This protects you significantly more against acidic, gaseous, and biological attacks. It comes with two modules: one for your helmet and one for your suit. Will impact mobility."

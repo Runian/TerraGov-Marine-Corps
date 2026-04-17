@@ -336,7 +336,7 @@
 
 	turret_range = 8
 	deploy_time = 5 SECONDS
-	max_shells = 75
+	max_shells = 100
 	fire_delay = 1 SECONDS
 	burst_amount = 1
 
@@ -383,7 +383,7 @@
 
 /obj/item/weapon/gun/sentry/flamer_sentry
 	name = "\improper SFT-575 sentry gun"
-	desc = "A deployable, fully automatic turret with AI targeting capabilities. Armed with a heavy flamethrower and a 200-round drum magazine."
+	desc = "A deployable, fully automatic turret with AI targeting capabilities. Armed with a heavy flamethrower and a 500-round drum magazine."
 	icon_state = "flamer_sentry"
 	icon = 'icons/obj/machines/deployable/sentry/flamer.dmi'
 	fire_sound = "gun_flamethrower"
