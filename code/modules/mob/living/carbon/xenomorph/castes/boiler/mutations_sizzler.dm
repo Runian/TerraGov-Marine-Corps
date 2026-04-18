@@ -89,9 +89,9 @@
 	if(!ability)
 		return
 	if(previous_amount)
-		ability.acid_speed_multiplier *= 1 + get_speedup(previous_amount) // First, we reverse...
+		ability.acid_delay_multiplier *= 1 + get_speedup(previous_amount) // First, we reverse...
 	if(new_amount)
-		ability.acid_speed_multiplier /= 1 + get_speedup(new_amount) // ... then we re-apply because math is hard!
+		ability.acid_delay_multiplier /= 1 + get_speedup(new_amount) // ... then we re-apply because math is hard!
 	return ..()
 
 /// Returns the percentage used to speed up Corrosive Acid by.

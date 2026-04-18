@@ -1,4 +1,3 @@
-
 //*********************//
 //        Base        //
 //*********************//
@@ -69,44 +68,58 @@
 	ability.smoke_typepath = initial(ability.smoke_typepath)
 	ability.radius = initial(ability.radius)
 
-
 /datum/mutation_upgrade/defense/melter/acidic_domain
 	name = "Acidic Domain"
 	desc = "While ontop of any acid puddle, you are immune to slowdown."
+	/// The turf that we are watching for new acid puddles.
 	var/turf/current_turf
 	/// The acid puddle that we are relying on for the immunity.
-	var/obj/effect/xenomorph/spray/acid_puddle
+	var/obj/effect/xenomorph/spray/immunity_puddle
 
 /datum/mutation_upgrade/defense/melter/acidic_domain/on_gain()
+	RegisterSignal(xenomorph_owner, COMSIG_MOVABLE_MOVED, PROC_REF(on_movement))
+	set_current_turf(get_turf(xenomorph_owner))
+	set_immunity_puddle(locate(/obj/effect/xenomorph/spray) in xenomorph_owner.loc)
+
+/datum/mutation_upgrade/defense/melter/acidic_domain/on_loss()
+	UnregisterSignal(xenomorph_owner, COMSIG_MOVABLE_MOVED)
+	set_current_turf(null)
+	set_immunity_puddle(null)
+
+/// Deals with all changes to the current_turf variable.
+/datum/mutation_upgrade/defense/melter/acidic_domain/proc/set_current_turf(turf/new_turf)
+	if(current_turf == new_turf)
+		return
+	if(current_turf)
+		UnregisterSignal(current_turf, COMSIG_ATOM_INITIALIZED_ON)
+	if(new_turf)
+		RegisterSignal(current_turf, COMSIG_ATOM_INITIALIZED_ON, PROC_REF(on_atom_initialize_on_turf))
+	current_turf = new_turf
+
+/// Deals with all changes to the immunity_puddle variable.
+/datum/mutation_upgrade/defense/melter/acidic_domain/proc/set_immunity_puddle(obj/effect/xenomorph/spray/new_puddle)
+	if(immunity_puddle == new_puddle)
+		return
+	if(immunity_puddle)
+		UnregisterSignal(immunity_puddle, COMSIG_QDELETING)
+	if(new_puddle)
+		RegisterSignal(immunity_puddle, COMSIG_QDELETING, PROC_REF(on_puddle_qdel))
+	immunity_puddle = new_puddle
+	if(!immunity_puddle)
+		REMOVE_TRAIT(xenomorph_owner, TRAIT_SLOWDOWNIMMUNE, MUTATION_TRAIT)
+		return
+	ADD_TRAIT(xenomorph_owner, TRAIT_SLOWDOWNIMMUNE, MUTATION_TRAIT)
+
+/// On movement, tries to find and set an acid puddle from our new location.
+/datum/mutation_upgrade/defense/melter/acidic_domain/proc/on_movement(datum/source, atom/old_loc, movement_dir, forced, list/old_locs)
+	SIGNAL_HANDLER
+	if(current_turf)
+		UnregisterSignal(current_turf, COMSIG_ATOM_INITIALIZED_ON)
 	current_turf = get_turf(xenomorph_owner)
 	if(current_turf)
 		RegisterSignal(current_turf, COMSIG_ATOM_INITIALIZED_ON, PROC_REF(on_atom_initialize_on_turf))
-	RegisterSignal(xenomorph_owner, COMSIG_MOVABLE_MOVED, PROC_REF(on_movement))
-	set_acid_puddle(locate(/obj/effect/xenomorph/spray) in xenomorph_owner.loc)
-
-/datum/mutation_upgrade/defense/melter/acidic_domain/on_loss()
-	if(current_turf)
-		UnregisterSignal(current_turf, COMSIG_ATOM_INITIALIZED_ON)
-	UnregisterSignal(xenomorph_owner, COMSIG_MOVABLE_MOVED)
-	set_acid_puddle(null)
-
-/datum/mutation_upgrade/defense/melter/acidic_domain/proc/set_acid_puddle(obj/effect/xenomorph/spray/found_puddle)
-	if(acid_puddle == found_puddle)
-		return
-	if(acid_puddle)
-		UnregisterSignal(acid_puddle, COMSIG_QDELETING)
-	acid_puddle = found_puddle
-	if(!acid_puddle)
-		REMOVE_TRAIT(xenomorph_owner, TRAIT_SLOWDOWNIMMUNE, MUTATION_TRAIT)
-		return
-	RegisterSignal(acid_puddle, COMSIG_QDELETING, PROC_REF(on_puddle_qdel))
-	ADD_TRAIT(xenomorph_owner, TRAIT_SLOWDOWNIMMUNE, MUTATION_TRAIT)
-
-/// On movement, tries to find and set a acid puddle from our new location.
-/datum/mutation_upgrade/defense/melter/acidic_domain/proc/on_movement(datum/source, atom/old_loc, movement_dir, forced, list/old_locs)
-	SIGNAL_HANDLER
 	var/obj/effect/xenomorph/spray/found_puddle = locate(/obj/effect/xenomorph/spray) in xenomorph_owner.loc
-	set_acid_puddle(found_puddle)
+	set_immunity_puddle(found_puddle)
 
 /// When our acid puddle is deleted, tries to find and set an acid puddle from our current location.
 /datum/mutation_upgrade/defense/melter/acidic_domain/proc/on_puddle_qdel(datum/source)
@@ -117,83 +130,113 @@
 			continue
 		new_found_puddle = next_puddle
 		break
-	set_acid_puddle(new_found_puddle)
+	set_immunity_puddle(new_found_puddle)
 
 /// If an acid puddle is created while we don't have one, set it as our current one.
 /datum/mutation_upgrade/defense/melter/acidic_domain/proc/on_atom_initialize_on_turf(datum/source, atom/new_atom)
 	SIGNAL_HANDLER
-	if(acid_puddle || !istype(new_atom, /obj/effect/xenomorph/spray))
+	if(immunity_puddle || !istype(new_atom, /obj/effect/xenomorph/spray))
 		return
-	set_acid_puddle(new_atom)
+	set_immunity_puddle(new_atom)
 
 //*********************//
-//         Spur        //
+//       Offense       //
 //*********************//
-/datum/mutation_upgrade/offense/fully_acid
-	name = "Fully Acid"
-	desc = "All of your stash damage is burn damage and is now checked against acid. You inflict 1/2/3 additional melting acid stacks."
-	/// For each structure, the additional stacks of melting acid.
-	var/stacks_per_structure = 1
 
-/datum/mutation_upgrade/offense/fully_acid/get_desc_for_alert(new_amount)
-	if(!new_amount)
-		return ..()
-	return "All of your stash damage is burn damage and is now checked against acid. You inflict [get_stacks(new_amount)] additional melting acid stacks."
+/datum/mutation_upgrade/offense/melter/corrosive_touch
+	name = "Corrosive Touch"
+	desc = "Your slash attacks now only deal burn damage and applies an additional two melting stacks."
 
-/datum/mutation_upgrade/offense/fully_acid/on_gain()
+/datum/mutation_upgrade/offense/melter/corrosive_touch/on_gain()
 	if(!isxenomelter(xenomorph_owner))
 		return
 	var/mob/living/carbon/xenomorph/runner/melter/melter_owner = xenomorph_owner
 	melter_owner.second_damage_type = BURN
 	melter_owner.second_damage_armor = ACID
-	return ..()
+	melter_owner.applied_acid_stacks = initial(melter_owner.applied_acid_stacks) + 2
 
-/datum/mutation_upgrade/offense/fully_acid/on_loss()
+/datum/mutation_upgrade/offense/melter/corrosive_touch/on_loss()
 	if(!isxenomelter(xenomorph_owner))
 		return
 	var/mob/living/carbon/xenomorph/runner/melter/melter_owner = xenomorph_owner
 	melter_owner.second_damage_type = initial(melter_owner.second_damage_type)
 	melter_owner.second_damage_armor = initial(melter_owner.second_damage_armor)
-	return ..()
+	melter_owner.applied_acid_stacks = initial(melter_owner.applied_acid_stacks)
 
-/datum/mutation_upgrade/offense/fully_acid/on_structure_update(previous_amount, new_amount)
+/datum/mutation_upgrade/offense/melter/acid_trail
+	name = "Acid Trail"
+	desc = "You gain an ability that can be toggled to leave a trail of acid where you move. Each acid puddle created will consume 5% of your remaining plasma."
+
+/datum/mutation_upgrade/offense/melter/acid_trail/on_gain()
+	return // TODO: Figure out how to sprite and add the ability.
+
+/datum/mutation_upgrade/offense/melter/acid_trail/on_loss()
+	return // TODO: Remove the ability.
+
+/datum/mutation_upgrade/offense/melter/vaporous_touch
+	name = "Vaporous Touch"
+	desc = "Your slash attacks against targets with 6+ melting stacks will create a tiny cloud of acidic opaque gas ontop of them."
+
+/datum/mutation_upgrade/offense/melter/vaporous_touch/on_gain()
 	if(!isxenomelter(xenomorph_owner))
 		return
 	var/mob/living/carbon/xenomorph/runner/melter/melter_owner = xenomorph_owner
-	melter_owner.applied_acid_stacks += get_stacks(new_amount - previous_amount)
-	return ..()
+	melter_owner.acid_stacks_gas_threshold = 6
 
-/// Returns the amount of stacks of melting acid that will be given.
-/datum/mutation_upgrade/offense/fully_acid/proc/get_stacks(structure_count)
-	return stacks_per_structure * structure_count
+/datum/mutation_upgrade/offense/melter/vaporous_touch/on_loss()
+	if(!isxenomelter(xenomorph_owner))
+		return
+	var/mob/living/carbon/xenomorph/runner/melter/melter_owner = xenomorph_owner
+	melter_owner.acid_stacks_gas_threshold = initial(melter_owner.acid_stacks_gas_threshold)
 
 //*********************//
-//         Veil        //
+//       Utility       //
 //*********************//
-/datum/mutation_upgrade/utility/acid_reserves
-	name = "Acid Reserves"
-	desc = "Corrosive Acid is now applied 50/75/100% faster."
-	/// For the first structure, the percentage to speed up Corrosive Acid by.
-	var/speedup_initial = 0.25
-	/// For each structure, the additional percentage to speed up Corrosive Acid by.
-	var/speedup_per_structure = 0.25
 
-/datum/mutation_upgrade/utility/acid_reserves/get_desc_for_alert(new_amount)
-	if(!new_amount)
-		return ..()
-	return "Corrosive Acid is now applied [PERCENT(get_speedup(new_amount))]% faster."
+/datum/mutation_upgrade/utility/melter/acidic_splurge
+	name = "Acidic Splurge"
+	desc = "Corrosive Acid's cast time is reduced by one second."
 
-/datum/mutation_upgrade/utility/acid_reserves/on_structure_update(previous_amount, new_amount)
+/datum/mutation_upgrade/offense/melter/acidic_splurge/on_gain()
 	var/datum/action/ability/activable/xeno/corrosive_acid/melter/ability = xenomorph_owner.actions_by_path[/datum/action/ability/activable/xeno/corrosive_acid/melter]
 	if(!ability)
 		return
-	if(previous_amount)
-		ability.acid_speed_multiplier *= 1 + get_speedup(previous_amount) // First, we reverse...
-	if(new_amount)
-		ability.acid_speed_multiplier /= 1 + get_speedup(new_amount) // ... then we re-apply because math is hard!
-	return ..()
+	ability.acid_delay_increase = -1 SECONDS // In sum, anything that don't have an increased acid delay are now instant.
 
-/// Returns the percentage used to speed up Corrosive Acid by.
-/datum/mutation_upgrade/utility/acid_reserves/proc/get_speedup(structure_count)
-	return speedup_initial + (speedup_per_structure * structure_count)
+/datum/mutation_upgrade/offense/melter/acidic_splurge/on_loss()
+	var/datum/action/ability/activable/xeno/corrosive_acid/melter/ability = xenomorph_owner.actions_by_path[/datum/action/ability/activable/xeno/corrosive_acid/melter]
+	if(!ability)
+		return
+	ability.acid_delay_increase = initial(ability.acid_delay_increase)
 
+/datum/mutation_upgrade/utility/melter/perpetual_dash
+	name = "Perpetual Dash"
+	desc = "Acid Dash can be casted up to 6 times as long the plasma and recast prerequisites are met."
+
+/datum/mutation_upgrade/offense/melter/perpetual_dash/on_gain()
+	var/datum/action/ability/activable/xeno/charge/acid_dash/melter/ability = xenomorph_owner.actions_by_path[/datum/action/ability/activable/xeno/charge/acid_dash/melter]
+	if(!ability)
+		return
+	ability.maximum_casts = 6
+
+/datum/mutation_upgrade/offense/melter/perpetual_dash/on_loss()
+	var/datum/action/ability/activable/xeno/charge/acid_dash/melter/ability = xenomorph_owner.actions_by_path[/datum/action/ability/activable/xeno/charge/acid_dash/melter]
+	if(!ability)
+		return
+	ability.maximum_casts = initial(ability.maximum_casts)
+
+/datum/mutation_upgrade/utility/melter/quick_dash
+	name = "Quick Dash"
+	desc = "Acid Dash has no recast prerequisites."
+
+/datum/mutation_upgrade/offense/melter/double_back/on_gain()
+	var/datum/action/ability/activable/xeno/charge/acid_dash/melter/ability = xenomorph_owner.actions_by_path[/datum/action/ability/activable/xeno/charge/acid_dash/melter]
+	if(!ability)
+		return
+	ability.recast_prerequisite = FALSE
+
+/datum/mutation_upgrade/offense/melter/double_back/on_loss()
+	var/datum/action/ability/activable/xeno/charge/acid_dash/melter/ability = xenomorph_owner.actions_by_path[/datum/action/ability/activable/xeno/charge/acid_dash/melter]
+	if(!ability)
+		return
+	ability.recast_prerequisite = initial(ability.recast_prerequisite)

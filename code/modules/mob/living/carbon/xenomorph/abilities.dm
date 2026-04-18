@@ -606,8 +606,10 @@ GLOBAL_LIST_INIT(xeno_resin_costs, list(
 		KEYBINDING_NORMAL = COMSIG_XENOABILITY_CORROSIVE_ACID,
 	)
 	use_state_flags = ABILITY_USE_BUCKLED
-	/// How much to reduce acid delay? Lower is faster. Multiplicative.
-	var/acid_speed_multiplier = 1
+	/// The amount of deciseconds to increase the acid delay by.
+	var/acid_delay_increase = 0 SECONDS
+	/// The amount to multiply the acid delay by.
+	var/acid_delay_multiplier = 1
 
 /datum/action/ability/activable/xeno/corrosive_acid/can_use_ability(atom/A, silent = FALSE, override_flags)
 	var/obj/effect/xenomorph/acid/current_acid_type = acid_type
@@ -646,7 +648,7 @@ GLOBAL_LIST_INIT(xeno_resin_costs, list(
 		A = existing_acid.acid_t // Swap the target to the target of the acid
 
 
-	var/aciddelay = max(0, A.get_acid_delay() * acid_speed_multiplier);
+	var/aciddelay = max(0, ((A.get_acid_delay() + acid_delay_increase) * acid_delay_multiplier));
 	if(SSmonitor.gamestate == SHUTTERS_CLOSED && CHECK_BITFIELD(SSticker.mode?.round_type_flags, MODE_ALLOW_XENO_QUICKBUILD) && SSresinshaping.active)
 		current_acid_type = /obj/effect/xenomorph/acid/strong //if it is before shutters open, everyone gets strong acid
 		aciddelay = 0

@@ -63,6 +63,8 @@
 	var/second_damage_armor = MELEE
 	/// The amount of melting acid stacks to be applied.
 	var/applied_acid_stacks = 2
+	/// The amount of melting acid stacks that must be reached for the creation of gas.
+	var/acid_stacks_gas_threshold
 
 /mob/living/carbon/xenomorph/runner/melter/Initialize(mapload)
 	. = ..()
@@ -88,6 +90,11 @@
 	target.apply_damage(xeno_caste.melee_damage * xeno_melee_damage_modifier, second_damage_type, null, second_damage_armor, attacker = src)
 	var/datum/status_effect/stacking/melting_acid/debuff = target.has_status_effect(STATUS_EFFECT_MELTING_ACID)
 	if(!debuff)
-		target.apply_status_effect(STATUS_EFFECT_MELTING_ACID, applied_acid_stacks)
+		debuff = target.apply_status_effect(STATUS_EFFECT_MELTING_ACID, applied_acid_stacks)
+	else
+		debuff.add_stacks(applied_acid_stacks)
+	if(!acid_stacks_gas_threshold || acid_stacks_gas_threshold > debuff.stacks)
 		return
-	debuff.add_stacks(applied_acid_stacks)
+	var/datum/effect_system/smoke_spread/emitted_gas = new /datum/effect_system/smoke_spread/xeno/acid(src)
+	emitted_gas.set_up(1, get_turf(src))
+	emitted_gas.start()

@@ -757,18 +757,22 @@ GLOBAL_LIST_INIT(boiler_glob_image_list, list(
 	keybinding_signals = list(
 		KEYBINDING_NORMAL = COMSIG_XENOABILITY_ACID_DASH,
 	)
-	paralyze_duration = 0 // Although we don't do anything related to paralyze, it is nice to have this zeroed out.
+	paralyze_duration = 1 SECONDS
 	charge_range = BOILER_CHARGEDISTANCE
-	///Can we use the ability again
-	var/recast_available = FALSE
-	///Is this the recast
-	var/recast = FALSE
-	/// If we should do acid_spray_act on those we pass over.
+	/// The maximum amount of times that we can cast this ability, including the first ability cast.
+	var/maximum_casts = 2
+	/// The available amount of times that we can cast this ability.
+	var/available_casts = 2
+	/// Does the ability need to hit a human to make recast available?
+	var/recast_prerequisite = TRUE
+	/// Have we hit a human with the last ability cast?
+	var/recast_prerequisite_met = FALSE
+	/// The timer id used to prevent all recasting if too much time has passed.
+	var/recast_decay_timer_id
+	/// Should we do acid_spray_act on those we pass over?
 	var/do_acid_spray_act = TRUE
 	///List of pass_flags given by this action
 	var/charge_pass_flags = PASS_LOW_STRUCTURE|PASS_DEFENSIVE_STRUCTURE|PASS_FIRE
-	/// How long we stun tackled targets
-	var/stun_duration = 1 SECONDS
 	/// The duration in deciseconds in which a trail of opaque gas will last.
 	var/gas_trail_duration = 0
 
@@ -776,66 +780,79 @@ GLOBAL_LIST_INIT(boiler_glob_image_list, list(
 	. = ..()
 	desc = "Instantly dash for [charge_range] tiles, tackling the first marine in your path. If you manage to tackle someone, gain another cast of the ability."
 
-/datum/action/ability/activable/xeno/charge/acid_dash/use_ability(atom/A)
-	if(!A)
+/datum/action/ability/activable/xeno/charge/acid_dash/on_cooldown_finish()
+	available_casts = maximum_casts
+	if(recast_decay_timer_id)
+		deltimer(recast_decay_timer_id)
+		recast_decay_timer_id = null
+	return ..()
+
+/datum/action/ability/activable/xeno/charge/acid_dash/can_use_ability(atom/A, silent, override_flags)
+	. = ..()
+	if(!.)
 		return
-	if(recast && cooldown_timer)
-		if(TIMER_COOLDOWN_RUNNING(src, COOLDOWN_ACID_DASH_ACTIVATION))
-			return
+	if(!A)
+		return FALSE
+	if(xeno_owner.xeno_flags & XENO_LEAPING)
+		return FALSE
+	if(!available_casts || TIMER_COOLDOWN_RUNNING(src, COOLDOWN_ACID_DASH_ACTIVATION))
+		return FALSE
+
+/datum/action/ability/activable/xeno/charge/acid_dash/use_ability(atom/A)
+	xeno_owner.visible_message(span_xenodanger("[xeno_owner] slides towards \the [A]!"), \
+		span_xenodanger("We dash towards \the [A], spraying acid down our path!") )
+	xeno_owner.emote("roar")
 	RegisterSignal(xeno_owner, COMSIG_XENO_OBJ_THROW_HIT, PROC_REF(obj_hit))
 	RegisterSignal(xeno_owner, COMSIG_MOVABLE_POST_THROW, PROC_REF(charge_complete))
 	RegisterSignal(xeno_owner, COMSIG_XENOMORPH_LEAP_BUMP, PROC_REF(mob_hit))
-	RegisterSignal(owner, COMSIG_MOVABLE_MOVED, PROC_REF(acid_steps)) //We drop acid on every tile we pass through
-
-	xeno_owner.visible_message(span_danger("[xeno_owner] slides towards \the [A]!"), \
-	span_danger("We dash towards \the [A], spraying acid down our path!") )
-	xeno_owner.emote("roar")
-	xeno_owner.xeno_flags |= XENO_LEAPING //This has to come before throw_at, which checks impact. So we don't do end-charge specials when thrown
-	if(recast)
-		succeed_activate(5) //Greatly reduced cost on recast
-	else
-		succeed_activate()
-
+	RegisterSignal(xeno_owner, COMSIG_MOVABLE_MOVED, PROC_REF(acid_steps)) // We drop acid on every tile we pass through.
+	xeno_owner.xeno_flags |= XENO_LEAPING // This has to come before throw_at, which checks impact. So we don't do end-charge specials when thrown.
 	xeno_owner.add_pass_flags(charge_pass_flags, type)
-	owner.throw_at(A, charge_range, 2, owner)
+	xeno_owner.throw_at(A, charge_range, 2, xeno_owner)
+	succeed_activate(available_casts != maximum_casts ? 5 : null) // Greatly reduced cost for recasts.
 
 /datum/action/ability/activable/xeno/charge/acid_dash/mob_hit(datum/source, mob/living/living_target)
 	. = TRUE
-	if(living_target.stat || isxeno(living_target) || !(iscarbon(living_target))) //we leap past xenos
+	if(living_target.stat || isxeno(living_target) || !(iscarbon(living_target))) // We leap past xenos.
 		return
-	if(!recast)
-		recast_available = TRUE
 	var/mob/living/carbon/carbon_victim = living_target
-	carbon_victim.ParalyzeNoChain(stun_duration)
-
-	to_chat(carbon_victim, span_userdanger("The [owner] tackles us, sending us behind them!"))
-	owner.visible_message(span_xenodanger("\The [owner] tackles [carbon_victim], swapping location with them!"), \
+	to_chat(carbon_victim, span_userdanger("The [xeno_owner] tackles us, sending us behind them!"))
+	xeno_owner.visible_message(span_xenodanger("\The [xeno_owner] tackles [carbon_victim], swapping location with them!"), \
 		span_xenodanger("We push [carbon_victim] in our acid trail!"), visible_message_flags = COMBAT_MESSAGE)
+	carbon_victim.ParalyzeNoChain(paralyze_duration)
+	recast_prerequisite_met = TRUE
 
 /datum/action/ability/activable/xeno/charge/acid_dash/charge_complete()
 	. = ..()
-	UnregisterSignal(owner, COMSIG_MOVABLE_MOVED)
-	if(recast_available)
-		addtimer(CALLBACK(src, PROC_REF(charge_complete)), 2 SECONDS) //Delayed recursive call, this time you won't gain a recast so it will go on cooldown in 2 SECONDS.
-		TIMER_COOLDOWN_START(src, COOLDOWN_ACID_DASH_ACTIVATION, 0.3 SECONDS) // Small delay before you can recast, to make it harder to misfire.
-		recast = TRUE
-		recast_available = FALSE
-	else
-		recast = FALSE
-		add_cooldown()
+	UnregisterSignal(xeno_owner, COMSIG_MOVABLE_MOVED)
 	xeno_owner.remove_pass_flags(charge_pass_flags, type)
-	recast_available = FALSE
+	available_casts--
+	if(!available_casts || (recast_prerequisite && !recast_prerequisite_met))
+		recast_decayed()
+		return
+	TIMER_COOLDOWN_START(src, COOLDOWN_ACID_DASH_ACTIVATION, 0.3 SECONDS) // Small delay before you can recast, to make it harder to misfire.
+	if(recast_decay_timer_id)
+		deltimer(recast_decay_timer_id)
+	recast_decay_timer_id = addtimer(CALLBACK(src, PROC_REF(recast_decayed)), 2 SECONDS)
 
-///Drops an acid puddle on the current owner's tile, will do 0 damage if the owner has no acid_spray_damage. Creates opaque gas if gas_trail_duration is set by mutation.
+/// Drops an acid puddle on the current owner's tile which uses the owner caste's acid_spray_damage. Creates opaque gas if gas_trail_duration is set by mutation.
 /datum/action/ability/activable/xeno/charge/acid_dash/proc/acid_steps(atom/A, atom/OldLoc, Dir, Forced)
 	SIGNAL_HANDLER
 	xenomorph_spray(get_turf(xeno_owner), 5 SECONDS, xeno_owner.xeno_caste.acid_spray_damage, xeno_owner, FALSE, do_acid_spray_act)
-	if(gas_trail_duration)
-		if(xeno_owner.stat != CONSCIOUS)
-			return
-		var/datum/effect_system/smoke_spread/xeno/acid/opaque/smoke = new()
-		smoke.set_up(0, get_turf(xeno_owner), gas_trail_duration / (2 SECONDS))
-		smoke.start()
+	if(!gas_trail_duration || xeno_owner.stat != CONSCIOUS)
+		return
+	var/datum/effect_system/smoke_spread/xeno/acid/opaque/smoke = new()
+	smoke.set_up(0, get_turf(xeno_owner), gas_trail_duration / (2 SECONDS))
+	smoke.start()
+
+/// Drops an acid puddle on the current owner's tile which uses the owner caste's acid_spray_damage. Creates opaque gas if gas_trail_duration is set by mutation.
+/datum/action/ability/activable/xeno/charge/acid_dash/proc/recast_decayed(atom/A, atom/OldLoc, Dir, Forced)
+	if(recast_decay_timer_id)
+		deltimer(recast_decay_timer_id)
+		recast_decay_timer_id = null
+	available_casts = 0
+	recast_prerequisite_met = FALSE
+	add_cooldown()
 
 // ***************************************
 // *********** High-Pressure Spit

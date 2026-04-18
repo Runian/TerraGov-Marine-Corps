@@ -517,7 +517,7 @@
 	desc = "Cover an object with acid to slowly melt it. Takes less time than usual."
 	ability_cost = 25
 	acid_type = /obj/effect/xenomorph/acid/weak
-	acid_speed_multiplier = 0.75 // 50% faster
+	acid_delay_multiplier = 0.75 // 33% faster
 
 /datum/action/ability/activable/xeno/charge/acid_dash/melter
 	ability_cost = 50
@@ -527,7 +527,7 @@
 	)
 	charge_range = 7
 	do_acid_spray_act = FALSE
-	stun_duration = 0.5 SECONDS
+	paralyze_duration = 0.5 SECONDS
 
 /datum/action/ability/activable/xeno/charge/acid_dash/melter/New(Target)
 	. = ..()
