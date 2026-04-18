@@ -187,13 +187,13 @@
 	name = "Acidic Splurge"
 	desc = "Corrosive Acid's cast time is reduced by one second."
 
-/datum/mutation_upgrade/offense/melter/acidic_splurge/on_gain()
+/datum/mutation_upgrade/utility/melter/acidic_splurge/on_gain()
 	var/datum/action/ability/activable/xeno/corrosive_acid/melter/ability = xenomorph_owner.actions_by_path[/datum/action/ability/activable/xeno/corrosive_acid/melter]
 	if(!ability)
 		return
 	ability.acid_delay_increase = -1 SECONDS // In sum, anything that don't have an increased acid delay are now instant.
 
-/datum/mutation_upgrade/offense/melter/acidic_splurge/on_loss()
+/datum/mutation_upgrade/utility/melter/acidic_splurge/on_loss()
 	var/datum/action/ability/activable/xeno/corrosive_acid/melter/ability = xenomorph_owner.actions_by_path[/datum/action/ability/activable/xeno/corrosive_acid/melter]
 	if(!ability)
 		return
@@ -201,31 +201,33 @@
 
 /datum/mutation_upgrade/utility/melter/perpetual_dash
 	name = "Perpetual Dash"
-	desc = "Acid Dash can be casted up to 6 times as long the plasma and recast prerequisites are met."
+	desc = "Acid Dash can be recasted up to 3 times as long the plasma and recast prerequisites are met."
 
-/datum/mutation_upgrade/offense/melter/perpetual_dash/on_gain()
+/datum/mutation_upgrade/utility/melter/perpetual_dash/on_gain()
 	var/datum/action/ability/activable/xeno/charge/acid_dash/melter/ability = xenomorph_owner.actions_by_path[/datum/action/ability/activable/xeno/charge/acid_dash/melter]
 	if(!ability)
 		return
-	ability.maximum_casts = 6
+	ability.maximum_casts = 4 // 1 base cast + 3 recasts
+	ability.available_casts = !ability.available_casts ? 0 : clamp(ability.available_casts, ability.available_casts + 4 - initial(ability.maximum_casts), ability.maximum_casts)
 
-/datum/mutation_upgrade/offense/melter/perpetual_dash/on_loss()
+/datum/mutation_upgrade/utility/melter/perpetual_dash/on_loss()
 	var/datum/action/ability/activable/xeno/charge/acid_dash/melter/ability = xenomorph_owner.actions_by_path[/datum/action/ability/activable/xeno/charge/acid_dash/melter]
 	if(!ability)
 		return
 	ability.maximum_casts = initial(ability.maximum_casts)
+	ability.available_casts = min(ability.available_casts, ability.maximum_casts)
 
 /datum/mutation_upgrade/utility/melter/quick_dash
 	name = "Quick Dash"
 	desc = "Acid Dash has no recast prerequisites."
 
-/datum/mutation_upgrade/offense/melter/double_back/on_gain()
+/datum/mutation_upgrade/utility/melter/quick_dash/on_gain()
 	var/datum/action/ability/activable/xeno/charge/acid_dash/melter/ability = xenomorph_owner.actions_by_path[/datum/action/ability/activable/xeno/charge/acid_dash/melter]
 	if(!ability)
 		return
 	ability.recast_prerequisite = FALSE
 
-/datum/mutation_upgrade/offense/melter/double_back/on_loss()
+/datum/mutation_upgrade/utility/melter/quick_dash/on_loss()
 	var/datum/action/ability/activable/xeno/charge/acid_dash/melter/ability = xenomorph_owner.actions_by_path[/datum/action/ability/activable/xeno/charge/acid_dash/melter]
 	if(!ability)
 		return

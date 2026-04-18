@@ -774,7 +774,7 @@ GLOBAL_LIST_INIT(boiler_glob_image_list, list(
 	///List of pass_flags given by this action
 	var/charge_pass_flags = PASS_LOW_STRUCTURE|PASS_DEFENSIVE_STRUCTURE|PASS_FIRE
 	/// The duration in deciseconds in which a trail of opaque gas will last.
-	var/gas_trail_duration = 0
+	var/gas_trail_duration = 0 SECONDS
 
 /datum/action/ability/activable/xeno/charge/acid_dash/New(Target)
 	. = ..()
@@ -833,9 +833,9 @@ GLOBAL_LIST_INIT(boiler_glob_image_list, list(
 	TIMER_COOLDOWN_START(src, COOLDOWN_ACID_DASH_ACTIVATION, 0.3 SECONDS) // Small delay before you can recast, to make it harder to misfire.
 	if(recast_decay_timer_id)
 		deltimer(recast_decay_timer_id)
-	recast_decay_timer_id = addtimer(CALLBACK(src, PROC_REF(recast_decayed)), 2 SECONDS)
+	recast_decay_timer_id = addtimer(CALLBACK(src, PROC_REF(recast_decayed)), 2 SECONDS, TIMER_UNIQUE|TIMER_STOPPABLE)
 
-/// Drops an acid puddle on the current owner's tile which uses the owner caste's acid_spray_damage. Creates opaque gas if gas_trail_duration is set by mutation.
+/// Drops an acid puddle on the current owner's tile which uses the owner caste's acid_spray_damage. Creates opaque gas if gas_trail_duration is set.
 /datum/action/ability/activable/xeno/charge/acid_dash/proc/acid_steps(atom/A, atom/OldLoc, Dir, Forced)
 	SIGNAL_HANDLER
 	xenomorph_spray(get_turf(xeno_owner), 5 SECONDS, xeno_owner.xeno_caste.acid_spray_damage, xeno_owner, FALSE, do_acid_spray_act)
@@ -845,7 +845,7 @@ GLOBAL_LIST_INIT(boiler_glob_image_list, list(
 	smoke.set_up(0, get_turf(xeno_owner), gas_trail_duration / (2 SECONDS))
 	smoke.start()
 
-/// Drops an acid puddle on the current owner's tile which uses the owner caste's acid_spray_damage. Creates opaque gas if gas_trail_duration is set by mutation.
+/// Sets the ability on cooldown and cleans up everything related to recasting.
 /datum/action/ability/activable/xeno/charge/acid_dash/proc/recast_decayed(atom/A, atom/OldLoc, Dir, Forced)
 	if(recast_decay_timer_id)
 		deltimer(recast_decay_timer_id)

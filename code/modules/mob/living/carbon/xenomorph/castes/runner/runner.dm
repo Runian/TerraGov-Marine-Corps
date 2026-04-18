@@ -95,6 +95,6 @@
 		debuff.add_stacks(applied_acid_stacks)
 	if(!acid_stacks_gas_threshold || acid_stacks_gas_threshold > debuff.stacks)
 		return
-	var/datum/effect_system/smoke_spread/emitted_gas = new /datum/effect_system/smoke_spread/xeno/acid(src)
-	emitted_gas.set_up(1, get_turf(src))
+	var/datum/effect_system/smoke_spread/emitted_gas = new /datum/effect_system/smoke_spread/xeno/acid(target)
+	emitted_gas.set_up(0, get_turf(target))
 	emitted_gas.start()
