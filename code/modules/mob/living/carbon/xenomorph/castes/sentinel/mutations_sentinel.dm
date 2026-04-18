@@ -17,7 +17,7 @@
 
 /datum/mutation_upgrade/defense/sentinel/armor_surge
 	name = "Armor Surge"
-	desc = "Drain Surge's duration is reduced to 4 seconds, but it grants a total of 50 bonus armor while it is active."
+	desc = "Drain Surge's duration is reduced to 4 seconds, but grants a total of 50 bonus armor while it is active."
 
 /datum/mutation_upgrade/defense/sentinel/armor_surge/on_gain()
 	var/datum/action/ability/activable/xeno/drain_sting/ability = xenomorph_owner.actions_by_path[/datum/action/ability/activable/xeno/drain_sting]
@@ -155,7 +155,6 @@
 //*********************//
 //       Utility       //
 //*********************//
-
 /datum/mutation_upgrade/utility/sentinel/toxic_compatibility
 	name = "Toxic Compatibility"
 	desc = "Drain Sting's potency is increased by the amount of xeno-affiliated reagents in your target. Each unit counts as a third of an Intoxicated stack."
