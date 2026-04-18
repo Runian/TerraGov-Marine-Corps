@@ -163,16 +163,6 @@
 	melter_owner.second_damage_armor = initial(melter_owner.second_damage_armor)
 	melter_owner.applied_acid_stacks = initial(melter_owner.applied_acid_stacks)
 
-/datum/mutation_upgrade/offense/melter/acid_trail
-	name = "Acid Trail"
-	desc = "You gain an ability that can be toggled to leave a trail of acid where you move. Each acid puddle created will consume 5% of your remaining plasma."
-
-/datum/mutation_upgrade/offense/melter/acid_trail/on_gain()
-	return // TODO: Figure out how to sprite and add the ability.
-
-/datum/mutation_upgrade/offense/melter/acid_trail/on_loss()
-	return // TODO: Remove the ability.
-
 /datum/mutation_upgrade/offense/melter/vaporous_touch
 	name = "Vaporous Touch"
 	desc = "Your slash attacks against targets with 6+ melting stacks will create a tiny cloud of acidic opaque gas ontop of them."
