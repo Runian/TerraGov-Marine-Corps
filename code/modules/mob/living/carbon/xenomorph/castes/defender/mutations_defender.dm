@@ -39,12 +39,10 @@
 /datum/mutation_upgrade/defense/defender/brittle_upclose/on_gain()
 	RegisterSignal(xenomorph_owner, COMSIG_XENO_PROJECTILE_HIT, PROC_REF(pre_projectile_hit))
 	ADD_TRAIT(xenomorph_owner, TRAIT_STAGGER_RESISTANT, MUTATION_TRAIT)
-	return ..()
 
 /datum/mutation_upgrade/defense/defender/brittle_upclose/on_loss()
 	UnregisterSignal(xenomorph_owner, list(COMSIG_XENO_PROJECTILE_HIT))
 	REMOVE_TRAIT(xenomorph_owner, TRAIT_STAGGER_RESISTANT, MUTATION_TRAIT)
-	return ..()
 
 /// When hit by a non-friendly projectile at pointblank range, have the projectile deal additional damage.
 /datum/mutation_upgrade/defense/defender/brittle_upclose/proc/pre_projectile_hit(datum/source, atom/movable/projectile/proj, cardinal_move, uncrossing)

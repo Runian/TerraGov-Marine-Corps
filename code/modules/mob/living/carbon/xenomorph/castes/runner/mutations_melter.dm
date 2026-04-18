@@ -1,53 +1,130 @@
+
 //*********************//
-//        Shell        //
+//        Base        //
 //*********************//
-/datum/mutation_upgrade/defense/acid_release
+
+/datum/mutation_upgrade/defense/melter
+	allowed_caste_names = list(/datum/xeno_caste/runner/melter)
+
+/datum/mutation_upgrade/offense/melter
+	allowed_caste_names = list(/datum/xeno_caste/runner/melter)
+
+/datum/mutation_upgrade/utility/melter
+	allowed_caste_names = list(/datum/xeno_caste/runner/melter)
+
+//*********************//
+//       Defense       //
+//*********************//
+
+/datum/mutation_upgrade/defense/melter/acid_release
 	name = "Acid Release"
-	desc = "Upon entering critical, release stunning acid in a radius of 2/3/4 tiles. This resets upon reaching full health."
-	/// For the first structure, the radius in which stunning acid is created.
-	var/radius_initial = 1
-	/// For each structure, the additional radius in which stunning acid is created.
-	var/radius_per_structure = 1
-	/// If the effect can be activated.
+	desc = "Upon getting staggered, create non-stunning acid in a 3x3 around you. This can only be activated once, but resets when you reach full health."
+	/// Can this be activated?
 	var/can_be_activated = FALSE
 
-/datum/mutation_upgrade/defense/acid_release/get_desc_for_alert(new_amount)
-	if(!new_amount)
-		return ..()
-	return "Upon entering critical, release stunning acid in a radius of [get_radius(new_amount)] tiles. This resets upon reaching full health."
-
-/datum/mutation_upgrade/defense/acid_release/on_gain()
+/datum/mutation_upgrade/defense/melter/acid_release/on_gain()
 	RegisterSignals(xenomorph_owner, list(COMSIG_XENOMORPH_BRUTE_DAMAGE, COMSIG_XENOMORPH_BURN_DAMAGE), PROC_REF(on_damage))
-	RegisterSignal(xenomorph_owner, COMSIG_MOB_STAT_CHANGED, PROC_REF(on_stat_changed))
+	RegisterSignal(xenomorph_owner, COMSIG_LIVING_STATUS_STAGGER, PROC_REF(on_staggered))
 	if(xenomorph_owner.health >= xenomorph_owner.maxHealth)
 		can_be_activated = TRUE
 	return ..()
 
-/datum/mutation_upgrade/defense/acid_release/on_loss()
-	UnregisterSignal(xenomorph_owner, list(COMSIG_XENOMORPH_BRUTE_DAMAGE, COMSIG_XENOMORPH_BURN_DAMAGE, COMSIG_MOB_STAT_CHANGED))
+/datum/mutation_upgrade/defense/melter/acid_release/on_loss()
+	UnregisterSignal(xenomorph_owner, list(COMSIG_XENOMORPH_BRUTE_DAMAGE, COMSIG_XENOMORPH_BURN_DAMAGE, COMSIG_LIVING_STATUS_STAGGER))
 	can_be_activated = FALSE
 	return ..()
 
-/// If it isn't ready to activate and they have full health, make it ready to activate.
-/datum/mutation_upgrade/defense/acid_release/proc/on_damage(datum/source, amount, list/amount_mod)
-	SIGNAL_HANDLER
-	if(!can_be_activated && xenomorph_owner.health >= xenomorph_owner.maxHealth)
-		can_be_activated = TRUE
-
-/// Cover the area around them with stunning acid upon entering critical if it is ready to activate.
-/datum/mutation_upgrade/defense/acid_release/proc/on_stat_changed(datum/source, old_stat, new_stat)
-	if(!isturf(xenomorph_owner.loc) || new_stat != UNCONSCIOUS)
+/// When available, creates non-stunning acid in a 3x3 radius upon stagger.
+/datum/mutation_upgrade/defense/melter/acid_release/proc/on_staggered(datum/source, amount, ignore_canstun)
+	if(!can_be_activated || !isturf(xenomorph_owner.loc))
 		return
 	var/turf/current_turf = xenomorph_owner.loc
-	for(var/turf/acid_tile AS in RANGE_TURFS(get_radius(get_total_structures()), current_turf))
+	for(var/turf/acid_tile AS in RANGE_TURFS(1, current_turf))
 		if(!line_of_sight(current_turf, acid_tile))
 			continue
-		xenomorph_spray(acid_tile, 6 SECONDS, 16, xenomorph_owner, TRUE, TRUE)
-	can_be_activated = FALSE
+		xenomorph_spray(acid_tile, 6 SECONDS, xenomorph_owner.xeno_caste.acid_spray_damage, xenomorph_owner, TRUE, TRUE)
 
-/// Returns the radius for how far the acid will be spawned.
-/datum/mutation_upgrade/defense/acid_release/proc/get_radius(structure_count, include_initial = TRUE)
-	return (include_initial ? radius_initial : 0) + (radius_per_structure * structure_count)
+/// If they have full health, make it available.
+/datum/mutation_upgrade/defense/melter/acid_release/proc/on_damage(datum/source, amount, list/amount_mod)
+	SIGNAL_HANDLER
+	if(can_be_activated || xenomorph_owner.health < xenomorph_owner.maxHealth)
+		return
+	can_be_activated = TRUE
+
+/datum/mutation_upgrade/defense/melter/extinguishing_shroud
+	name = "Extinguishing Shroud"
+	desc = "Melter Shroud's gas is now light neurotoxin and larger."
+
+/datum/mutation_upgrade/defense/melter/extinguishing_shroud/on_gain()
+	var/datum/action/ability/activable/xeno/melter_shroud/ability = xenomorph_owner.actions_by_path[/datum/action/ability/activable/xeno/melter_shroud]
+	if(!ability)
+		return
+	ability.smoke_typepath = /datum/effect_system/smoke_spread/xeno/neuro/light
+	ability.radius = initial(ability.radius) + 1
+
+/datum/mutation_upgrade/defense/melter/extinguishing_shroud/on_loss()
+	var/datum/action/ability/activable/xeno/melter_shroud/ability = xenomorph_owner.actions_by_path[/datum/action/ability/activable/xeno/melter_shroud]
+	if(!ability)
+		return
+	ability.smoke_typepath = initial(ability.smoke_typepath)
+	ability.radius = initial(ability.radius)
+
+
+/datum/mutation_upgrade/defense/melter/acidic_domain
+	name = "Acidic Domain"
+	desc = "While ontop of any acid puddle, you are immune to slowdown."
+	var/turf/current_turf
+	/// The acid puddle that we are relying on for the immunity.
+	var/obj/effect/xenomorph/spray/acid_puddle
+
+/datum/mutation_upgrade/defense/melter/acidic_domain/on_gain()
+	current_turf = get_turf(xenomorph_owner)
+	if(current_turf)
+		RegisterSignal(current_turf, COMSIG_ATOM_INITIALIZED_ON, PROC_REF(on_atom_initialize_on_turf))
+	RegisterSignal(xenomorph_owner, COMSIG_MOVABLE_MOVED, PROC_REF(on_movement))
+	set_acid_puddle(locate(/obj/effect/xenomorph/spray) in xenomorph_owner.loc)
+
+/datum/mutation_upgrade/defense/melter/acidic_domain/on_loss()
+	if(current_turf)
+		UnregisterSignal(current_turf, COMSIG_ATOM_INITIALIZED_ON)
+	UnregisterSignal(xenomorph_owner, COMSIG_MOVABLE_MOVED)
+	set_acid_puddle(null)
+
+/datum/mutation_upgrade/defense/melter/acidic_domain/proc/set_acid_puddle(obj/effect/xenomorph/spray/found_puddle)
+	if(acid_puddle == found_puddle)
+		return
+	if(acid_puddle)
+		UnregisterSignal(acid_puddle, COMSIG_QDELETING)
+	acid_puddle = found_puddle
+	if(!acid_puddle)
+		REMOVE_TRAIT(xenomorph_owner, TRAIT_SLOWDOWNIMMUNE, MUTATION_TRAIT)
+		return
+	RegisterSignal(acid_puddle, COMSIG_QDELETING, PROC_REF(on_puddle_qdel))
+	ADD_TRAIT(xenomorph_owner, TRAIT_SLOWDOWNIMMUNE, MUTATION_TRAIT)
+
+/// On movement, tries to find and set a acid puddle from our new location.
+/datum/mutation_upgrade/defense/melter/acidic_domain/proc/on_movement(datum/source, atom/old_loc, movement_dir, forced, list/old_locs)
+	SIGNAL_HANDLER
+	var/obj/effect/xenomorph/spray/found_puddle = locate(/obj/effect/xenomorph/spray) in xenomorph_owner.loc
+	set_acid_puddle(found_puddle)
+
+/// When our acid puddle is deleted, tries to find and set an acid puddle from our current location.
+/datum/mutation_upgrade/defense/melter/acidic_domain/proc/on_puddle_qdel(datum/source)
+	SIGNAL_HANDLER
+	var/obj/effect/xenomorph/spray/new_found_puddle
+	for(var/obj/effect/xenomorph/spray/next_puddle in current_turf.contents)
+		if(next_puddle == source)
+			continue
+		new_found_puddle = next_puddle
+		break
+	set_acid_puddle(new_found_puddle)
+
+/// If an acid puddle is created while we don't have one, set it as our current one.
+/datum/mutation_upgrade/defense/melter/acidic_domain/proc/on_atom_initialize_on_turf(datum/source, atom/new_atom)
+	SIGNAL_HANDLER
+	if(acid_puddle || !istype(new_atom, /obj/effect/xenomorph/spray))
+		return
+	set_acid_puddle(new_atom)
 
 //*********************//
 //         Spur        //

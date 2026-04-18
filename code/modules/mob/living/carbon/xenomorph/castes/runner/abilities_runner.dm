@@ -545,10 +545,14 @@
 	keybinding_signals = list(
 		KEYBINDING_NORMAL = COMSIG_XENOABILITY_ACID_SHROUD_MELTER,
 	)
+	/// The typepath of the smoke to create.
+	var/datum/effect_system/smoke_spread/xeno/smoke_typepath = /datum/effect_system/smoke_spread/xeno/acid
+	/// The radius of the smoke.
+	var/radius = 2
 
 /datum/action/ability/activable/xeno/melter_shroud/use_ability(atom/A)
-	var/datum/effect_system/smoke_spread/emitted_gas = new /datum/effect_system/smoke_spread/xeno/acid(xeno_owner)
-	emitted_gas.set_up(2, get_turf(xeno_owner))
+	var/datum/effect_system/smoke_spread/emitted_gas = new smoke_typepath(xeno_owner)
+	emitted_gas.set_up(radius, get_turf(xeno_owner))
 	emitted_gas.start()
 	succeed_activate()
 	add_cooldown()
