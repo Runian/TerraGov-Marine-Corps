@@ -52,18 +52,6 @@
 		/datum/action/ability/xeno_action/regenerate_skin,
 	)
 
-	mutations = list(
-		/datum/mutation_upgrade/defense/brittle_upclose,
-		/datum/mutation_upgrade/defense/carapace_waxing,
-		/datum/mutation_upgrade/defense/carapace_regrowth,
-		/datum/mutation_upgrade/offense/breathtaking_spin,
-		/datum/mutation_upgrade/offense/sharpening_claws,
-		/datum/mutation_upgrade/offense/power_spin,
-		/datum/mutation_upgrade/utility/carapace_sweat,
-		/datum/mutation_upgrade/utility/carapace_sharing,
-		/datum/mutation_upgrade/utility/slow_and_steady
-	)
-
 /datum/xeno_caste/defender/ancient
 	upgrade = XENO_UPGRADE_NORMAL
 

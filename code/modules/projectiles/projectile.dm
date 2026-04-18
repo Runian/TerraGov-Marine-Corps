@@ -1402,7 +1402,7 @@ So if we are on the 32th absolute pixel coordinate we are on tile 1, but if we a
 	to_chat(src, span_userdanger("[victim_feedback.Join(" ")]"))
 
 // Sundering procs
-/mob/living/proc/adjust_sunder(adjustment)
+/mob/living/proc/adjust_sunder(adjustment, use_multiplier = TRUE)
 	return 0
 
 /mob/living/proc/set_sunder(new_sunder)

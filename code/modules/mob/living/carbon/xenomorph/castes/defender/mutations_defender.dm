@@ -24,13 +24,13 @@
 	var/datum/action/ability/xeno_action/regenerate_skin/ability = xenomorph_owner.actions_by_path[/datum/action/ability/xeno_action/regenerate_skin]
 	if(!ability)
 		return
-	ability.removes_all_debuffs = TRUE
+	ability.removes_various_debuffs = TRUE
 
 /datum/mutation_upgrade/defense/defender/scout/on_loss()
 	var/datum/action/ability/xeno_action/regenerate_skin/ability = xenomorph_owner.actions_by_path[/datum/action/ability/xeno_action/regenerate_skin]
 	if(!ability)
 		return
-	ability.removes_all_debuffs = initial(ability.removes_all_debuffs)
+	ability.removes_various_debuffs = initial(ability.removes_various_debuffs)
 
 /datum/mutation_upgrade/defense/defender/brittle_upclose
 	name = "Brittle Upclose"
@@ -59,14 +59,14 @@
 	name = "Carapace Regrowth"
 	desc = "Regenerate Skin heals you for a total of 60% of your maximum health, but temporarily reduces your soft armor by 30 for 6 seconds."
 
-/datum/mutation_upgrade/defense/defender/carapace_waxing/on_gain()
+/datum/mutation_upgrade/defense/defender/carapace_regrowth/on_gain()
 	var/datum/action/ability/xeno_action/regenerate_skin/ability = xenomorph_owner.actions_by_path[/datum/action/ability/xeno_action/regenerate_skin]
 	if(!ability)
 		return
 	ability.maximum_health_percentage_to_heal = 0.60
 	ability.armor_modifier_amount = -30
 
-/datum/mutation_upgrade/defense/defender/scout/on_loss()
+/datum/mutation_upgrade/defense/defender/carapace_regrowth/on_loss()
 	var/datum/action/ability/xeno_action/regenerate_skin/ability = xenomorph_owner.actions_by_path[/datum/action/ability/xeno_action/regenerate_skin]
 	if(!ability)
 		return
@@ -105,17 +105,17 @@
 	var/datum/action/ability/xeno_action/tail_sweep/ability = xenomorph_owner.actions_by_path[/datum/action/ability/xeno_action/tail_sweep]
 	if(!ability)
 		return
-	ability.throws_targets_instead = TRUE
+	ability.throws_instead = TRUE
 
 /datum/mutation_upgrade/offense/defender/power_spin/on_loss()
 	var/datum/action/ability/xeno_action/tail_sweep/ability = xenomorph_owner.actions_by_path[/datum/action/ability/xeno_action/tail_sweep]
 	if(!ability)
 		return
-	ability.throws_targets_instead = initial(ability.throws_targets_instead)
+	ability.throws_instead = initial(ability.throws_instead)
 
 /datum/mutation_upgrade/offense/defender/sharpening_claws
 	name = "Sharpening Claws"
-	desc = "Regenerate Skin can be alternative cast to set your sunder to maximum instead. For every point of sunder, your slash damage is increased by 0.4%."
+	desc = "Regenerate Skin will maximize your sunder if you alternative cast it. For every point of sunder you currently have, your slash damage is increased by 0.4%."
 	/// The amount that the owner's melee damage modifier has been increased so far.
 	var/modifier_so_far = 0
 
@@ -126,7 +126,6 @@
 	if(!ability)
 		return
 	ability.alternative_sundering = TRUE
-
 
 /datum/mutation_upgrade/offense/defender/sharpening_claws/on_loss()
 	UnregisterSignal(xenomorph_owner, COMSIG_XENOMORPH_SUNDER_CHANGE)
@@ -153,13 +152,13 @@
 	name = "Carapace Sweat"
 	desc = "Regenerate Skin extinguishes and applies the Resin Jelly effect to you for 6 seconds."
 
-/datum/mutation_upgrade/offense/defender/carapace_sweat/on_gain()
+/datum/mutation_upgrade/utility/defender/carapace_sweat/on_gain()
 	var/datum/action/ability/xeno_action/regenerate_skin/ability = xenomorph_owner.actions_by_path[/datum/action/ability/xeno_action/regenerate_skin]
 	if(!ability)
 		return
 	ability.resin_jelly_duration = 6 SECONDS
 
-/datum/mutation_upgrade/offense/defender/carapace_sweat/on_loss()
+/datum/mutation_upgrade/utility/defender/carapace_sweat/on_loss()
 	var/datum/action/ability/xeno_action/regenerate_skin/ability = xenomorph_owner.actions_by_path[/datum/action/ability/xeno_action/regenerate_skin]
 	if(!ability)
 		return
@@ -169,14 +168,14 @@
 	name = "Slow and Steady"
 	desc = "You can move during Fortify slowly."
 
-/datum/mutation_upgrade/utility/defender/carapace_sweat/on_gain()
+/datum/mutation_upgrade/utility/defender/slow_and_steady/on_gain()
 	var/datum/action/ability/xeno_action/fortify/ability = xenomorph_owner.actions_by_path[/datum/action/ability/xeno_action/fortify]
 	if(!ability)
 		return
 	ability.set_immobilize(FALSE)
 	ability.set_movement_delay(1 SECONDS)
 
-/datum/mutation_upgrade/utility/defender/carapace_sweat/on_loss()
+/datum/mutation_upgrade/utility/defender/slow_and_steady/on_loss()
 	var/datum/action/ability/xeno_action/fortify/ability = xenomorph_owner.actions_by_path[/datum/action/ability/xeno_action/fortify]
 	if(!ability)
 		return

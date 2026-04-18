@@ -22,6 +22,8 @@
 	var/damage_type = BRUTE
 	/// The multiplier of the damage to be applied.
 	var/damage_multiplier = 1
+	/// Should the affected humans be thrown instead? Humans that are impacted by thrown humans are dealt additional effects.
+	var/throws_instead = FALSE
 
 /datum/action/ability/xeno_action/tail_sweep/New(Target)
 	. = ..()
@@ -42,34 +44,35 @@
 	xeno_owner.add_filter("defender_tail_sweep", 2, gauss_blur_filter(1)) //Add cool SFX
 	xeno_owner.spin(4, 1)
 	xeno_owner.AddComponent(/datum/component/throw_parry, DEFENDER_REFLECT_TIME)
-	playsound(xeno_owner,pick('sound/effects/alien/tail_swipe1.ogg','sound/effects/alien/tail_swipe2.ogg','sound/effects/alien/tail_swipe3.ogg'), 25, 1) //Sound effects
+	playsound(xeno_owner, pick('sound/effects/alien/tail_swipe1.ogg','sound/effects/alien/tail_swipe2.ogg','sound/effects/alien/tail_swipe3.ogg'), 25, 1) // Sound effects.
 
-	var/sweep_range = 1
-	var/list/L = orange(sweep_range, xeno_owner)		// Not actually the fruit
-
-	for (var/mob/living/carbon/human/H in L)
-		if(H.stat == DEAD || !xeno_owner.Adjacent(H))
+	var/list/everything_nearby = orange(1, xeno_owner)
+	for (var/mob/living/carbon/human/nearby_human in everything_nearby)
+		if(nearby_human.stat == DEAD || !xeno_owner.Adjacent(nearby_human))
 			continue
-		H.add_filter("defender_tail_sweep", 2, gauss_blur_filter(1)) //Add cool SFX; motion blur
-		addtimer(CALLBACK(H, TYPE_PROC_REF(/datum, remove_filter), "defender_tail_sweep"), 0.5 SECONDS) //Remove cool SFX
-		var/damage = xeno_owner.xeno_caste.melee_damage
-		var/affecting = H.get_limb(ran_zone(null, 0))
-		if(!affecting) //Still nothing??
-			affecting = H.get_limb("chest") //Gotta have a torso?!
+		nearby_human.add_filter("defender_tail_sweep", 2, gauss_blur_filter(1)) //Add cool SFX; motion blur.
+		addtimer(CALLBACK(nearby_human, TYPE_PROC_REF(/datum, remove_filter), "defender_tail_sweep"), 0.5 SECONDS) // Remove cool SFX.
 		if(damage_multiplier > 0)
-			H.apply_damage(damage * damage_multiplier, damage_type, updating_health = TRUE, attacker = owner)
+			var/affected_limb = nearby_human.get_limb(ran_zone(null, 0))
+			if(!affected_limb) // If the random zone picked a limb that doesn't exist, we'll choose the limb that humans always have.
+				affected_limb = nearby_human.get_limb("chest")
+			nearby_human.apply_damage(xeno_owner.xeno_caste.melee_damage * damage_multiplier, damage_type, affected_limb, updating_health = TRUE, attacker = owner)
 		if(knockback_distance >= 1)
-			H.knockback(xeno_owner, knockback_distance, 4)
+			if(throws_instead)
+				RegisterSignal(nearby_human, COMSIG_MOVABLE_IMPACT, PROC_REF(on_throw_impact))
+				RegisterSignal(nearby_human, COMSIG_MOVABLE_POST_THROW, PROC_REF(on_post_throw))
+				nearby_human.throw_at(get_step(nearby_human, get_dir(xeno_owner, nearby_human)), knockback_distance, 4, xeno_owner)
+			else
+				nearby_human.knockback(xeno_owner, knockback_distance, 4)
 		if(stagger_duration)
-			H.adjust_stagger(stagger_duration)
+			nearby_human.adjust_stagger(stagger_duration)
 		if(paralyze_duration)
-			H.Paralyze(paralyze_duration)
+			nearby_human.Paralyze(paralyze_duration)
 		GLOB.round_statistics.defender_tail_sweep_hits++
 		SSblackbox.record_feedback("tally", "round_statistics", 1, "defender_tail_sweep_hits")
-		shake_camera(H, 2, 1)
-
-		to_chat(H, span_xenowarning("We are struck by \the [xeno_owner]'s tail sweep!"))
-		playsound(H,'sound/weapons/alien_claw_block.ogg', 50, 1)
+		shake_camera(nearby_human, 2, 1)
+		to_chat(nearby_human, span_xenowarning("We are struck by \the [xeno_owner]'s tail sweep!"))
+		playsound(nearby_human,'sound/weapons/alien_claw_block.ogg', 50, 1)
 
 	addtimer(CALLBACK(xeno_owner, TYPE_PROC_REF(/datum, remove_filter), "defender_tail_sweep"), 0.5 SECONDS) //Remove cool SFX
 	succeed_activate()
@@ -81,6 +84,28 @@
 	to_chat(xeno_owner, span_notice("We gather enough strength to tail sweep again."))
 	owner.playsound_local(owner, 'sound/effects/alien/new_larva.ogg', 25, 0, 1)
 	return ..()
+
+/// Called when the throw has ended.
+/datum/action/ability/xeno_action/tail_sweep/proc/on_post_throw(datum/source)
+	SIGNAL_HANDLER
+	UnregisterSignal(source, list(COMSIG_MOVABLE_POST_THROW, COMSIG_MOVABLE_IMPACT))
+
+/// Called when the source has hit something.
+/datum/action/ability/xeno_action/tail_sweep/proc/on_throw_impact(datum/source, atom/hit_atom, impact_speed)
+	SIGNAL_HANDLER
+	UnregisterSignal(source, COMSIG_MOVABLE_IMPACT)
+	if(!ishuman(hit_atom))
+		return
+	var/mob/living/carbon/human/hit_human = hit_atom
+	if(damage_multiplier > 0)
+		var/affected_limb = hit_human.get_limb(ran_zone(null, 0))
+		if(!affected_limb)
+			affected_limb = hit_human.get_limb("chest")
+		INVOKE_ASYNC(hit_human, TYPE_PROC_REF(/mob/living/carbon/human, apply_damage), xeno_owner.xeno_caste.melee_damage * damage_multiplier, damage_type, affected_limb, updating_health = TRUE, attacker = owner)
+	if(stagger_duration)
+		hit_human.adjust_stagger(stagger_duration)
+	if(paralyze_duration)
+		hit_human.Paralyze(paralyze_duration)
 
 /datum/action/ability/xeno_action/tail_sweep/ai_should_start_consider()
 	return TRUE
@@ -310,6 +335,7 @@
 			ADD_TRAIT(xeno_owner, TRAIT_IMMOBILE, FORTIFY_TRAIT)
 		if(movement_delay)
 			RegisterSignal(xeno_owner, COMSIG_MOVABLE_MOVED, PROC_REF(on_move))
+			xeno_owner.next_move_slowdown = max(xeno_owner.next_move_slowdown, movement_delay)
 		ADD_TRAIT(xeno_owner, TRAIT_STOPS_TANK_COLLISION, FORTIFY_TRAIT)
 		if(!silent)
 			to_chat(xeno_owner, span_xenowarning("We tuck ourselves into a defensive stance."))
@@ -320,6 +346,7 @@
 			REMOVE_TRAIT(xeno_owner, TRAIT_IMMOBILE, FORTIFY_TRAIT)
 		if(movement_delay)
 			UnregisterSignal(xeno_owner, COMSIG_MOVABLE_MOVED)
+			xeno_owner.next_move_slowdown = clamp(xeno_owner.next_move_slowdown, 0, xeno_owner.next_move_slowdown - movement_delay)
 		REMOVE_TRAIT(xeno_owner, TRAIT_STOPS_TANK_COLLISION, FORTIFY_TRAIT)
 		if(!silent)
 			to_chat(xeno_owner, span_xenowarning("We resume our normal stance."))
@@ -372,20 +399,31 @@
 	)
 	/// The percentage (as decimal) of the owner's maximum health to heal by.
 	var/maximum_health_percentage_to_heal = 0.12
-	/// Should it remove all debuffs?
-	var/removes_all_debuffs = FALSE
+	/// Should it remove various debuffs?
+	var/removes_various_debuffs = FALSE
 	/// The duration in deciseconds of the Resin Jelly status effect that the owner will get. Will also extinguish them.
 	var/resin_jelly_duration = 0 SECONDS
 	/// The armor that was given to the owner, if any.
 	var/datum/armor/armor_modifier
-	/// Should a temporary soft armor debuff be applied? If so, how much soft armor should be taken away?
+	/// Should a temporary soft armor modifier be applied? If so, how much?
 	var/armor_modifier_amount
 	/// ID of the timer that will revert the armor given.
 	var/armor_modifier_timer_id
+	/// Can the ability be alternative activated to remove all sunder?
+	var/alternative_sundering = FALSE
 
 /datum/action/ability/xeno_action/regenerate_skin/on_cooldown_finish()
 	to_chat(xeno_owner, span_notice("We feel we are ready to shred our skin and grow another."))
 	return ..()
+
+/datum/action/ability/xeno_action/regenerate_skin/alternate_action_activate()
+	. = ..()
+	if(!alternative_sundering || !can_use_action())
+		return
+	xeno_owner.do_jitter_animation(1000)
+	xeno_owner.adjust_sunder(xeno_owner.xeno_caste.sunder_max, FALSE)
+	add_cooldown(1 SECONDS)
+	succeed_activate()
 
 /datum/action/ability/xeno_action/regenerate_skin/action_activate()
 	if(!can_use_action(TRUE))
@@ -400,12 +438,12 @@
 		span_notice("We shed our skin, showing the fresh new layer underneath!"))
 
 	xeno_owner.do_jitter_animation(1000)
-	xeno_owner.set_sunder(0)
+	xeno_owner.adjust_sunder(-xeno_owner.sunder, FALSE)
 	if(maximum_health_percentage_to_heal)
 		var/health_to_heal = maximum_health_percentage_to_heal * xeno_owner.xeno_caste.max_health
 		HEAL_XENO_DAMAGE(xeno_owner, health_to_heal, FALSE)
 		xeno_owner.updatehealth()
-	if(removes_all_debuffs)
+	if(removes_various_debuffs)
 		if(xeno_owner.IsSlowed())
 			xeno_owner.set_slowdown(0)
 		if(xeno_owner.IsStaggered())
@@ -423,7 +461,7 @@
 			qdel(status_effect)
 	if(resin_jelly_duration)
 		xeno_owner.apply_status_effect(STATUS_EFFECT_RESIN_JELLY_COATING, resin_jelly_duration)
-		xeno_owner.ExtinguishMob() // Checks if they are on fire anyways.
+		xeno_owner.ExtinguishMob() // This checks if they are on fire anyways.
 	if(armor_modifier_amount != 0)
 		reverse_armor_modifier()
 		armor_modifier = getArmor(armor_modifier_amount, armor_modifier_amount, armor_modifier_amount, armor_modifier_amount, armor_modifier_amount, armor_modifier_amount, armor_modifier_amount, armor_modifier_amount)
@@ -499,11 +537,11 @@
 		slapped.add_filter("defender_tail_sweep", 2, gauss_blur_filter(1)) //Add cool SFX; motion blur
 		addtimer(CALLBACK(slapped, TYPE_PROC_REF(/datum, remove_filter), "defender_tail_sweep"), 0.5 SECONDS) //Remove cool SFX
 		var/damage = xeno_owner.xeno_caste.melee_damage/2
-		var/affecting = slapped.get_limb(ran_zone(null, 0))
-		if(!affecting)
-			affecting = slapped.get_limb("chest")
+		var/affected_limb = slapped.get_limb(ran_zone(null, 0))
+		if(!affected_limb)
+			affected_limb = slapped.get_limb("chest")
 		slapped.knockback(xeno_owner, 1, 4)
-		slapped.apply_damage(damage, BRUTE, affecting, MELEE, attacker = owner)
+		slapped.apply_damage(damage, BRUTE, affected_limb, MELEE, attacker = owner)
 		slapped.apply_damage(damage, STAMINA, updating_health = TRUE, attacker = owner)
 		slapped.Paralyze(0.3 SECONDS)
 		shake_camera(slapped, 2, 1)

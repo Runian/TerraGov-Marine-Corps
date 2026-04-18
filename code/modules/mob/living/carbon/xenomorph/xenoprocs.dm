@@ -513,12 +513,12 @@
 		return TRUE
 	return FALSE
 
-/mob/living/carbon/xenomorph/adjust_sunder(adjustment)
+/mob/living/carbon/xenomorph/adjust_sunder(adjustment, use_multiplier = TRUE)
 	. = ..()
 	if(.)
 		return
 	var/old_sunder = sunder
-	sunder = clamp(sunder + (adjustment > 0 ? adjustment * xeno_caste.sunder_multiplier : adjustment), 0, xeno_caste.sunder_max)
+	sunder = clamp(sunder + (adjustment > 0 ? adjustment * (use_multiplier ? xeno_caste.sunder_multiplier : 1) : adjustment), 0, xeno_caste.sunder_max)
 	SEND_SIGNAL(src, COMSIG_XENOMORPH_SUNDER_CHANGE, old_sunder, sunder)
 	return sunder - old_sunder // The real difference in sunder. Negative: real loss in sunder. Positive: real gain in sunder.
 
