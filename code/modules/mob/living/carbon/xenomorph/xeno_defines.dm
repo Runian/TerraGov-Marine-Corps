@@ -353,7 +353,7 @@ GLOBAL_LIST_INIT(strain_list, init_glob_strain_list())
 	//which special resin structure to build when we secrete special resin
 	var/selected_special_resin = /turf/closed/wall/resin/regenerating/special/bulletproof
 	/// Which reagent to slash with using reagent slash. Use `set_selected_reagent` when changing this.
-	var/selected_reagent = /datum/reagent/toxin/xeno_hemodile
+	var/selected_reagent = /datum/reagent/toxin/xeno_neurotoxin
 	///which plant to place when we use sow
 	var/obj/structure/xeno/plant/selected_plant = /obj/structure/xeno/plant/heal_fruit
 	///Naming variables
