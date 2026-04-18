@@ -771,7 +771,7 @@ GLOBAL_LIST_INIT(boiler_glob_image_list, list(
 	var/recast_decay_timer_id
 	/// Should we do acid_spray_act on those we pass over?
 	var/do_acid_spray_act = TRUE
-	///List of pass_flags given by this action
+	/// List of pass_flags given by this action.
 	var/charge_pass_flags = PASS_LOW_STRUCTURE|PASS_DEFENSIVE_STRUCTURE|PASS_FIRE
 	/// The duration in deciseconds in which a trail of opaque gas will last.
 	var/gas_trail_duration = 0 SECONDS
