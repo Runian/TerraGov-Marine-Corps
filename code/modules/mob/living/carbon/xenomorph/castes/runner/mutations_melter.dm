@@ -207,15 +207,15 @@
 	var/datum/action/ability/activable/xeno/charge/acid_dash/melter/ability = xenomorph_owner.actions_by_path[/datum/action/ability/activable/xeno/charge/acid_dash/melter]
 	if(!ability)
 		return
-	ability.maximum_casts = 4 // 1 base cast + 3 recasts
-	ability.available_casts = !ability.available_casts ? 0 : clamp(ability.available_casts, ability.available_casts + 4 - initial(ability.maximum_casts), ability.maximum_casts)
+	ability.maximum_recasts = 3
+	ability.available_recasts = !ability.available_recasts ? 0 : clamp(ability.available_recasts, ability.available_recasts + 3 - initial(ability.maximum_recasts), ability.maximum_recasts)
 
 /datum/mutation_upgrade/utility/melter/perpetual_dash/on_loss()
 	var/datum/action/ability/activable/xeno/charge/acid_dash/melter/ability = xenomorph_owner.actions_by_path[/datum/action/ability/activable/xeno/charge/acid_dash/melter]
 	if(!ability)
 		return
-	ability.maximum_casts = initial(ability.maximum_casts)
-	ability.available_casts = min(ability.available_casts, ability.maximum_casts)
+	ability.maximum_recasts = initial(ability.maximum_recasts)
+	ability.available_recasts = min(ability.available_recasts, ability.maximum_recasts)
 
 /datum/mutation_upgrade/utility/melter/quick_dash
 	name = "Quick Dash"
