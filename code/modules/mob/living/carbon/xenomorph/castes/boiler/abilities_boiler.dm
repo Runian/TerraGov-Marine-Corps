@@ -785,6 +785,7 @@ GLOBAL_LIST_INIT(boiler_glob_image_list, list(
 	if(recast_decay_timer_id)
 		deltimer(recast_decay_timer_id)
 		recast_decay_timer_id = null
+	recast_prerequisite_met = FALSE
 	return ..()
 
 /datum/action/ability/activable/xeno/charge/acid_dash/can_use_ability(atom/A, silent, override_flags)
