@@ -54,7 +54,7 @@
 			"name" = mutation.name,
 			"type" = mutation.type,
 			"desc" = mutation.desc,
-			"owned" = has_mutation(xenomorph_user, mutation)
+			"owned" = has_mutation_by_typepath(xenomorph_user, mutation.type)
 		))
 	.["mutation_categories"] = list(mutation_categories)
 
@@ -80,11 +80,11 @@
 	return xenomorph_target.xeno_caste.caste_name in mutation_target.allowed_caste_names
 
 /// Returns TRUE if the xenomorph already has a mutation.
-/datum/mutation_datum/proc/has_mutation(mob/living/carbon/xenomorph/xenomorph_target, datum/mutation_upgrade/mutation)
+/datum/mutation_datum/proc/has_mutation_by_typepath(mob/living/carbon/xenomorph/xenomorph_target, datum/mutation_upgrade/mutation_typepath)
 	if(!length(xenomorph_target.owned_mutations))
 		return FALSE
 	for(var/datum/mutation_upgrade/owned_mutation AS in xenomorph_target.owned_mutations)
-		if(!istype(owned_mutation, mutation.type))
+		if(!istype(owned_mutation, mutation_typepath))
 			continue
 		return TRUE
 
@@ -114,7 +114,7 @@
 		if(!silent)
 			to_chat(xenomorph_purchaser, span_warning("That mutation is invalid."))
 		return FALSE
-	if(has_mutation(xenomorph_purchaser, mutation))
+	if(has_mutation_by_typepath(xenomorph_purchaser, mutation.type))
 		to_chat(xenomorph_purchaser, span_warning("You already have this mutation!"))
 		return FALSE
 	if(!can_choose_mutation(xenomorph_purchaser, mutation))
