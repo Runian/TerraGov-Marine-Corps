@@ -767,7 +767,7 @@ GLOBAL_LIST_INIT(boiler_glob_image_list, list(
 	var/recast_prerequisite = TRUE
 	/// Have we hit a human with the last ability cast?
 	var/recast_prerequisite_met = FALSE
-	/// The timer id for the callback that will set the ability on cooldown if recast is not used up in time.
+	/// The timer id for the callback that will set the ability on cooldown if recast(s) is not used up in time.
 	var/recast_decay_timer_id
 	/// Should we do acid_spray_act on those we pass over?
 	var/do_acid_spray_act = TRUE
@@ -796,14 +796,12 @@ GLOBAL_LIST_INIT(boiler_glob_image_list, list(
 		return FALSE
 	if(xeno_owner.xeno_flags & XENO_LEAPING)
 		return FALSE
-	if(TIMER_COOLDOWN_RUNNING(src, COOLDOWN_ACID_DASH_ACTIVATION))
-		return FALSE
 	if(!available_recasts)
 		return FALSE
 
 /datum/action/ability/activable/xeno/charge/acid_dash/use_ability(atom/A)
 	if(recast_prerequisite_met)
-		available_recasts--
+		available_recasts = clamp(available_recasts - 1, 0, maximum_recasts)
 	xeno_owner.visible_message(span_xenodanger("[xeno_owner] slides towards \the [A]!"), \
 		span_xenodanger("We dash towards \the [A], spraying acid down our path!") )
 	xeno_owner.emote("roar")
@@ -814,7 +812,7 @@ GLOBAL_LIST_INIT(boiler_glob_image_list, list(
 	xeno_owner.xeno_flags |= XENO_LEAPING // This has to come before throw_at, which checks impact. So we don't do end-charge specials when thrown.
 	xeno_owner.add_pass_flags(charge_pass_flags, type)
 	xeno_owner.throw_at(A, charge_range, 2, xeno_owner)
-	succeed_activate(available_recasts != maximum_recasts ? 5 : null) // Greatly reduced cost for recasts.
+	succeed_activate(available_recasts >= maximum_recasts ? null : 5) // Greatly reduced cost for recasts.
 
 /datum/action/ability/activable/xeno/charge/acid_dash/mob_hit(datum/source, mob/living/living_target)
 	. = TRUE
@@ -831,10 +829,10 @@ GLOBAL_LIST_INIT(boiler_glob_image_list, list(
 	. = ..()
 	UnregisterSignal(xeno_owner, COMSIG_MOVABLE_MOVED)
 	xeno_owner.remove_pass_flags(charge_pass_flags, type)
+<<<<<<< HEAD
 	if(!available_recasts || (recast_prerequisite && !recast_prerequisite_met))
 		recast_decayed()
 		return
-	TIMER_COOLDOWN_START(src, COOLDOWN_ACID_DASH_ACTIVATION, 0.2 SECONDS) // Small delay before you can recast, to make it harder to misfire.
 	if(recast_decay_timer_id)
 		deltimer(recast_decay_timer_id)
 	recast_decay_timer_id = addtimer(CALLBACK(src, PROC_REF(recast_decayed)), 2 SECONDS, TIMER_UNIQUE|TIMER_STOPPABLE)
