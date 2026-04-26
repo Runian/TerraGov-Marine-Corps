@@ -8,11 +8,14 @@
 /datum/mutation_datum/proc/initialize_all_mutation_upgrades()
 	if(length(all_mutation_upgrades))
 		return
+	// Only initializing non-base type mutations.
 	for(var/mutation_upgrade_type AS in subtypesof(/datum/mutation_upgrade))
 		var/datum/mutation_upgrade/mutation = new mutation_upgrade_type()
-		// Only initializing mutations that have a name and are available for at least one caste.
-		if(mutation.name && length(mutation.allowed_caste_names) > 0)
-			all_mutation_upgrades += mutation
+		if(!mutation.name || !mutation.category)
+			continue
+		if(!length(mutation.allowed_caste_names))
+			continue
+		all_mutation_upgrades += mutation
 
 /datum/mutation_datum/New()
 	. = ..()
@@ -32,31 +35,24 @@
 	. = ..()
 	var/mob/living/carbon/xenomorph/xenomorph_user = user
 	.["mutation_points_available"] = GLOB.hive_datums[xenomorph_user.hive].mutation_points
-	.["mutation_points_maximum"] = max(GLOB.hive_datums[xenomorph_user.hive].mutation_points, MUTATION_MAXIMUM_POINTS)
+	.["mutation_points_maximum"] = max(MUTATION_MAXIMUM_POINTS, .["mutation_points_available"])
 
 /datum/mutation_datum/ui_static_data(mob/user)
 	. = ..()
 	var/mob/living/carbon/xenomorph/xenomorph_user = user
 	.["mutation_points_used"] = length(xenomorph_user.owned_mutations)
-
 	.["mutations"] = list()
-	.["mutation_categories"] = list()
-
-	var/mutation_categories = list()
 	for(var/datum/mutation_upgrade/mutation AS in all_mutation_upgrades)
-		if(!mutation.category)
-			continue
 		if(!can_choose_mutation(xenomorph_user, mutation))
 			continue
-		if(!mutation_categories[mutation.category])
-			mutation_categories += list("[mutation.category]" = mutation.category)
-		.["mutations"] += list(list(
+		if(!.["mutations"][mutation.category])
+			.["mutations"][mutation.category] = list()
+		.["mutations"]["[mutation.category]"] += list(list(
 			"name" = mutation.name,
 			"type" = mutation.type,
 			"desc" = mutation.desc,
 			"owned" = has_mutation_by_typepath(xenomorph_user, mutation.type)
 		))
-	.["mutation_categories"] = list(mutation_categories)
 
 /datum/mutation_datum/ui_act(action, params)
 	. = ..()
