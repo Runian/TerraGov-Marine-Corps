@@ -459,20 +459,19 @@ GLOBAL_LIST_INIT(tier_to_primo_upgrade, list(
 	psypoint_cost = ANY_PRIMORDIAL_PRICE
 	icon = "primosent"
 
-
 /datum/hive_upgrade/xenos/mutation_point
 	name = "Mutation Point"
 	desc = "Permanently grants each member of the hive to choose an additional mutation."
 	category = "Mutations"
 	psypoint_cost = 600
 	upgrade_flags = UPGRADE_FLAG_MESSAGE_HIVE|UPGRADE_FLAG_MUST_BE_HIVE_RULER
-	icon = "veil"
+	icon = "mutation_point"
 
 /datum/hive_upgrade/mutation_point/can_buy(mob/living/carbon/xenomorph/buyer, silent = TRUE)
 	. = ..()
 	if(!.)
 		return FALSE
-	if(!(SSticker.mode?.round_type_flags & MODE_MUTATIONS_OBTAINABLE) && !HAS_TRAIT(buyer, TRAIT_VALHALLA_XENO))
+	if(!(SSticker.mode?.round_type_flags & MODE_MUTATIONS_OBTAINABLE))
 		if(!silent)
 			to_chat(buyer, span_xenowarning("The hive isn't permitted to buy mutations."))
 		return FALSE
@@ -480,7 +479,7 @@ GLOBAL_LIST_INIT(tier_to_primo_upgrade, list(
 	var/datum/mutation_datum/mutations = GLOB.mutation_selector
 	if(hive_status.mutation_points >= mutations.completed_disk_colors)
 		if(!silent)
-			to_chat(buyer, span_xenowarning("The hive cannot sustain [hive_status.mutation_points == 0 ? "any" : "more"] mutations right now. Wait for the talls to complete more disks."))
+			to_chat(buyer, span_xenowarning("The hive cannot sustain [hive_status.mutation_points == 0 ? "any" : "more"] mutations right now."))
 		return FALSE
 
 /datum/hive_upgrade/mutation_point/on_buy(mob/living/carbon/xenomorph/buyer)

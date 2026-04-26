@@ -30,38 +30,33 @@
 
 /datum/mutation_datum/ui_data(mob/user)
 	. = ..()
-
 	var/mob/living/carbon/xenomorph/xenomorph_user = user
-	.["disks_completed"] = HAS_TRAIT(xenomorph_user, TRAIT_VALHALLA_XENO) ? 3 : length(completed_disk_colors)
+	.["mutation_points_available"] = GLOB.hive_datums[xenomorph_user.hive].mutation_points
+	.["mutation_points_maximum"] = max(GLOB.hive_datums[xenomorph_user.hive].mutation_points, MUTATION_MAXIMUM_POINTS)
 
 /datum/mutation_datum/ui_static_data(mob/user)
 	. = ..()
 	var/mob/living/carbon/xenomorph/xenomorph_user = user
-	.["defense_mutations"] = list()
-	.["offense_mutations"] = list()
-	.["utility_mutations"] = list()
+	.["mutation_points_used"] = length(xenomorph_user.owned_mutations)
+
+	.["mutations"] = list()
+	.["mutation_categories"] = list()
+
+	var/mutation_categories = list()
 	for(var/datum/mutation_upgrade/mutation AS in all_mutation_upgrades)
+		if(!mutation.category)
+			continue
 		if(!can_choose_mutation(xenomorph_user, mutation))
 			continue
-		var/list_name
-		switch(mutation.category)
-			if(MUTATION_DEFENSE)
-				list_name = "defense_mutations"
-			if(MUTATION_OFFENSE)
-				list_name = "offense_mutations"
-			if(MUTATION_UTILITY)
-				list_name = "utility_mutations"
-		if(!list_name)
-			continue
-		.[list_name] += list(list(
+		if(!mutation_categories[mutation.category])
+			mutation_categories += list("[mutation.category]" = mutation.category)
+		.["mutations"] += list(list(
 			"name" = mutation.name,
 			"type" = mutation.type,
 			"desc" = mutation.desc,
-			"owned" = has_mutation_by_typepath(xenomorph_user, mutation.type)
+			"owned" = has_mutation(xenomorph_user, mutation)
 		))
-	.["points_available"] = HAS_TRAIT(xenomorph_user, TRAIT_VALHALLA_XENO) ? MUTATION_MAXIMUM_POINTS : GLOB.hive_datums[xenomorph_user.hivenumber].mutation_points
-	.["points_used"] = length(xenomorph_user.owned_mutations)
-	.["points_maximum"] = MUTATION_MAXIMUM_POINTS
+	.["mutation_categories"] = list(mutation_categories)
 
 /datum/mutation_datum/ui_act(action, params)
 	. = ..()
@@ -69,11 +64,9 @@
 		return
 	if(!isxeno(usr))
 		return
-
 	switch(action)
 		if("purchase")
 			try_purchase_mutation(usr, text2path(params["upgrade_type"]))
-
 	SStgui.close_user_uis(usr, src)
 
 /// Returns the mutation from the global list if it can be found with its typepath.
@@ -86,44 +79,54 @@
 /datum/mutation_datum/proc/can_choose_mutation(mob/living/carbon/xenomorph/xenomorph_target, datum/mutation_upgrade/mutation_target)
 	return xenomorph_target.xeno_caste.caste_name in mutation_target.allowed_caste_names
 
-/// Returns TRUE if the xenomorph already has a mutation by its typepath.
-/datum/mutation_datum/proc/has_mutation_by_typepath(mob/living/carbon/xenomorph/xenomorph_target, datum/mutation_upgrade/mutation_typepath)
+/// Returns TRUE if the xenomorph already has a mutation.
+/datum/mutation_datum/proc/has_mutation(mob/living/carbon/xenomorph/xenomorph_target, datum/mutation_upgrade/mutation)
 	if(!length(xenomorph_target.owned_mutations))
 		return FALSE
 	for(var/datum/mutation_upgrade/owned_mutation AS in xenomorph_target.owned_mutations)
-		if(!istype(owned_mutation, mutation_typepath))
+		if(!istype(owned_mutation, mutation.type))
 			continue
 		return TRUE
-	return FALSE
 
 /// Tries to purchase a mutation based on its typepath. Returns TRUE if the mutation was successfully purchased.
-/datum/mutation_datum/proc/try_purchase_mutation(mob/living/carbon/xenomorph/xenomorph_purchaser, datum/mutation_upgrade/mutation_typepath)
+/datum/mutation_datum/proc/try_purchase_mutation(mob/living/carbon/xenomorph/xenomorph_purchaser, datum/mutation_upgrade/mutation_typepath, silent = FALSE)
 	if(!xenomorph_purchaser.hive || !mutation_typepath)
 		return FALSE
-	if(!(SSticker.mode?.round_type_flags & MODE_MUTATIONS_OBTAINABLE) && !HAS_TRAIT(xenomorph_purchaser, TRAIT_VALHALLA_XENO))
+	if(!(SSticker.mode?.round_type_flags & MODE_MUTATIONS_OBTAINABLE))
+		if(!silent)
+			to_chat(xenomorph_purchaser, span_warning("Mutations cannot be obtained."))
 		return FALSE
 	if(!(xenomorph_purchaser.xeno_caste.caste_flags & CASTE_MUTATIONS_ALLOWED))
+		if(!silent)
+			to_chat(xenomorph_purchaser, span_warning("Your caste is disallowed from getting mutations."))
+		return FALSE
+	if(xenomorph_purchaser.fortify)
+		if(!silent)
+			to_chat(xenomorph_purchaser, span_warning("You cannot get new mutations while fortified."))
+		return FALSE
+	var/mutation_points_available = xenomorph_purchaser.hive.mutation_points
+	if(length(xenomorph_purchaser.owned_mutations) > mutation_points_available)
+		if(!silent)
+			to_chat(xenomorph_purchaser, span_warning("The hive can only support up to [mutation_points_available] mutations!"))
 		return FALSE
 	var/datum/mutation_upgrade/mutation = find_mutation_by_typepath(mutation_typepath)
 	if(!mutation)
-		to_chat(xenomorph_purchaser, span_warning("That is not a valid mutation."))
+		if(!silent)
+			to_chat(xenomorph_purchaser, span_warning("That mutation is invalid."))
+		return FALSE
+	if(has_mutation(xenomorph_purchaser, mutation))
+		to_chat(xenomorph_purchaser, span_warning("You already have this mutation!"))
 		return FALSE
 	if(!can_choose_mutation(xenomorph_purchaser, mutation))
-		to_chat(xenomorph_purchaser, span_warning("Your caste cannot get this mutation."))
-		return FALSE
-	if(xenomorph_purchaser.fortify)
-		to_chat(xenomorph_purchaser, span_warning("You cannot buy mutations while fortified!"))
-		return FALSE
-	if(length(xenomorph_purchaser.owned_mutations) > MUTATION_MAXIMUM_POINTS || (!HAS_TRAIT(xenomorph_purchaser, TRAIT_VALHALLA_XENO) && (length(xenomorph_purchaser.owned_mutations) >= length(completed_disk_colors))))
-		to_chat(xenomorph_purchaser, span_warning("The hive hasn't developed enough to get another mutation..."))
-		return FALSE
-	if(has_mutation_by_typepath(xenomorph_purchaser, mutation_typepath))
-		to_chat(xenomorph_purchaser, span_warning("You already own this mutation!"))
+		if(!silent)
+			to_chat(xenomorph_purchaser, span_warning("That mutation is not available for your caste."))
 		return FALSE
 	for(var/datum/mutation_upgrade/owned_mutation AS in xenomorph_purchaser.owned_mutations)
 		if(!(mutation_typepath in owned_mutation.conflicting_mutation_types))
 			continue
 		to_chat(xenomorph_purchaser, span_warning("That mutation is not compatible with the mutation: [owned_mutation.name]"))
+		return FALSE
+	if(!mutation.can_gain(xenomorph_purchaser, silent))
 		return FALSE
 	to_chat(xenomorph_purchaser, span_xenonotice("Mutation gained."))
 	xenomorph_purchaser.do_jitter_animation(500)

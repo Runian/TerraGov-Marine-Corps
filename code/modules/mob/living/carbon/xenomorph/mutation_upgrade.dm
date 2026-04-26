@@ -49,10 +49,9 @@
 	on_loss()
 	return ..()
 
-/// Updates the alert's name and description.
-/datum/mutation_upgrade/proc/update_alert()
-	alert.name = get_name_for_alert()
-	alert.desc = get_desc_for_alert()
+/// Can this mutation upgrade be gained by a specific xenomorph?
+/datum/mutation_upgrade/proc/can_gain(mob/living/carbon/xenomorph/prospective_xenomorph_owner, silent = FALSE)
+	return TRUE
 
 /// The name that the alert will have after updating.
 /datum/mutation_upgrade/proc/get_name_for_alert()
@@ -62,6 +61,10 @@
 /datum/mutation_upgrade/proc/get_desc_for_alert()
 	return desc
 
+/// Updates the alert's name and description.
+/datum/mutation_upgrade/proc/update_alert()
+	alert.name = get_name_for_alert()
+	alert.desc = get_desc_for_alert()
 
 /// Called when the mutation is gained by the xenomorph owner.
 /datum/mutation_upgrade/proc/on_gain()
