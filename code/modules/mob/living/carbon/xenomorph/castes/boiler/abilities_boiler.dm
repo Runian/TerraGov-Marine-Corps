@@ -829,7 +829,6 @@ GLOBAL_LIST_INIT(boiler_glob_image_list, list(
 	. = ..()
 	UnregisterSignal(xeno_owner, COMSIG_MOVABLE_MOVED)
 	xeno_owner.remove_pass_flags(charge_pass_flags, type)
-<<<<<<< HEAD
 	if(!available_recasts || (recast_prerequisite && !recast_prerequisite_met))
 		recast_decayed()
 		return
