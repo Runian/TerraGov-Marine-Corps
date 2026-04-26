@@ -53,12 +53,6 @@
 		/datum/action/ability/xeno_action/toggle_long_range/bull,
 	)
 
-	mutations = list(
-		/datum/mutation_upgrade/defense/unstoppable,
-		/datum/mutation_upgrade/offense/speed_demon,
-		/datum/mutation_upgrade/utility/railgun
-	)
-
 /datum/xeno_caste/bull/normal
 	upgrade = XENO_UPGRADE_NORMAL
 

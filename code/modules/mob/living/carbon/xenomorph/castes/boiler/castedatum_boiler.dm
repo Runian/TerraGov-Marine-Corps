@@ -68,18 +68,6 @@
 		/datum/action/ability/activable/xeno/acid_shroud,
 	)
 
-	mutations = list(
-		/datum/mutation_upgrade/defense/staggered_panic,
-		/datum/mutation_upgrade/defense/thick_containment,
-		/datum/mutation_upgrade/defense/dim_containment,
-		/datum/mutation_upgrade/offense/gaseous_spray,
-		/datum/mutation_upgrade/offense/hip_fire,
-		/datum/mutation_upgrade/offense/rapid_fire,
-		/datum/mutation_upgrade/utility/acid_trail,
-		/datum/mutation_upgrade/utility/chemical_mixing,
-		/datum/mutation_upgrade/utility/binoculars
-	)
-
 /datum/xeno_caste/boiler/normal
 	upgrade = XENO_UPGRADE_NORMAL
 
@@ -121,12 +109,6 @@
 		/datum/action/ability/activable/xeno/smokescreen_spit,
 		/datum/action/ability/activable/xeno/charge/acid_dash,
 		/datum/action/ability/xeno_action/steam_rush,
-	)
-
-	mutations = list(
-		/datum/mutation_upgrade/defense/gaseous_trail,
-		/datum/mutation_upgrade/offense/neurotoxin_swap,
-		/datum/mutation_upgrade/utility/fast_acid
 	)
 
 /datum/xeno_caste/boiler/sizzler/primordial

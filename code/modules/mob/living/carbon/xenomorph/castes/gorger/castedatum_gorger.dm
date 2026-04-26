@@ -60,12 +60,6 @@
 		/datum/action/ability/activable/xeno/devour,
 	)
 
-	mutations = list(
-		/datum/mutation_upgrade/defense/unmoving_link,
-		/datum/mutation_upgrade/offense/necrotic_link,
-		/datum/mutation_upgrade/utility/burst_healing
-	)
-
 /datum/xeno_caste/gorger/normal
 	upgrade = XENO_UPGRADE_NORMAL
 

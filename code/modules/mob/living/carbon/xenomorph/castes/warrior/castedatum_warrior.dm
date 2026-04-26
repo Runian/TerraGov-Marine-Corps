@@ -53,12 +53,6 @@
 		/datum/action/ability/activable/xeno/warrior/punch,
 	)
 
-	mutations = list(
-		/datum/mutation_upgrade/defense/zoomies,
-		/datum/mutation_upgrade/offense/enhanced_strength,
-		/datum/mutation_upgrade/utility/friendly_toss
-	)
-
 /datum/xeno_caste/warrior/normal
 	upgrade = XENO_UPGRADE_NORMAL
 

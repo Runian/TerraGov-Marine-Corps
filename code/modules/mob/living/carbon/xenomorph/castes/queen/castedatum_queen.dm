@@ -84,13 +84,6 @@
 		/datum/action/ability/activable/xeno/place_pattern,
 	)
 
-	mutations = list(
-		/datum/mutation_upgrade/defense/healthy_bulwark,
-		/datum/mutation_upgrade/defense/bulwark_zone,
-		/datum/mutation_upgrade/offense/alternative_sting,
-		/datum/mutation_upgrade/utility/rallying_cry
-	)
-
 /datum/xeno_caste/queen/young
 	upgrade = XENO_UPGRADE_NORMAL
 

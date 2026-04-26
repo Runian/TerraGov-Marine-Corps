@@ -55,12 +55,6 @@
 	///multiplier on plasma amount vs damage that is recieved on attack
 	var/plasma_damage_dealt_mult = 2.5
 
-	mutations = list(
-		/datum/mutation_upgrade/defense/flame_cloak,
-		/datum/mutation_upgrade/offense/only_fire,
-		/datum/mutation_upgrade/utility/burnt_wounds
-	)
-
 /datum/xeno_caste/pyrogen/on_caste_applied(mob/xenomorph)
 	. = ..()
 	xenomorph.AddElement(/datum/element/plasma_on_attack, plasma_damage_dealt_mult)

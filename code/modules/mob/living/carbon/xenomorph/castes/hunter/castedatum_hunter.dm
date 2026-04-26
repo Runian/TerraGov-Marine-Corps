@@ -66,18 +66,6 @@
 	vent_exit_speed = HUNTER_VENT_CRAWL_TIME
 	silent_vent_crawl = TRUE
 
-	mutations = list(
-		/datum/mutation_upgrade/defense/fleeting_mirage,
-		/datum/mutation_upgrade/defense/splitting_mirage,
-		/datum/mutation_upgrade/defense/cloaking_mirage,
-		/datum/mutation_upgrade/offense/debilitating_strike,
-		/datum/mutation_upgrade/offense/ambush,
-		/datum/mutation_upgrade/offense/maul,
-		/datum/mutation_upgrade/utility/one_target,
-		/datum/mutation_upgrade/utility/mirage_flood,
-		/datum/mutation_upgrade/utility/faceblind
-	)
-
 /datum/xeno_caste/hunter/normal
 	upgrade = XENO_UPGRADE_NORMAL
 

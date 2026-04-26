@@ -59,12 +59,6 @@
 		/datum/action/ability/activable/xeno/spray_acid/line,
 	)
 
-	mutations = list(
-		/datum/mutation_upgrade/defense/acid_sweat,
-		/datum/mutation_upgrade/offense/hit_and_run,
-		/datum/mutation_upgrade/utility/wet_claws
-	)
-
 /datum/xeno_caste/spitter/normal
 	upgrade = XENO_UPGRADE_NORMAL
 
@@ -105,12 +99,6 @@
 		/datum/action/ability/activable/xeno/scatter_spit,
 		/datum/action/ability/xeno_action/acid_mine,
 		/datum/action/ability/xeno_action/acid_mine/gas_mine,
-	)
-
-	mutations = list(
-		/datum/mutation_upgrade/defense/self_explosion,
-		/datum/mutation_upgrade/offense/blood_grenades,
-		/datum/mutation_upgrade/utility/repurposed_capacity
 	)
 
 /datum/xeno_caste/spitter/globadier/normal

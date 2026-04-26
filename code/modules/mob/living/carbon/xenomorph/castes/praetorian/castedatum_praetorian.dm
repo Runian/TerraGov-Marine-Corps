@@ -68,12 +68,6 @@
 		/datum/action/ability/xeno_action/pheromones/emit_frenzy,
 	)
 
-	mutations = list(
-		/datum/mutation_upgrade/defense/adaptive_armor,
-		/datum/mutation_upgrade/offense/circular_acid,
-		/datum/mutation_upgrade/utility/wide_pheromones
-	)
-
 /datum/xeno_caste/praetorian/normal
 	upgrade = XENO_UPGRADE_NORMAL
 
@@ -133,12 +127,6 @@
 		/datum/action/ability/xeno_action/pheromones/emit_frenzy,
 	)
 
-	mutations = list(
-		/datum/mutation_upgrade/defense/flame_dance,
-		/datum/mutation_upgrade/offense/bob_and_weave,
-		/datum/mutation_upgrade/utility/eb_and_flow
-	)
-
 /datum/xeno_caste/praetorian/dancer/normal
 	upgrade = XENO_UPGRADE_NORMAL
 
@@ -191,12 +179,6 @@
 		/datum/action/ability/xeno_action/pheromones/emit_recovery,
 		/datum/action/ability/xeno_action/pheromones/emit_warding,
 		/datum/action/ability/xeno_action/pheromones/emit_frenzy,
-	)
-
-	mutations = list(
-		/datum/mutation_upgrade/defense/advance_away,
-		/datum/mutation_upgrade/offense/wall_bang,
-		/datum/mutation_upgrade/utility/low_charge
 	)
 
 /datum/xeno_caste/praetorian/oppressor/normal

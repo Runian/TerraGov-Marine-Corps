@@ -78,17 +78,6 @@
 		/datum/action/ability/activable/xeno/place_pattern,
 	)
 
-	mutations = list(
-		/datum/mutation_upgrade/defense/hardened_travel,
-		/datum/mutation_upgrade/defense/costly_travel,
-		/datum/mutation_upgrade/defense/rejuvenating_build,
-		/datum/mutation_upgrade/offense/resin_splash,
-		/datum/mutation_upgrade/offense/hostile_pylon,
-		/datum/mutation_upgrade/utility/protective_light,
-		/datum/mutation_upgrade/utility/forward_light,
-		/datum/mutation_upgrade/utility/weed_specialist
-	)
-
 /datum/xeno_caste/hivelord/normal
 	upgrade = XENO_UPGRADE_NORMAL
 

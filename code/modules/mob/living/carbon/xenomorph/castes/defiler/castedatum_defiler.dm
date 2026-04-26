@@ -68,12 +68,6 @@
 		/datum/reagent/toxin/xeno_ozelomelyn,
 	)
 
-	mutations = list(
-		/datum/mutation_upgrade/defense/panic_gas,
-		/datum/mutation_upgrade/offense/envenomed,
-		/datum/mutation_upgrade/utility/wide_gas
-	)
-
 	// *** Pheromones *** //
 	aura_strength = 2.6 //It's .1 better than a carrier.
 

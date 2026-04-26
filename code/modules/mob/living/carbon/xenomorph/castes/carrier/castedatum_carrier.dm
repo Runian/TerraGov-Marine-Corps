@@ -66,18 +66,6 @@
 		/datum/action/ability/xeno_action/choose_hugger_type,
 	)
 
-	mutations = list(
-		/datum/mutation_upgrade/defense/shared_jelly,
-		/datum/mutation_upgrade/defense/hugger_overflow,
-		/datum/mutation_upgrade/defense/recurring_panic,
-		/datum/mutation_upgrade/offense/leapfrog,
-		/datum/mutation_upgrade/offense/claw_delivered,
-		/datum/mutation_upgrade/offense/fake_huggers,
-		/datum/mutation_upgrade/utility/oviposition,
-		/datum/mutation_upgrade/utility/life_for_life,
-		/datum/mutation_upgrade/utility/swarm_trap
-	)
-
 /datum/xeno_caste/carrier/normal
 	upgrade = XENO_UPGRADE_NORMAL
 

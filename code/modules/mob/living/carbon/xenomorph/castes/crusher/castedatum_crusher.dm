@@ -55,12 +55,6 @@
 		/datum/action/ability/activable/xeno/cresttoss,
 	)
 
-	mutations = list(
-		/datum/mutation_upgrade/defense/tough_rock,
-		/datum/mutation_upgrade/offense/earthquake,
-		/datum/mutation_upgrade/utility/friendly_chest
-	)
-
 /datum/xeno_caste/crusher/on_caste_applied(mob/xenomorph)
 	. = ..()
 	xenomorph.AddElement(/datum/element/ridable, /datum/component/riding/creature/crusher)

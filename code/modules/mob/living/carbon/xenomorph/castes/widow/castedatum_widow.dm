@@ -72,12 +72,6 @@
 		/datum/action/ability/activable/xeno/place_pattern,
 	)
 
-	mutations = list(
-		/datum/mutation_upgrade/defense/hive_toughness,
-		/datum/mutation_upgrade/offense/web_yank,
-		/datum/mutation_upgrade/utility/incubator
-	)
-
 /datum/xeno_caste/widow/on_caste_applied(mob/xenomorph)
 	. = ..()
 	xenomorph.AddElement(/datum/element/wall_speedup, WIDOW_SPEED_BONUS)

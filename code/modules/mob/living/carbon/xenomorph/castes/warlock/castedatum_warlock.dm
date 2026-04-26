@@ -33,12 +33,6 @@
 		/datum/action/ability/xeno_action/psychic_whisper,
 	)
 
-	mutations = list(
-		/datum/mutation_upgrade/defense/cautious_mind,
-		/datum/mutation_upgrade/offense/draining_blast,
-		/datum/mutation_upgrade/utility/mobile_mind
-	)
-
 /datum/xeno_caste/warlock/normal
 	upgrade = XENO_UPGRADE_NORMAL
 

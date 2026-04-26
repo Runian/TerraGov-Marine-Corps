@@ -45,12 +45,6 @@
 		/datum/action/ability/activable/xeno/puppet_blessings,
 	)
 
-	mutations = list(
-		/datum/mutation_upgrade/defense/flesh_for_life,
-		/datum/mutation_upgrade/offense/suffocating_presence,
-		/datum/mutation_upgrade/utility/shifting_costs
-	)
-
 /datum/xeno_caste/puppeteer/normal
 	upgrade = XENO_UPGRADE_NORMAL
 
