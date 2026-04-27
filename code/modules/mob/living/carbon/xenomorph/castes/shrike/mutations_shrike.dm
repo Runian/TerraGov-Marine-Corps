@@ -1,170 +1,92 @@
 //*********************//
+//        Base        //
+//*********************//
+
+/datum/mutation_upgrade/defense/shrike
+	allowed_caste_names = list(/datum/xeno_caste/shrike)
+
+/datum/mutation_upgrade/offense/shrike
+	allowed_caste_names = list(/datum/xeno_caste/shrike)
+
+/datum/mutation_upgrade/utility/shrike
+	allowed_caste_names = list(/datum/xeno_caste/shrike)
+
+//*********************//
+//       Defense       //
+//*********************//
+
+//*********************//
 //        Shell        //
 //*********************//
-/datum/mutation_upgrade/defense/lone_healer
+/datum/mutation_upgrade/defense/shrike/lone_healer
 	name = "Lone Healer"
-	desc = "Psychic Cure can now target yourself. Healing yourself is only 50/60/70% as effective."
-	/// For the first structure, the multiplier of Psychic Cure's initial healing power to add to the ability.
-	var/self_heal_multiplier_initial = -0.6
-	/// For each structure, the multiplier of Psychic Cure's initial healing power to add to the ability.
-	var/self_heal_multiplier_per_structure = 0.1
+	desc = "Psychic Cure can now target yourself."
+	required_abilities_types = list(
+		/datum/action/ability/activable/xeno/psychic_cure
+	)
 
-/datum/mutation_upgrade/defense/lone_healer/get_desc_for_alert(new_amount)
-	if(!new_amount)
-		return ..()
-	return "Psychic Cure can now target yourself. Healing yourself is only [PERCENT(1 + get_self_heal_multiplier(new_amount))]% as effective."
+/datum/mutation_upgrade/defense/shrike/lone_healer/on_gain()
+	var/datum/action/ability/activable/xeno/psychic_cure/ability = xenomorph_owner.actions_by_path[/datum/action/ability/activable/xeno/psychic_cure]
+	ability.use_state_flags |= ABILITY_TARGET_SELF
 
-/datum/mutation_upgrade/defense/lone_healer/on_gain()
-	. = ..()
-	var/datum/action/ability/activable/xeno/psychic_cure/cure_ability = xenomorph_owner.actions_by_path[/datum/action/ability/activable/xeno/psychic_cure]
-	if(!cure_ability)
-		return
-	cure_ability.use_state_flags |= ABILITY_TARGET_SELF
-	cure_ability.self_heal_multiplier += get_self_heal_multiplier(0)
+/datum/mutation_upgrade/defense/shrike/lone_healer/on_loss()
+	var/datum/action/ability/activable/xeno/psychic_cure/ability = xenomorph_owner.actions_by_path[/datum/action/ability/activable/xeno/psychic_cure]
+	ability.use_state_flags &= ~(ABILITY_TARGET_SELF)
 
-/datum/mutation_upgrade/defense/lone_healer/on_loss()
-	. = ..()
-	var/datum/action/ability/activable/xeno/psychic_cure/cure_ability = xenomorph_owner.actions_by_path[/datum/action/ability/activable/xeno/psychic_cure]
-	if(!cure_ability)
-		return
-	cure_ability.use_state_flags &= ~(ABILITY_TARGET_SELF)
-	cure_ability.self_heal_multiplier -= get_self_heal_multiplier(0)
+/datum/mutation_upgrade/defense/shrike/feedback_healing
+	name = "Feedback Healing"
+	desc = "Psychic Cure heals you for 50% of the health that was healed."
+	required_abilities_types = list(
+		/datum/action/ability/activable/xeno/psychic_cure
+	)
 
-/datum/mutation_upgrade/defense/lone_healer/on_structure_update(previous_amount, new_amount)
-	. = ..()
-	var/datum/action/ability/activable/xeno/psychic_cure/cure_ability = xenomorph_owner.actions_by_path[/datum/action/ability/activable/xeno/psychic_cure]
-	if(!cure_ability)
-		return
-	cure_ability.self_heal_multiplier += get_self_heal_multiplier(new_amount - previous_amount, FALSE)
+/datum/mutation_upgrade/defense/shrike/feedback_healing/on_gain()
+	var/datum/action/ability/activable/xeno/psychic_cure/ability = xenomorph_owner.actions_by_path[/datum/action/ability/activable/xeno/psychic_cure]
+	ability.self_heal_percentage = 0.50
 
-/// Returns the multiplier of Psychic Cure's initial healing power to add to the ability.
-/datum/mutation_upgrade/defense/lone_healer/proc/get_self_heal_multiplier(structure_count, include_initial = TRUE)
-	return (include_initial ? self_heal_multiplier_initial : 0) + (self_heal_multiplier_per_structure * structure_count)
+/datum/mutation_upgrade/defense/shrike/feedback_healing/on_loss()
+	var/datum/action/ability/activable/xeno/psychic_cure/ability = xenomorph_owner.actions_by_path[/datum/action/ability/activable/xeno/psychic_cure]
+	ability.self_heal_percentage = initial(ability.self_heal_percentage)
 
-/datum/mutation_upgrade/defense/shared_cure
-	name = "Shared Cure"
-	desc = "20/35/50% of the health restored from Psychic Cure is reapplied to you."
-	/// For the first structure, the percentage of restored health from Psychic Cure to heal the owner. 1 = 100%, 0.01 = 1%.
-	var/rebound_initial = 0.05
-	/// For each structure, the additional percentage of restored health from Psychic Cure to heal the owner.
-	var/rebound_per_structure = 0.15
+/datum/mutation_upgrade/defense/shrike/fireproof_healing
+	name = "Fireproof Healing"
+	desc = "Psychic Cure applies the Resin Jelly effect to your target for its cooldown duration."
+	required_abilities_types = list(
+		/datum/action/ability/activable/xeno/psychic_cure
+	)
 
-/datum/mutation_upgrade/defense/shared_cure/get_desc_for_alert(new_amount)
-	if(!new_amount)
-		return ..()
-	return "[PERCENT(get_rebound(new_amount))]% of the health restored from Psychic Cure is reapplied to you."
+/datum/mutation_upgrade/defense/shrike/fireproof_healing/on_gain()
+	var/datum/action/ability/activable/xeno/psychic_cure/ability = xenomorph_owner.actions_by_path[/datum/action/ability/activable/xeno/psychic_cure]
+	ability.applies_resin_jelly = TRUE
 
-/datum/mutation_upgrade/defense/shared_cure/on_gain()
-	. = ..()
-	var/datum/action/ability/activable/xeno/psychic_cure/cure_ability = xenomorph_owner.actions_by_path[/datum/action/ability/activable/xeno/psychic_cure]
-	if(!cure_ability)
-		return
-	cure_ability.rebound_percentage += get_rebound(0)
+/datum/mutation_upgrade/defense/shrike/fireproof_healing/on_loss()
+	var/datum/action/ability/activable/xeno/psychic_cure/ability = xenomorph_owner.actions_by_path[/datum/action/ability/activable/xeno/psychic_cure]
+	ability.applies_resin_jelly = initial(ability.applies_resin_jelly)
 
-/datum/mutation_upgrade/defense/shared_cure/on_loss()
-	. = ..()
-	var/datum/action/ability/activable/xeno/psychic_cure/cure_ability = xenomorph_owner.actions_by_path[/datum/action/ability/activable/xeno/psychic_cure]
-	if(!cure_ability)
-		return
-	cure_ability.rebound_percentage -= get_rebound(0)
+//*********************//
+//       Offense       //
+//*********************//
+/datum/mutation_upgrade/defense/shrike/psychic_collusion
+	name = "Psychic Collusion"
+	desc = "Psychic Fling enables collision for human targets. Upon colliding with a human, they are stunned as well."
+	required_abilities_types = list(
+		/datum/action/ability/activable/xeno/psychic_fling
+	)
 
-/datum/mutation_upgrade/defense/shared_cure/on_structure_update(previous_amount, new_amount)
-	. = ..()
-	var/datum/action/ability/activable/xeno/psychic_cure/cure_ability = xenomorph_owner.actions_by_path[/datum/action/ability/activable/xeno/psychic_cure]
-	if(!cure_ability)
-		return
-	cure_ability.rebound_percentage += get_rebound(new_amount - previous_amount, FALSE)
+/datum/mutation_upgrade/defense/shrike/psychic_collusion/on_gain()
+	var/datum/action/ability/activable/xeno/psychic_fling/ability = xenomorph_owner.actions_by_path[/datum/action/ability/activable/xeno/psychic_fling]
+	ability.impact_stuns = TRUE
 
-/// Returns the percentage of restored health from Psychic Cure to heal the owner.
-/datum/mutation_upgrade/defense/shared_cure/proc/get_rebound(structure_count, include_initial = TRUE)
-	return (include_initial ? rebound_initial : 0) + (rebound_per_structure * structure_count)
+/datum/mutation_upgrade/defense/shrike/psychic_collusion/on_loss()
+	var/datum/action/ability/activable/xeno/psychic_fling/ability = xenomorph_owner.actions_by_path[/datum/action/ability/activable/xeno/psychic_fling]
+	ability.impact_stuns = initial(ability.impact_stuns)
 
-/datum/mutation_upgrade/defense/resistant_cure
-	name = "Resistant Cure"
-	desc = "Psychic Cure now also applies the effects of resin jelly to you and your target for 40/50/60 seconds."
-	/// For the first structure, the amount of deciseconds that Psychic Cure will give fire immunity.
-	var/duration_initial = 30 SECONDS
-	/// For each structure, the amount of deciseconds that Psychic Cure will give fire immunity.
-	var/duration_per_structure = 10 SECONDS
 
-/datum/mutation_upgrade/defense/resistant_cure/get_desc_for_alert(new_amount)
-	if(!new_amount)
-		return ..()
-	return "Psychic Cure now also applies the effects of resin jelly to you and your target for [get_duration(new_amount) / 10] seconds."
-
-/datum/mutation_upgrade/defense/resistant_cure/on_gain()
-	. = ..()
-	var/datum/action/ability/activable/xeno/psychic_cure/cure_ability = xenomorph_owner.actions_by_path[/datum/action/ability/activable/xeno/psychic_cure]
-	if(!cure_ability)
-		return
-	cure_ability.resin_jelly_duration += get_duration(0)
-
-/datum/mutation_upgrade/defense/resistant_cure/on_loss()
-	. = ..()
-	var/datum/action/ability/activable/xeno/psychic_cure/cure_ability = xenomorph_owner.actions_by_path[/datum/action/ability/activable/xeno/psychic_cure]
-	if(!cure_ability)
-		return
-	cure_ability.resin_jelly_duration -= get_duration(0)
-
-/datum/mutation_upgrade/defense/resistant_cure/on_structure_update(previous_amount, new_amount)
-	. = ..()
-	var/datum/action/ability/activable/xeno/psychic_cure/cure_ability = xenomorph_owner.actions_by_path[/datum/action/ability/activable/xeno/psychic_cure]
-	if(!cure_ability)
-		return
-	cure_ability.resin_jelly_duration += get_duration(new_amount - previous_amount, FALSE)
-
-/// Returns the amount of deciseconds that Psychic Cure will give fire immunity.
-/datum/mutation_upgrade/defense/resistant_cure/proc/get_duration(structure_count, include_initial = TRUE)
-	return (include_initial ? duration_initial : 0) + (duration_per_structure * structure_count)
 
 //*********************//
 //         Spur        //
 //*********************//
-/datum/mutation_upgrade/offense/smashing_fling
-	name = "Smashing Fling"
-	desc = "Psychic Fling deals 150/175/200% damage equal to your melee damage, enables collusions, but no longer immediately stuns. If the target collides with a human, object, or wall: both are briefly paralyzed and dealt damage again."
-	/// For the first structure, the multiplier of the owner's melee damage to deal as both immediate and collusion damage.
-	var/multiplier_initial = 1.25
-	/// For each structure, the multiplier of the owner's melee damage to deal as both immediate and collusion damage.
-	var/multiplier_per_structure = 0.25
 
-/datum/mutation_upgrade/offense/smashing_fling/get_desc_for_alert(new_amount)
-	if(!new_amount)
-		return ..()
-	return "Psychic Fling deals [PERCENT(get_multiplier(new_amount))]% damage equal to your melee damage, enables collusions, but no longer immediately stuns. If the target collides with a human, object, or wall: both are paralyzed and dealt damage again."
-
-/datum/mutation_upgrade/offense/smashing_fling/on_gain()
-	. = ..()
-	var/datum/action/ability/activable/xeno/psychic_fling/fling_ability = xenomorph_owner.actions_by_path[/datum/action/ability/activable/xeno/psychic_fling]
-	if(!fling_ability)
-		return
-	fling_ability.stun_duration = 0 SECONDS
-	fling_ability.damage_multiplier += get_multiplier(0)
-	fling_ability.collusion_paralyze_duration = 0.1 SECONDS // This is honestly flavor.
-	fling_ability.collusion_damage_multiplier += get_multiplier(0)
-
-/datum/mutation_upgrade/offense/smashing_fling/on_loss()
-	. = ..()
-	var/datum/action/ability/activable/xeno/psychic_fling/fling_ability = xenomorph_owner.actions_by_path[/datum/action/ability/activable/xeno/psychic_fling]
-	if(!fling_ability)
-		return
-	fling_ability.stun_duration = initial(fling_ability.stun_duration)
-	fling_ability.damage_multiplier -= get_multiplier(0)
-	fling_ability.collusion_paralyze_duration = initial(fling_ability.collusion_paralyze_duration)
-	fling_ability.collusion_damage_multiplier -= get_multiplier(0)
-
-/datum/mutation_upgrade/offense/smashing_fling/on_structure_update(previous_amount, new_amount)
-	. = ..()
-	var/datum/action/ability/activable/xeno/psychic_fling/fling_ability = xenomorph_owner.actions_by_path[/datum/action/ability/activable/xeno/psychic_fling]
-	if(!fling_ability)
-		return
-	var/amount = get_multiplier(new_amount - previous_amount, FALSE)
-	fling_ability.damage_multiplier += amount
-	fling_ability.collusion_damage_multiplier += amount
-
-/// Returns the multiplier of the owner's melee damage to deal as both immediate and collusion damage.
-/datum/mutation_upgrade/offense/smashing_fling/proc/get_multiplier(structure_count, include_initial = TRUE)
-	return (include_initial ? multiplier_initial : 0) + (multiplier_per_structure * structure_count)
 
 /datum/mutation_upgrade/offense/gravity_tide
 	name = "Gravity Tide"

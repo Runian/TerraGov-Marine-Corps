@@ -58,6 +58,8 @@
 // ***************************************
 #define SHRIKE_FLING_RANGE 3
 #define SHRIKE_FLING_DISTANCE 3
+#define SHRIKE_FLING_ITEM_DISTANCE 4
+
 /datum/action/ability/activable/xeno/psychic_fling
 	name = "Psychic Fling"
 	action_icon_state = "fling"
@@ -68,20 +70,20 @@
 		KEYBINDING_NORMAL = COMSIG_XENOABILITY_PSYCHIC_FLING,
 	)
 	target_flags = ABILITY_MOB_TARGET
-	/// How long in deciseconds should humans be stunned? If they are to be stunned, they will also drop held items.
+	/// The distance the owner must be within range of the target to activate the ability.
+	var/ability_range = SHRIKE_FLING_RANGE
+	/// The distance that the non-item target are thrown away from the owner.
+	var/throw_distance = SHRIKE_FLING_DISTANCE
+	/// The distance that the item target are thrown away from the owner.
+	var/throw_distance_item = SHRIKE_FLING_ITEM_DISTANCE
+	/// How long in deciseconds should any human target be for stunned?
 	var/stun_duration = 2 SECONDS
-	/// Should humans take damage immediately? If so, what is the multiplier of the owner's melee damage for determining how much damage to deal?
-	var/damage_multiplier = 0
-	/// If humans were to collide with something, how long in deciseconds should they be paralyzed for collusion?
-	var/collusion_paralyze_duration = 0
-	/// If humans were to collide with something, what is the multiplier of the owner's melee damage for determining how much damage to deal?
-	var/collusion_damage_multiplier = 0
-	/// Should the collusion duration/multiplier only register for xenomorphs; also allows targetting of other xenos. This means that only flung xenomorphs can deal its effects to collided things.
-	var/collusion_xenos_only = FALSE
+	/// Should the target be able to impact and stun humans?
+	var/impact_stuns = FALSE
 
 /datum/action/ability/activable/xeno/psychic_fling/New(Target)
 	. = ..()
-	desc = "Sends an enemy or an item flying [SHRIKE_FLING_DISTANCE] tiles away. A [SHRIKE_FLING_RANGE] tile ranged ability. Stuns for [stun_duration / (1 SECONDS)] seconds."
+	desc = "Sends an enemy or an item flying [throw_distance] tiles away. A [ability_range] tile ranged ability. Stuns for [stun_duration / (1 SECONDS)] seconds."
 
 /datum/action/ability/activable/xeno/psychic_fling/on_cooldown_finish()
 	to_chat(owner, span_notice("We gather enough mental strength to fling something again."))
@@ -93,14 +95,11 @@
 		return FALSE
 	if(QDELETED(target))
 		return FALSE
-	if(!isitem(target) && !ishuman(target) && !isdroid(target) && !isxeno(target)) // Only items, humans, droids, and xenomorphs.
-		return FALSE
-	if(isxeno(target) && (target != xeno_owner) && !collusion_xenos_only)
+	if(!isitem(target) && !ishuman(target) && !isdroid(target) && (!isxeno(target) || target != owner)) // Only items, humans, droids, and themselves (as an xenomorph).
 		return FALSE
 	if(target.move_resist >= MOVE_FORCE_OVERPOWERING)
 		return FALSE
-	var/max_dist = SHRIKE_FLING_RANGE //the distance only goes to 3 now, since this is more of a utility then an attack.
-	if(!line_of_sight(owner, target, max_dist))
+	if(!line_of_sight(owner, target, ability_range))
 		if(!silent)
 			to_chat(owner, span_warning("We must get closer to fling, our mind cannot reach this far."))
 		return FALSE
@@ -132,23 +131,14 @@
 		if(stun_duration)
 			human_target.Stun(stun_duration)
 			human_target.drop_all_held_items()
-		if(damage_multiplier)
-			human_target.apply_damage(xeno_owner.xeno_caste.melee_damage * xeno_owner.xeno_melee_damage_modifier * damage_multiplier, BRUTE, blocked = MELEE, updating_health = TRUE, attacker = owner)
 		shake_camera(human_target, 2, 1)
 		RegisterSignal(human_target, COMSIG_MOVABLE_POST_THROW, PROC_REF(on_post_throw))
-		if(!collusion_xenos_only && (collusion_paralyze_duration || collusion_damage_multiplier))
+		if(!impact_stuns)
 			RegisterSignal(human_target, COMSIG_MOVABLE_IMPACT, PROC_REF(on_throw_impact))
 		else
 			human_target.add_pass_flags(PASS_MOB, THROW_TRAIT)
-	if(isxeno(movable_target))
-		var/mob/living/carbon/xenomorph/xenomorph_target = movable_target
-		RegisterSignal(xenomorph_target, COMSIG_MOVABLE_POST_THROW, PROC_REF(on_post_throw))
-		if(collusion_paralyze_duration || collusion_damage_multiplier)
-			RegisterSignal(xenomorph_target, COMSIG_MOVABLE_IMPACT, PROC_REF(on_throw_impact))
-		else
-			xenomorph_target.add_pass_flags(PASS_MOB, THROW_TRAIT)
 	var/facing = xeno_owner == movable_target ? xeno_owner.dir : get_dir(xeno_owner, movable_target)
-	var/fling_distance = (isitem(movable_target)) ? 4 : SHRIKE_FLING_DISTANCE // Objects get flung further away.
+	var/fling_distance = isitem(movable_target) ? throw_distance_item : throw_distance // Items are flung further away.
 	var/turf/T = movable_target.loc
 	var/turf/temp
 	for(var/x in 1 to fling_distance)
@@ -166,7 +156,7 @@
 	SIGNAL_HANDLER
 	var/mob/living/living_source = source
 	UnregisterSignal(living_source, COMSIG_MOVABLE_POST_THROW)
-	if(collusion_paralyze_duration || collusion_damage_multiplier)
+	if(impact_stuns)
 		UnregisterSignal(living_source, COMSIG_MOVABLE_IMPACT)
 		return
 	living_source.remove_pass_flags(PASS_MOB, THROW_TRAIT)
@@ -175,36 +165,17 @@
 /datum/action/ability/activable/xeno/psychic_fling/proc/on_throw_impact(datum/source, atom/hit_atom, impact_speed)
 	SIGNAL_HANDLER
 	var/mob/living/living_source = source
-	UnregisterSignal(source, COMSIG_MOVABLE_IMPACT)
-	var/damage = xeno_owner.xeno_caste.melee_damage * xeno_owner.xeno_melee_damage_modifier * collusion_damage_multiplier
-	var/valid_impact = FALSE
-	if(isliving(hit_atom))
-		valid_impact = TRUE
-		var/mob/living/living_hit = hit_atom
-		if(!xeno_owner.issamexenohive(living_hit))
-			INVOKE_ASYNC(living_hit, TYPE_PROC_REF(/mob, emote), isxeno(living_hit) ? "hiss1" : "scream")
-			if(damage)
-				living_hit.apply_damage(damage, BRUTE, blocked = MELEE, updating_health = TRUE, attacker = owner)
-			if(collusion_paralyze_duration)
-				living_hit.Paralyze(collusion_paralyze_duration)
-	if(isobj(hit_atom))
-		valid_impact = TRUE
-		var/obj/hit_object = hit_atom
-		if(!istype(hit_object, /obj/structure/xeno) && damage)
-			hit_object.take_damage(damage, BRUTE, MELEE)
-	if(iswallturf(hit_atom))
-		valid_impact = TRUE
-		var/turf/closed/wall/hit_wall = hit_atom
-		if(!(hit_wall.resistance_flags & INDESTRUCTIBLE) && damage)
-			hit_wall.take_damage(damage, BRUTE, MELEE)
-	if(!valid_impact)
+	UnregisterSignal(living_source, COMSIG_MOVABLE_IMPACT)
+	if(!stun_duration)
 		return
-	if(!xeno_owner.issamexenohive(living_source))
-		INVOKE_ASYNC(living_source, TYPE_PROC_REF(/mob, emote), isxeno(living_source) ? "hiss1" : "scream")
-		if(damage)
-			living_source.apply_damage(damage, BRUTE, blocked = MELEE, updating_health = TRUE, attacker = owner)
-		if(collusion_paralyze_duration)
-			living_source.Paralyze(collusion_paralyze_duration)
+	if(!isliving(hit_atom))
+		return
+	if(xeno_owner.issamexenohive(living_source))
+		return
+	var/mob/living/living_hit = hit_atom
+	INVOKE_ASYNC(living_hit, TYPE_PROC_REF(/mob, emote), isxeno(living_hit) ? "hiss1" : "scream")
+	living_hit.Paralyze(stun_duration)
+	living_source.Paralyze(stun_duration)
 
 // ***************************************
 // *********** Unrelenting Force
@@ -334,20 +305,18 @@
 	target_flags = ABILITY_MOB_TARGET
 	/// How far can the ability be used?
 	var/heal_range = SHRIKE_HEAL_RANGE
-	/// If the ability was used on themselves, what is the amount to multiply healing power by?
-	var/self_heal_multiplier = 1
 	/// The percentage of restored health that will be re-applied to the owner. 1 = 100%, 0.01 = 1%.
-	var/rebound_percentage = 0
-	/// The amount of deciseconds that the Resin Jelly Coating status effect will be applied.
-	var/resin_jelly_duration = 0
+	var/self_heal_percentage = 0
+	/// Should STATUS_EFFECT_RESIN_JELLY_COATING be applied? The duration will be equal to the ability's cooldown duration.
+	var/applies_resin_jelly = FALSE
 	/// The amount of deciseconds that various status effects are delayed: Stun, Knockdown, and Stagger. Slowdown immunity is given, but not delayed.
-	var/delayed_status_duration = 0
+	var/delayed_status_duration = 0 SECONDS
 	/// List of all delayed status effects to be reapplied at the end.
 	var/list/delayed_status_list = list()
 	/// The xenomorph who is having their status effects being delayed.
 	var/mob/living/carbon/xenomorph/delayed_status_patient
-	/// Timer that will give back any delayed status effect.
-	var/delayed_status_timer
+	/// The timer id of the callback proc that will apply all delayed status effects back to the target.
+	var/delayed_status_timer_id
 
 /datum/action/ability/activable/xeno/psychic_cure/on_cooldown_finish()
 	to_chat(owner, span_notice("We gather enough mental strength to cure sisters again."))
@@ -402,9 +371,9 @@
 	playsound(target,'sound/effects/magic.ogg', 75, 1)
 	new /obj/effect/temp_visual/telekinesis(get_turf(target))
 	var/mob/living/carbon/xenomorph/patient = target
-	var/healing_results = patient.heal_wounds(xeno_owner == patient ? SHRIKE_CURE_HEAL_MULTIPLIER * self_heal_multiplier : SHRIKE_CURE_HEAL_MULTIPLIER)
-	patient.adjust_sunder(xeno_owner == patient ?  -SHRIKE_CURE_HEAL_MULTIPLIER * self_heal_multiplier : -SHRIKE_CURE_HEAL_MULTIPLIER)
-	if(patient.health > 0) //If they are not in crit after the heal, let's remove evil debuffs.
+	var/healing_results = patient.heal_wounds(SHRIKE_CURE_HEAL_MULTIPLIER)
+	patient.adjust_sunder(-SHRIKE_CURE_HEAL_MULTIPLIER)
+	if(patient.health > 0) //If they are not in crit after the heal, let us remove evil debuffs.
 		patient.SetUnconscious(0)
 		patient.SetStun(0)
 		patient.SetParalyzed(0)
@@ -413,16 +382,12 @@
 	patient.updatehealth()
 
 	var/amount_healed = healing_results[2] - healing_results[1]
-	if(rebound_percentage && amount_healed)
-		var/amount_to_heal = amount_healed * rebound_percentage
+	if(self_heal_percentage && amount_healed)
+		var/amount_to_heal = amount_healed * self_heal_percentage
 		HEAL_XENO_DAMAGE(xeno_owner, amount_to_heal, FALSE)
-	if(resin_jelly_duration)
-		xeno_owner.apply_status_effect(STATUS_EFFECT_RESIN_JELLY_COATING, resin_jelly_duration)
-		xeno_owner.emote("roar")
-		if(xeno_owner != patient)
-			patient.apply_status_effect(STATUS_EFFECT_RESIN_JELLY_COATING, resin_jelly_duration)
-			patient.emote("roar")
-
+	if(applies_resin_jelly)
+		patient.apply_status_effect(STATUS_EFFECT_RESIN_JELLY_COATING, cooldown_duration)
+		patient.emote("roar")
 	if(delayed_status_patient)
 		end_delayed_status_effects()
 	if(delayed_status_duration)
@@ -433,7 +398,7 @@
 	add_cooldown()
 
 /datum/action/ability/activable/xeno/psychic_cure/proc/start_delayed_status_effects(mob/living/carbon/xenomorph/patient)
-	delayed_status_timer = addtimer(CALLBACK(src, PROC_REF(end_delayed_status_effects)), delayed_status_duration, TIMER_UNIQUE|TIMER_STOPPABLE)
+	delayed_status_timer_id = addtimer(CALLBACK(src, PROC_REF(end_delayed_status_effects)), delayed_status_duration, TIMER_UNIQUE|TIMER_STOPPABLE)
 	delayed_status_patient = patient
 	ADD_TRAIT(delayed_status_patient, TRAIT_SLOWDOWNIMMUNE, SHRIKE_ABILITY_TRAIT)
 	RegisterSignal(patient, COMSIG_LIVING_STATUS_STUN, PROC_REF(on_stun))
@@ -442,9 +407,9 @@
 	delayed_status_patient.add_filter("psychic_cure_delayed", 2, outline_filter(2, COLOR_BLUE))
 
 /datum/action/ability/activable/xeno/psychic_cure/proc/end_delayed_status_effects()
-	if(delayed_status_timer)
-		deltimer(delayed_status_timer)
-		delayed_status_timer = null
+	if(delayed_status_timer_id)
+		deltimer(delayed_status_timer_id)
+		delayed_status_timer_id = null
 	REMOVE_TRAIT(delayed_status_patient, TRAIT_SLOWDOWNIMMUNE, SHRIKE_ABILITY_TRAIT)
 	UnregisterSignal(delayed_status_patient, COMSIG_LIVING_STATUS_STUN)
 	UnregisterSignal(delayed_status_patient, COMSIG_LIVING_STATUS_KNOCKDOWN)
@@ -470,9 +435,6 @@
 	SIGNAL_HANDLER
 	delayed_status_list[EFFECT_STAGGER] += amount
 	return COMPONENT_NO_STUN
-
-// COMSIG_LIVING_STATUS_STAGGER
-
 
 // ***************************************
 // *********** Construct Acid Well
