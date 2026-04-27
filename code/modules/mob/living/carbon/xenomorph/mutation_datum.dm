@@ -32,27 +32,31 @@
 		ui.open()
 
 /datum/mutation_datum/ui_data(mob/user)
-	. = ..()
 	var/mob/living/carbon/xenomorph/xenomorph_user = user
-	.["mutation_points_available"] = GLOB.hive_datums[xenomorph_user.hive].mutation_points
-	.["mutation_points_maximum"] = max(MUTATION_MAXIMUM_POINTS, .["mutation_points_available"])
+	var/list/data = list()
+	data["mutation_points_available"] = xenomorph_user.hive.mutation_points
+	data["mutation_points_maximum"] = max(MUTATION_MAXIMUM_POINTS, data["mutation_points_available"])
+	return data
 
 /datum/mutation_datum/ui_static_data(mob/user)
-	. = ..()
 	var/mob/living/carbon/xenomorph/xenomorph_user = user
-	.["mutation_points_used"] = length(xenomorph_user.owned_mutations)
-	.["mutations"] = list()
+	var/list/data = list()
+	data["mutation_points_used"] = length(xenomorph_user.owned_mutations)
+	data["mutations"] = list()
+	data["mutation_categories"] = list()
 	for(var/datum/mutation_upgrade/mutation AS in all_mutation_upgrades)
 		if(!can_choose_mutation(xenomorph_user, mutation))
 			continue
-		if(!.["mutations"][mutation.category])
-			.["mutations"][mutation.category] = list()
-		.["mutations"]["[mutation.category]"] += list(list(
+		if(!(mutation.category in data["mutation_categories"]))
+			data["mutation_categories"] += mutation.category
+		data["mutations"] += list(list(
+			"category" = mutation.category,
 			"name" = mutation.name,
-			"type" = mutation.type,
-			"desc" = mutation.desc,
+			"description" = mutation.desc,
+			"typepath" = mutation.type,
 			"owned" = has_mutation_by_typepath(xenomorph_user, mutation.type)
 		))
+	return data
 
 /datum/mutation_datum/ui_act(action, params)
 	. = ..()
@@ -62,7 +66,7 @@
 		return
 	switch(action)
 		if("purchase")
-			try_purchase_mutation(usr, text2path(params["upgrade_type"]))
+			try_purchase_mutation(usr, text2path(params["mutation_typepath"]))
 	SStgui.close_user_uis(usr, src)
 
 /// Returns the mutation from the global list if it can be found with its typepath.

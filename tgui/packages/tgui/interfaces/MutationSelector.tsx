@@ -11,28 +11,28 @@ import { BooleanLike } from 'tgui-core/react';
 import { useBackend } from '../backend';
 import { Window } from '../layouts';
 
-type Upgrade = {
-  name: string;
-  type: string;
-  desc: string;
-  owned: BooleanLike;
-};
-
 type MutationBarData = {
-  points_available: number;
-  points_used: number;
-  points_maximum: number;
+  mutation_points_available: number;
+  mutation_points_used: number;
+  mutation_points_maximum: number;
 };
 
 type MutationData = {
-  defense_mutations: Upgrade[];
-  offense_mutations: Upgrade[];
-  utility_mutations: Upgrade[];
+  mutation_categories: string[];
+  mutations: MutationIndividualData[];
+};
+
+type MutationIndividualData = {
+  category: string;
+  name: string;
+  description: string;
+  typepath: string;
+  owned: BooleanLike;
 };
 
 export const MutationSelector = (_props: any) => {
   const { data } = useBackend<MutationData>();
-  const { defense_mutations, offense_mutations, utility_mutations } = data;
+  const { mutations, mutation_categories } = data;
 
   return (
     <Window theme="xeno" width={500} height={600}>
@@ -40,18 +40,14 @@ export const MutationSelector = (_props: any) => {
         <Section title="Mutation Evolution" key="Mutation Evolution">
           <MutationBar />
         </Section>
-        <MutationSection
-          category_name="Defense"
-          mutations={defense_mutations}
-        />
-        <MutationSection
-          category_name="Offense"
-          mutations={offense_mutations}
-        />
-        <MutationSection
-          category_name="Utility"
-          mutations={utility_mutations}
-        />
+        {mutation_categories &&
+          mutation_categories.map((category_name) => (
+            <MutationSection
+              key={category_name}
+              category_name={category_name}
+              mutations={mutations}
+            />
+          ))}
       </Window.Content>
     </Window>
   );
@@ -59,12 +55,16 @@ export const MutationSelector = (_props: any) => {
 
 const MutationBar = (_props: any) => {
   const { data } = useBackend<MutationBarData>();
-  const { points_available, points_used, points_maximum } = data;
+  const {
+    mutation_points_available,
+    mutation_points_used,
+    mutation_points_maximum,
+  } = data;
 
   let tooltipContent = 'You are ready to buy another mutation.';
-  if (points_maximum === points_used) {
+  if (mutation_points_used >= mutation_points_maximum) {
     tooltipContent = 'You have the maximum amount of mutations!';
-  } else if (points_used >= points_available) {
+  } else if (mutation_points_used >= mutation_points_available) {
     tooltipContent = "You can't buy another mutation yet...";
   }
 
@@ -72,8 +72,11 @@ const MutationBar = (_props: any) => {
     <Tooltip content={tooltipContent}>
       <Flex mb={1}>
         <Flex.Item grow>
-          <ProgressBar color="green" value={points_available / points_maximum}>
-            {`${points_available} / ${points_maximum} `}
+          <ProgressBar
+            color="green"
+            value={mutation_points_available / mutation_points_maximum}
+          >
+            {`${mutation_points_available} / ${mutation_points_maximum} `}
           </ProgressBar>
         </Flex.Item>
       </Flex>
@@ -83,34 +86,41 @@ const MutationBar = (_props: any) => {
 
 const MutationSection = (props: {
   category_name: string;
-  mutations: Upgrade[];
+  mutations: MutationIndividualData[];
 }) => {
   const { act, data } = useBackend<MutationBarData>();
-  const { points_available, points_used } = data;
+  const { mutation_points_available, mutation_points_used } = data;
 
   return (
     <Collapsible title={`${props.category_name} Mutations`}>
       {props.mutations &&
-        props.mutations.map((mutation) => (
-          <Section
-            title={`${mutation.name}`}
-            mb={1}
-            key={mutation.name}
-            buttons={
-              <Button
-                content={`Buy`}
-                key={mutation.name}
-                onClick={() => act('purchase', { upgrade_type: mutation.type })}
-                disabled={points_used >= points_available || mutation.owned}
-                selected={mutation.owned}
-              />
-            }
-          >
-            <Flex direction="column-reverse" align={'left'}>
-              {mutation.desc}
-            </Flex>
-          </Section>
-        ))}
+        props.mutations
+          .filter((mutation) => mutation.category === props.category_name)
+          .map((mutation) => (
+            <Section
+              title={`${mutation.name}`}
+              mb={1}
+              key={mutation.name}
+              buttons={
+                <Button
+                  content={`Buy`}
+                  key={mutation.name}
+                  onClick={() =>
+                    act('purchase', { mutation_typepath: mutation.typepath })
+                  }
+                  disabled={
+                    mutation_points_used >= mutation_points_available ||
+                    mutation.owned
+                  }
+                  selected={mutation.owned}
+                />
+              }
+            >
+              <Flex direction="column-reverse" align={'left'}>
+                {mutation.description}
+              </Flex>
+            </Section>
+          ))}
     </Collapsible>
   );
 };

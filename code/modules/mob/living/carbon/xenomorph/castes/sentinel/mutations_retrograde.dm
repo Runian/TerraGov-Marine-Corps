@@ -2,13 +2,13 @@
 //        Base        //
 //*********************//
 /datum/mutation_upgrade/defense/retrograde
-	allowed_caste_names = list(/datum/xeno_caste/runner/retrograde)
+	allowed_caste_names = list(/datum/xeno_caste/sentinel/retrograde)
 
 /datum/mutation_upgrade/offense/retrograde
-	allowed_caste_names = list(/datum/xeno_caste/runner/retrograde)
+	allowed_caste_names = list(/datum/xeno_caste/sentinel/retrograde)
 
 /datum/mutation_upgrade/utility/retrograde
-	allowed_caste_names = list(/datum/xeno_caste/runner/retrograde)
+	allowed_caste_names = list(/datum/xeno_caste/sentinel/retrograde)
 
 //*********************//
 //       Defense       //
@@ -91,16 +91,16 @@
 	desc = "Your spit now uses your selected reagent and may apply different effects accordingly."
 
 /datum/mutation_upgrade/offense/chemical_spit/retrograde/on_gain()
-	var/datum/action/ability/activable/xeno/retrograde_spit/ability = xenomorph_owner.actions_by_path[/datum/action/ability/activable/xeno/retrograde_spit]
-	if(!ability)
-		return
-	ability.uses_selected_reagent = TRUE
+	//var/datum/action/ability/activable/xeno/retrograde_spit/ability = xenomorph_owner.actions_by_path[/datum/action/ability/activable/xeno/retrograde_spit]
+	//if(!ability)
+	//	return
+	//ability.uses_selected_reagent = TRUE
 
 /datum/mutation_upgrade/offense/chemical_spit/retrograde/on_loss()
-	var/datum/action/ability/activable/xeno/retrograde_spit/ability = xenomorph_owner.actions_by_path[/datum/action/ability/activable/xeno/retrograde_spit]
-	if(!ability)
-		return
-	ability.uses_selected_reagent = initial(ability.uses_selected_reagent)
+	//var/datum/action/ability/activable/xeno/retrograde_spit/ability = xenomorph_owner.actions_by_path[/datum/action/ability/activable/xeno/retrograde_spit]
+	//if(!ability)
+	//	return
+	//ability.uses_selected_reagent = initial(ability.uses_selected_reagent)
 
 //*********************//
 //         Veil        //

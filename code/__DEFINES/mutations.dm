@@ -6,8 +6,8 @@ GLOBAL_DATUM_INIT(mutation_selector, /datum/mutation_datum, new)
 #define MUTATION_UTILITY_ALERT /atom/movable/screen/alert/utility_mutation
 
 /// Name of each mutation category.
-#define MUTATION_DEFENSE "defense"
-#define MUTATION_OFFENSE "offense"
-#define MUTATION_UTILITY "utility"
+#define MUTATION_DEFENSE "Defense"
+#define MUTATION_OFFENSE "Offense"
+#define MUTATION_UTILITY "Utility"
 
 #define MUTATION_MAXIMUM_POINTS 3
