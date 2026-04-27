@@ -15,6 +15,8 @@
 	var/list/allowed_caste_names = list()
 	/// If the prospective xenomorph_owner already has one of these mutation types, they cannot get this mutation.
 	var/list/datum/mutation_upgrade/conflicting_mutation_types = list()
+	/// If the prospective xenomorph_owner does not have all of these abilities types, they cannot get this mutation.
+	var/list/datum/action/ability/required_abilities_types = list()
 
 /// Handles creation of an mutation upgrade. If there will be an owner, applies the alert for having the mutation, registers various signals, and then updates with current structure count.
 /datum/mutation_upgrade/New(mob/living/carbon/xenomorph/new_xenomorph_owner)
@@ -51,6 +53,22 @@
 
 /// Can this mutation upgrade be gained by a specific xenomorph?
 /datum/mutation_upgrade/proc/can_gain(mob/living/carbon/xenomorph/prospective_xenomorph_owner, silent = FALSE)
+	SHOULD_CALL_PARENT(TRUE)
+	if(length(conflicting_mutation_types) && length(prospective_xenomorph_owner.owned_mutations))
+		for(var/datum/mutation_upgrade/owned_mutation AS in prospective_xenomorph_owner.owned_mutations)
+			if(!(type in owned_mutation.conflicting_mutation_types))
+				continue
+			if(!silent)
+				to_chat(prospective_xenomorph_owner, span_warning("That mutation is not compatible with the mutation: [owned_mutation.name]"))
+			return FALSE
+	if(length(required_abilities_types))
+		for(var/datum/action/ability/required_ability_typepath AS in required_abilities_types)
+			var/datum/action/ability/required_ability = prospective_xenomorph_owner.actions_by_path[required_ability_typepath]
+			if(required_ability)
+				continue
+			if(!silent)
+				to_chat(prospective_xenomorph_owner, span_danger("That mutation requires an ability that you do not have."))
+			return FALSE
 	return TRUE
 
 /// The name that the alert will have after updating.

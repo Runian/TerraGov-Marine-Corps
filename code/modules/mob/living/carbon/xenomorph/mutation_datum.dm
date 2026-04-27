@@ -121,11 +121,6 @@
 		if(!silent)
 			to_chat(xenomorph_purchaser, span_warning("That mutation is not available for your caste."))
 		return FALSE
-	for(var/datum/mutation_upgrade/owned_mutation AS in xenomorph_purchaser.owned_mutations)
-		if(!(mutation_typepath in owned_mutation.conflicting_mutation_types))
-			continue
-		to_chat(xenomorph_purchaser, span_warning("That mutation is not compatible with the mutation: [owned_mutation.name]"))
-		return FALSE
 	if(!mutation.can_gain(xenomorph_purchaser, silent))
 		return FALSE
 	to_chat(xenomorph_purchaser, span_xenonotice("Mutation gained."))
