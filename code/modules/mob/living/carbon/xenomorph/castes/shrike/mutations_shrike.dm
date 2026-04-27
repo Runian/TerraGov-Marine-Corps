@@ -149,27 +149,27 @@
 	var/datum/action/ability/activable/xeno/psychic_fling/fling_ability = xenomorph_owner.actions_by_path[/datum/action/ability/activable/xeno/psychic_fling]
 	if(!fling_ability)
 		return
-	fling_ability.use_state_flags |= ABILITY_TARGET_SELF
-	fling_ability.collusion_damage_multiplier += get_multiplier(0)
-	fling_ability.collusion_paralyze_duration += 2 SECONDS
-	fling_ability.collusion_xenos_only = TRUE
+	//fling_ability.use_state_flags |= ABILITY_TARGET_SELF
+	//fling_ability.collusion_damage_multiplier += get_multiplier(0)
+	//fling_ability.collusion_paralyze_duration += 2 SECONDS
+	//fling_ability.collusion_xenos_only = TRUE
 
 /datum/mutation_upgrade/offense/body_fling/on_loss()
 	. = ..()
 	var/datum/action/ability/activable/xeno/psychic_fling/fling_ability = xenomorph_owner.actions_by_path[/datum/action/ability/activable/xeno/psychic_fling]
 	if(!fling_ability)
 		return
-	fling_ability.use_state_flags &= ~ABILITY_TARGET_SELF
-	fling_ability.collusion_damage_multiplier -= get_multiplier(0)
-	fling_ability.collusion_paralyze_duration -= 2 SECONDS
-	fling_ability.collusion_xenos_only = initial(fling_ability.collusion_xenos_only)
+	//fling_ability.use_state_flags &= ~ABILITY_TARGET_SELF
+	//fling_ability.collusion_damage_multiplier -= get_multiplier(0)
+	//fling_ability.collusion_paralyze_duration -= 2 SECONDS
+	//fling_ability.collusion_xenos_only = initial(fling_ability.collusion_xenos_only)
 
 /datum/mutation_upgrade/offense/body_fling/on_structure_update(previous_amount, new_amount)
 	. = ..()
 	var/datum/action/ability/activable/xeno/psychic_fling/fling_ability = xenomorph_owner.actions_by_path[/datum/action/ability/activable/xeno/psychic_fling]
 	if(!fling_ability)
 		return
-	fling_ability.collusion_damage_multiplier += get_multiplier(new_amount - previous_amount, FALSE)
+	//fling_ability.collusion_damage_multiplier += get_multiplier(new_amount - previous_amount, FALSE)
 
 /// Returns multiplier of the owner's slash damage dealt when a xenomorph flung by Psychic Fling collides with a human.
 /datum/mutation_upgrade/offense/body_fling/proc/get_multiplier(structure_count, include_initial = TRUE)
