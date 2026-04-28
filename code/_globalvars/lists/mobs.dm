@@ -221,3 +221,15 @@ GLOBAL_LIST_INIT(human_init_actions, list(
 ))
 
 GLOBAL_LIST_INIT_TYPED(mutation_upgrade_datums, /datum/mutation_upgrade, initialize_mutation_upgrade_list())
+
+/// Returns all mutation upgrades that are ready to be used.
+/proc/initialize_mutation_upgrade_list()
+	. = list()
+	// Only initializing non-base type mutations.
+	for(var/mutation_upgrade_type AS in subtypesof(/datum/mutation_upgrade))
+		var/datum/mutation_upgrade/mutation = new mutation_upgrade_type()
+		if(!mutation.name || !mutation.category)
+			continue
+		if(!length(mutation.allowed_caste_names))
+			continue
+		. += mutation

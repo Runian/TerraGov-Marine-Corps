@@ -3,18 +3,6 @@
 	/// A list of disk colors that have been fully printed.
 	var/list/completed_disk_colors = list()
 
-/// Returns all mutation upgrades that are ready to be used.
-/proc/initialize_mutation_upgrade_list()
-	. = list()
-	// Only initializing non-base type mutations.
-	for(var/mutation_upgrade_type AS in subtypesof(/datum/mutation_upgrade))
-		var/datum/mutation_upgrade/mutation = new mutation_upgrade_type()
-		if(!mutation.name || !mutation.category)
-			continue
-		if(!length(mutation.allowed_caste_names))
-			continue
-		. += mutation
-
 /datum/mutation_datum/New()
 	. = ..()
 	RegisterSignal(SSdcs, COMSIG_GLOB_DISK_GENERATED, PROC_REF(on_disk_printed))
