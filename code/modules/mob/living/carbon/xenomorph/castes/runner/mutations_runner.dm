@@ -33,7 +33,7 @@
 		return
 	ability.alternate_action_activate() // Turning it off and giving them the notification it happened.
 
-/datum/mutation_upgrade/shell/upfront_evasion/on_loss()
+/datum/mutation_upgrade/defense/runner/upfront_evasion/on_loss()
 	var/datum/action/ability/xeno_action/evasion/ability = xenomorph_owner.actions_by_path[/datum/action/ability/xeno_action/evasion]
 	if(!ability)
 		return
