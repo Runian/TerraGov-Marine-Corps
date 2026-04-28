@@ -100,8 +100,19 @@
 	if(!can_choose_mutation(xenomorph_purchaser, mutation))
 		to_chat(xenomorph_purchaser, span_warning("That mutation is not available for your caste."))
 		return FALSE
-	if(!mutation.can_gain(xenomorph_purchaser, silent))
-		return FALSE
+	if(length(mutation.conflicting_mutation_types))
+		for(var/datum/mutation_upgrade/owned_mutation AS in xenomorph_purchaser.owned_mutations)
+			if(!(mutation.type in owned_mutation.conflicting_mutation_types))
+				continue
+			to_chat(xenomorph_purchaser, span_warning("That mutation is not compatible with the mutation: [owned_mutation.name]"))
+			return FALSE
+	if(length(mutation.required_abilities_types))
+		for(var/datum/action/ability/required_ability_typepath AS in mutation.required_abilities_types)
+			var/datum/action/ability/required_ability = xenomorph_purchaser.actions_by_path[required_ability_typepath]
+			if(required_ability)
+				continue
+			to_chat(xenomorph_purchaser, span_danger("That mutation requires an ability that you do not have."))
+			return FALSE
 	to_chat(xenomorph_purchaser, span_xenonotice("Mutation gained."))
 	xenomorph_purchaser.do_jitter_animation(500)
 	new mutation_typepath(xenomorph_purchaser) // Everything else in handled during the mutation's New().

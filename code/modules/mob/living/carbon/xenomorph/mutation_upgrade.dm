@@ -51,24 +51,6 @@
 	on_loss()
 	return ..()
 
-/// Can this mutation upgrade be gained by a specific xenomorph?
-/datum/mutation_upgrade/proc/can_gain(mob/living/carbon/xenomorph/prospective_xenomorph_owner, silent = FALSE)
-	SHOULD_CALL_PARENT(TRUE)
-	if(length(conflicting_mutation_types) && length(prospective_xenomorph_owner.owned_mutations))
-		for(var/datum/mutation_upgrade/owned_mutation AS in prospective_xenomorph_owner.owned_mutations)
-			if(!(type in owned_mutation.conflicting_mutation_types))
-				continue
-			to_chat(prospective_xenomorph_owner, span_warning("That mutation is not compatible with the mutation: [owned_mutation.name]"))
-			return FALSE
-	if(length(required_abilities_types))
-		for(var/datum/action/ability/required_ability_typepath AS in required_abilities_types)
-			var/datum/action/ability/required_ability = prospective_xenomorph_owner.actions_by_path[required_ability_typepath]
-			if(required_ability)
-				continue
-			to_chat(prospective_xenomorph_owner, span_danger("That mutation requires an ability that you do not have."))
-			return FALSE
-	return TRUE
-
 /// The name that the alert will have after updating.
 /datum/mutation_upgrade/proc/get_name_for_alert()
 	return name
