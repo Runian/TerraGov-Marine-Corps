@@ -7,11 +7,11 @@
 	var/category
 	/// The typepath of the alert to be given.
 	var/atom/movable/screen/alert/alert_typepath
-	/// If the prospective xenomorph_owner is one of these castes (compared via name), they can view this option. Any /datum/xeno_caste are converted to names during /New().
+	/// If the xenomorph is one of these castes (compared via name), they can view and potentially buy this mutation. Any /datum/xeno_caste are converted to names during /New().
 	var/list/allowed_caste_names = list()
-	/// If the prospective xenomorph_owner already has one of these mutation types, they cannot get this mutation.
+	/// If the xenomorph already has one of these mutation types, they cannot get this mutation.
 	var/list/datum/mutation_upgrade/conflicting_mutation_types = list()
-	/// If the prospective xenomorph_owner does not have all of these abilities types, they cannot get this mutation.
+	/// If the xenomorph does not have all of these abilities types, they cannot get this mutation.
 	var/list/datum/action/ability/required_abilities_types = list()
 
 /// Handles creation of an mutation upgrade. If there will be an owner, applies the alert for having the mutation, registers various signals, and then updates with current structure count.
@@ -71,11 +71,3 @@
 /atom/movable/screen/alert/utility_mutation
 	name = "utility mutation"
 	icon_state = "xeno_mutation_utility"
-
-
-/datum/mutation_upgrade/proc/on_structure_update(previous_amount, new_amount)
-	return // TODO: Depreciated. Switch over to `/on_gain` and `/on_loss` instead.
-
-/datum/mutation_upgrade/proc/get_total_structures(previous_amount, new_amount)
-	return 0 // TODO: Depreciated. Do not use this at all.
-
