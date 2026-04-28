@@ -112,13 +112,6 @@
 	ability.targetable_range -= 1
 	ability.ranged_effectiveness -= 0.5
 
-/datum/mutation_upgrade/offense/sentinel/far_sting/on_structure_update(previous_amount, new_amount)
-	. = ..()
-	var/datum/action/ability/activable/xeno/drain_sting/sting_ability = xenomorph_owner.actions_by_path[/datum/action/ability/activable/xeno/drain_sting]
-	if(!sting_ability)
-		return
-	sting_ability.ranged_effectiveness += get_effectiveness(new_amount - previous_amount, FALSE)
-
 /datum/mutation_upgrade/offense/sentinel/imbued_claws
 	name = "Imbued Claws"
 	desc = "Drain Surge's armor is converted to a melee damage modifier."
