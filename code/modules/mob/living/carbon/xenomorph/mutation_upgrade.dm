@@ -58,16 +58,14 @@
 		for(var/datum/mutation_upgrade/owned_mutation AS in prospective_xenomorph_owner.owned_mutations)
 			if(!(type in owned_mutation.conflicting_mutation_types))
 				continue
-			if(!silent)
-				to_chat(prospective_xenomorph_owner, span_warning("That mutation is not compatible with the mutation: [owned_mutation.name]"))
+			to_chat(prospective_xenomorph_owner, span_warning("That mutation is not compatible with the mutation: [owned_mutation.name]"))
 			return FALSE
 	if(length(required_abilities_types))
 		for(var/datum/action/ability/required_ability_typepath AS in required_abilities_types)
 			var/datum/action/ability/required_ability = prospective_xenomorph_owner.actions_by_path[required_ability_typepath]
 			if(required_ability)
 				continue
-			if(!silent)
-				to_chat(prospective_xenomorph_owner, span_danger("That mutation requires an ability that you do not have."))
+			to_chat(prospective_xenomorph_owner, span_danger("That mutation requires an ability that you do not have."))
 			return FALSE
 	return TRUE
 

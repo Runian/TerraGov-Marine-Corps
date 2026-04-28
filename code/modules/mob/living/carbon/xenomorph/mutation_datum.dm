@@ -74,37 +74,31 @@
 		return TRUE
 
 /// Tries to purchase a mutation based on its typepath. Returns TRUE if the mutation was successfully purchased.
-/datum/mutation_datum/proc/try_purchase_mutation(mob/living/carbon/xenomorph/xenomorph_purchaser, datum/mutation_upgrade/mutation_typepath, silent = FALSE)
+/datum/mutation_datum/proc/try_purchase_mutation(mob/living/carbon/xenomorph/xenomorph_purchaser, datum/mutation_upgrade/mutation_typepath)
 	if(!xenomorph_purchaser.hive || !mutation_typepath)
 		return FALSE
 	if(!(SSticker.mode?.round_type_flags & MODE_MUTATIONS_OBTAINABLE))
-		if(!silent)
-			to_chat(xenomorph_purchaser, span_warning("Mutations cannot be obtained."))
+		to_chat(xenomorph_purchaser, span_warning("Mutations cannot be obtained."))
 		return FALSE
 	if(!(xenomorph_purchaser.xeno_caste.caste_flags & CASTE_MUTATIONS_ALLOWED))
-		if(!silent)
-			to_chat(xenomorph_purchaser, span_warning("Your caste is disallowed from getting mutations."))
+		to_chat(xenomorph_purchaser, span_warning("Your caste is disallowed from getting mutations."))
 		return FALSE
 	if(xenomorph_purchaser.fortify)
-		if(!silent)
-			to_chat(xenomorph_purchaser, span_warning("You cannot get new mutations while fortified."))
+		to_chat(xenomorph_purchaser, span_warning("You cannot get new mutations while fortified."))
 		return FALSE
 	var/mutation_points_available = xenomorph_purchaser.hive.mutation_points
 	if(length(xenomorph_purchaser.owned_mutations) > mutation_points_available)
-		if(!silent)
-			to_chat(xenomorph_purchaser, span_warning("The hive can only support up to [mutation_points_available] mutations!"))
+		to_chat(xenomorph_purchaser, span_warning("The hive can only support up to [mutation_points_available] mutations!"))
 		return FALSE
 	var/datum/mutation_upgrade/mutation = find_mutation_by_typepath(mutation_typepath)
 	if(!mutation)
-		if(!silent)
-			to_chat(xenomorph_purchaser, span_warning("That mutation is invalid."))
+		to_chat(xenomorph_purchaser, span_warning("That mutation is invalid."))
 		return FALSE
 	if(has_mutation_by_typepath(xenomorph_purchaser, mutation.type))
 		to_chat(xenomorph_purchaser, span_warning("You already have this mutation!"))
 		return FALSE
 	if(!can_choose_mutation(xenomorph_purchaser, mutation))
-		if(!silent)
-			to_chat(xenomorph_purchaser, span_warning("That mutation is not available for your caste."))
+		to_chat(xenomorph_purchaser, span_warning("That mutation is not available for your caste."))
 		return FALSE
 	if(!mutation.can_gain(xenomorph_purchaser, silent))
 		return FALSE
