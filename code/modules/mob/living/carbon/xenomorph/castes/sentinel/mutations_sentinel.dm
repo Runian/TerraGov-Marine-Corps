@@ -68,7 +68,7 @@
 	ability.drain_surge_armor_per -= 1
 
 //*********************//
-//         Spur        //
+//       Offense       //
 //*********************//
 /datum/mutation_upgrade/offense/sentinel/acidic_slasher
 	name = "Acidic Slasher"
@@ -136,7 +136,7 @@
 	ability.drain_surge_melee = initial(ability.drain_surge_melee)
 
 //*********************//
-//         Veil        //
+//       Utility       //
 //*********************//
 /datum/mutation_upgrade/utility/sentinel/toxic_compatibility
 	name = "Toxic Compatibility"
