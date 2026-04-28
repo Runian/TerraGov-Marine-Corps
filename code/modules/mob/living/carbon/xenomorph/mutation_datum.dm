@@ -2,12 +2,10 @@
 	interaction_flags = INTERACT_UI_INTERACT
 	/// A list of disk colors that have been fully printed.
 	var/list/completed_disk_colors = list()
-	/// List of all mutation upgrades.
-	var/list/datum/mutation_upgrade/all_mutation_upgrades = list()
 
-/datum/mutation_datum/proc/initialize_all_mutation_upgrades()
-	if(length(all_mutation_upgrades))
-		return
+/// Returns all mutation upgrades that are ready to be used.
+/proc/initialize_mutation_upgrade_list()
+	. = list()
 	// Only initializing non-base type mutations.
 	for(var/mutation_upgrade_type AS in subtypesof(/datum/mutation_upgrade))
 		var/datum/mutation_upgrade/mutation = new mutation_upgrade_type()
@@ -15,11 +13,10 @@
 			continue
 		if(!length(mutation.allowed_caste_names))
 			continue
-		all_mutation_upgrades += mutation
+		. += mutation
 
 /datum/mutation_datum/New()
 	. = ..()
-	initialize_all_mutation_upgrades()
 	RegisterSignal(SSdcs, COMSIG_GLOB_DISK_GENERATED, PROC_REF(on_disk_printed))
 
 /datum/mutation_datum/ui_state(mob/user)
@@ -44,7 +41,7 @@
 	data["mutation_points_used"] = length(xenomorph_user.owned_mutations)
 	data["mutations"] = list()
 	data["mutation_categories"] = list()
-	for(var/datum/mutation_upgrade/mutation AS in all_mutation_upgrades)
+	for(var/datum/mutation_upgrade/mutation AS in GLOB.mutation_upgrade_datums)
 		if(!can_choose_mutation(xenomorph_user, mutation))
 			continue
 		if(!(mutation.category in data["mutation_categories"]))
@@ -71,7 +68,7 @@
 
 /// Returns the mutation from the global list if it can be found with its typepath.
 /datum/mutation_datum/proc/find_mutation_by_typepath(datum/mutation_upgrade/mutation_typepath)
-	for(var/datum/mutation_upgrade/mutation AS in all_mutation_upgrades)
+	for(var/datum/mutation_upgrade/mutation AS in GLOB.mutation_upgrade_datums)
 		if(istype(mutation, mutation_typepath))
 			return mutation
 

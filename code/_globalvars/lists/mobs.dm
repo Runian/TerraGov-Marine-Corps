@@ -219,3 +219,5 @@ GLOBAL_LIST_INIT(human_init_actions, list(
 	/datum/action/innate/message_squad,
 	/datum/action/ability/activable/build_designator,
 ))
+
+GLOBAL_LIST_INIT_TYPED(mutation_upgrade_datums, /datum/mutation_upgrade, initialize_mutation_upgrade_list())
