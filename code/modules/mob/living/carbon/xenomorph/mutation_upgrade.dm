@@ -7,10 +7,6 @@
 	var/category
 	/// The typepath of the alert to be given.
 	var/atom/movable/screen/alert/alert_typepath
-	/// The alert that was given to the owner.
-	var/atom/movable/screen/alert/alert
-	/// If any, the xenomorph owner of this mutation upgrade.
-	var/mob/living/carbon/xenomorph/xenomorph_owner
 	/// If the prospective xenomorph_owner is one of these castes (compared via name), they can view this option. Any /datum/xeno_caste are converted to names during /New().
 	var/list/allowed_caste_names = list()
 	/// If the prospective xenomorph_owner already has one of these mutation types, they cannot get this mutation.
@@ -20,60 +16,36 @@
 
 /// Handles creation of an mutation upgrade. If there will be an owner, applies the alert for having the mutation, registers various signals, and then updates with current structure count.
 /datum/mutation_upgrade/New(mob/living/carbon/xenomorph/new_xenomorph_owner)
-	if(length(allowed_caste_names) > 0)
-		var/list/saner_caste_names = list()
-		for(var/possible_caste_type AS in allowed_caste_names)
-			if(ispath(possible_caste_type, /datum/xeno_caste))
-				var/datum/xeno_caste/caste_type = possible_caste_type
-				saner_caste_names += caste_type.caste_name // We use names because we want to differentiate between the caste + caste primo vs. strain + strain primo.
-				continue
-			saner_caste_names += possible_caste_type // We are assuming that it is the caste's name.
-		allowed_caste_names.Cut()
-		allowed_caste_names = saner_caste_names
-	if(!new_xenomorph_owner)
+	if(!length(allowed_caste_names))
 		return
-	xenomorph_owner = new_xenomorph_owner
-	xenomorph_owner.owned_mutations += src
-	alert = xenomorph_owner.throw_alert("mutation_[initial(name)]", alert_typepath)
-	update_alert()
-	RegisterSignal(xenomorph_owner, COMSIG_XENOMORPH_ABILITY_ON_UPGRADE, TYPE_PROC_REF(/datum/mutation_upgrade, on_xenomorph_upgrade))
-	on_gain()
+	var/list/saner_caste_names = list()
+	for(var/possible_caste_type AS in allowed_caste_names)
+		if(ispath(possible_caste_type, /datum/xeno_caste))
+			var/datum/xeno_caste/caste_type = possible_caste_type
+			saner_caste_names += caste_type.caste_name // We use names because we want to differentiate between the caste + caste primo vs. strain + strain primo.
+			continue
+		saner_caste_names += possible_caste_type // We are assuming that it is the caste's name.
+	allowed_caste_names.Cut()
+	allowed_caste_names = saner_caste_names
 
-/// Handles destruction of an mutation upgrade. If there was an owner, removes the status effect for having the mutation, unregisters various signals, and then updates with zero structures.
-/datum/mutation_upgrade/Destroy(force)
-	if(!xenomorph_owner)
-		return ..()
-	if(alert)
-		xenomorph_owner.clear_alert("mutation_[initial(name)]")
-	if(xenomorph_owner.owned_mutations.Find(src))
-		xenomorph_owner.owned_mutations -= src
-	UnregisterSignal(xenomorph_owner, COMSIG_XENOMORPH_ABILITY_ON_UPGRADE)
-	on_loss()
-	return ..()
+/// Called when the mutation is gained.
+/datum/mutation_upgrade/proc/on_gain(mob/living/carbon/xenomorph/mutated_xenomorph)
+	SHOULD_CALL_PARENT(TRUE)
+	var/atom/movable/screen/alert/alert = mutated_xenomorph.throw_alert("mutation_[initial(name)]", alert_typepath)
+	alert.name = name
+	alert.desc = desc
+	mutated_xenomorph.owned_mutations += type
+	RegisterSignal(mutated_xenomorph, COMSIG_XENOMORPH_ABILITY_ON_UPGRADE, TYPE_PROC_REF(/datum/mutation_upgrade, on_xenomorph_upgrade))
 
-/// The name that the alert will have after updating.
-/datum/mutation_upgrade/proc/get_name_for_alert()
-	return name
-
-/// The desc that the alert will have after updating. This should be more informative than the description (by providing meaningful values to compare with) or easier to understand (by using less words or dumbing down the language).
-/datum/mutation_upgrade/proc/get_desc_for_alert()
-	return desc
-
-/// Updates the alert's name and description.
-/datum/mutation_upgrade/proc/update_alert()
-	alert.name = get_name_for_alert()
-	alert.desc = get_desc_for_alert()
-
-/// Called when the mutation is gained by the xenomorph owner.
-/datum/mutation_upgrade/proc/on_gain()
-	return
-
-/// Called when the mutation is lost by the xenomorph owner.
-/datum/mutation_upgrade/proc/on_loss()
-	return
+/// Called when the mutation is lost.
+/datum/mutation_upgrade/proc/on_loss(mob/living/carbon/xenomorph/mutated_xenomorph)
+	SHOULD_CALL_PARENT(TRUE)
+	mutated_xenomorph.clear_alert("mutation_[initial(name)]")
+	mutated_xenomorph.owned_mutations -= type
+	UnregisterSignal(mutated_xenomorph, COMSIG_XENOMORPH_ABILITY_ON_UPGRADE)
 
 /// Called whenever the xenomorph owner is upgraded (e.g. normal to primordial).
-/datum/mutation_upgrade/proc/on_xenomorph_upgrade()
+/datum/mutation_upgrade/proc/on_xenomorph_upgrade(mob/living/carbon/xenomorph/mutated_xenomorph)
 	return
 
 /datum/mutation_upgrade/defense
