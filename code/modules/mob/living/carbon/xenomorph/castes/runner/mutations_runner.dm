@@ -262,16 +262,16 @@
 	ability.savage_plasma_conversion_rate -= 0.05
 
 //*********************//
-//         Veil        //
+//       Utility       //
 //*********************//
-/datum/mutation_upgrade/veil/headslam
+/datum/mutation_upgrade/utility/runner/headslam
 	name = "Head Slam"
 	desc = "Pounce stuns only for 25% as long. It now confuses and blurs your target's vision for a second."
 	required_abilities_types = list(
 		/datum/action/ability/activable/xeno/pounce/runner
 	)
 
-/datum/mutation_upgrade/veil/headslam/on_mutation_enabled()
+/datum/mutation_upgrade/utility/runner/headslam/on_mutation_enabled()
 	var/datum/action/ability/activable/xeno/pounce/runner/ability = xenomorph_owner.actions_by_path[/datum/action/ability/activable/xeno/pounce/runner]
 	if(!ability)
 		return
@@ -279,7 +279,7 @@
 	ability.self_immobilize_duration *= 0.25
 	ability.savage_debuff_amount += 2 SECONDS
 
-/datum/mutation_upgrade/veil/headslam/on_mutation_disabled()
+/datum/mutation_upgrade/utility/runner/headslam/on_mutation_disabled()
 	var/datum/action/ability/activable/xeno/pounce/runner/ability = xenomorph_owner.actions_by_path[/datum/action/ability/activable/xeno/pounce/runner]
 	if(!ability)
 		return
