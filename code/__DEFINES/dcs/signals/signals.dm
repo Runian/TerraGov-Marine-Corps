@@ -892,11 +892,6 @@
 
 #define COMSIG_FACE_HUGGER_DEATH "face_hugger_death"
 
-// Mutations:
-#define COMSIG_GLOB_MUTATION_CHAMBER_SHELL "!mutation_chamber_shell" // From: [/obj/structure/xeno/mutation_chamber/shell] (previous_amount, new_amount)
-#define COMSIG_GLOB_MUTATION_CHAMBER_SPUR "!mutation_chamber_spur" // From: [/obj/structure/xeno/mutation_chamber/shell] (previous_amount, new_amount)
-#define COMSIG_GLOB_MUTATION_CHAMBER_VEIL "!mutation_chamber_veil" // From: [/obj/structure/xeno/mutation_chamber/shell] (previous_amount, new_amount)
-
 //human signals
 #define COMSIG_CLICK_QUICKEQUIP "click_quickequip"
 

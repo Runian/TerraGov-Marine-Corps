@@ -299,67 +299,6 @@ GLOBAL_LIST_INIT(tier_to_primo_upgrade, list(
 			to_chat(buyer, span_xenowarning("We need open space to allow this structure to bombard enemies!"))
 		return FALSE
 
-/datum/hive_upgrade/building/mutation_chamber
-	/// The maximum amount of buildings that can exist before being disallowed from buying more.
-	var/max_chambers = MUTATION_CHAMBER_MAXIMUM
-
-/datum/hive_upgrade/building/mutation_chamber/can_buy(mob/living/carbon/xenomorph/buyer, silent = TRUE)
-	. = ..()
-	if(!.)
-		return FALSE
-	if(!(SSticker.mode?.round_type_flags & MODE_MUTATIONS_OBTAINABLE) && !HAS_TRAIT(buyer, TRAIT_VALHALLA_XENO))
-		if(!silent)
-			to_chat(buyer, span_xenowarning("The hive isn't permitted to buy this structure."))
-		return FALSE
-
-/datum/hive_upgrade/building/mutation_chamber/shell
-	name = "Shell Mutation Chamber"
-	desc = "Constructs a chamber that allows xenos to buy survival mutations. Build up to 3 structures to increase mutation power."
-	icon = "shell"
-	psypoint_cost = MUTATION_SHELL_CHAMBER_COST
-	building_type = /obj/structure/xeno/mutation_chamber/shell
-
-/datum/hive_upgrade/building/mutation_chamber/shell/can_buy(mob/living/carbon/xenomorph/buyer, silent = TRUE)
-	. = ..()
-	if(!.)
-		return FALSE
-	if(length(buyer.hive.shell_chambers) >= max_chambers)
-		if(!silent)
-			to_chat(buyer, span_xenowarning("Hive cannot support more than [max_chambers] active shell chambers!"))
-		return FALSE
-
-/datum/hive_upgrade/building/mutation_chamber/spur
-	name = "Spur Mutation Chamber"
-	desc = "Constructs a chamber that allows xenos to buy attack mutations. Build up to 3 structures to increase mutation power."
-	icon = "spur"
-	psypoint_cost = MUTATION_SPUR_CHAMBER_COST
-	building_type = /obj/structure/xeno/mutation_chamber/spur
-
-/datum/hive_upgrade/building/mutation_chamber/spur/can_buy(mob/living/carbon/xenomorph/buyer, silent = TRUE)
-	. = ..()
-	if(!.)
-		return FALSE
-	if(length(buyer.hive.spur_chambers) >= max_chambers)
-		if(!silent)
-			to_chat(buyer, span_xenowarning("Hive cannot support more than [max_chambers] active spur chambers!"))
-		return FALSE
-
-/datum/hive_upgrade/building/mutation_chamber/veil
-	name = "Veil Mutation Chamber"
-	desc = "Constructs a chamber that allows xenos to buy utility mutations. Build up to 3 structures to increase mutation power."
-	icon = "veil"
-	psypoint_cost = MUTATION_VEIL_CHAMBER_COST
-	building_type = /obj/structure/xeno/mutation_chamber/veil
-
-/datum/hive_upgrade/building/mutation_chamber/veil/can_buy(mob/living/carbon/xenomorph/buyer, silent = TRUE)
-	. = ..()
-	if(!.)
-		return FALSE
-	if(length(buyer.hive.veil_chambers) >= max_chambers)
-		if(!silent)
-			to_chat(buyer, span_xenowarning("Hive cannot support more than [max_chambers] active veil chambers!"))
-		return FALSE
-
 /datum/hive_upgrade/building/tunnel
 	building_type = /obj/structure/xeno/tunnel
 
@@ -519,3 +458,34 @@ GLOBAL_LIST_INIT(tier_to_primo_upgrade, list(
 	desc = "Unlocks the primordial for the first tier"
 	psypoint_cost = ANY_PRIMORDIAL_PRICE
 	icon = "primosent"
+
+/datum/hive_upgrade/xenos/mutation_point
+	name = "Mutation Point"
+	desc = "Permanently grants each member of the hive to choose an additional mutation."
+	category = "Mutations"
+	psypoint_cost = 600
+	upgrade_flags = UPGRADE_FLAG_MESSAGE_HIVE|UPGRADE_FLAG_MUST_BE_HIVE_RULER
+	icon = "mutation_point"
+
+/datum/hive_upgrade/mutation_point/can_buy(mob/living/carbon/xenomorph/buyer, silent = TRUE)
+	. = ..()
+	if(!.)
+		return FALSE
+	if(!(SSticker.mode?.round_type_flags & MODE_MUTATIONS_OBTAINABLE))
+		if(!silent)
+			to_chat(buyer, span_xenowarning("The hive isn't permitted to buy mutations."))
+		return FALSE
+	var/datum/hive_status/hive_status = GLOB.hive_datums[buyer.hivenumber]
+	var/datum/mutation_datum/mutations = GLOB.mutation_selector
+	if(hive_status.mutation_points >= mutations.completed_disk_colors)
+		if(!silent)
+			to_chat(buyer, span_xenowarning("The hive cannot sustain [hive_status.mutation_points == 0 ? "any" : "more"] mutations right now."))
+		return FALSE
+
+/datum/hive_upgrade/mutation_point/on_buy(mob/living/carbon/xenomorph/buyer)
+	if(!can_buy(buyer, FALSE))
+		return FALSE
+	GLOB.hive_datums[buyer.hivenumber].mutation_points += 1
+	log_game("[buyer] purchased a mutation point, spending [psypoint_cost] psy points in the process.")
+	xeno_message("[buyer] has purchased a mutation point for the hive!", "xenoannounce", 5, buyer.hivenumber)
+	return ..()

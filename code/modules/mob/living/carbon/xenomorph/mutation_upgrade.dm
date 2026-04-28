@@ -1,149 +1,72 @@
 /datum/mutation_upgrade
-	/// The name that is displayed in the TGUI.
+	/// The name of the mutation.
 	var/name
-	/// The description that is displayed in the TGUI.
+	/// The description of the mutation.
 	var/desc
-	/// The category slot that this upgrade takes. This prevents the owner from buying additional mutation that have the same category.
+	/// The category it appears in.
 	var/category
-	/// The structure that needs to exist for a successful purchase.
-	var/required_structure
 	/// The typepath of the alert to be given.
 	var/atom/movable/screen/alert/alert_typepath
-	/// The alert that was given to the owner.
-	var/atom/movable/screen/alert/alert
-	/// The xenomorph owner of this mutation upgrade.
-	var/mob/living/carbon/xenomorph/xenomorph_owner
-	/// If the prospective xenomorph_owner already has one of these mutation types, they cannot get this mutation.
+	/// If the xenomorph is one of these castes (compared via name), they can view and potentially buy this mutation. Any /datum/xeno_caste are converted to names during /New().
+	var/list/allowed_caste_names = list()
+	/// If the xenomorph already has one of these mutation types, they cannot get this mutation.
 	var/list/datum/mutation_upgrade/conflicting_mutation_types = list()
+	/// If the xenomorph does not have all of these abilities types, they cannot get this mutation.
+	var/list/datum/action/ability/required_abilities_types = list()
 
-/// Sets up the owner, applies the alert for having the mutation, registers various signals, and then updates with current structure count.
 /datum/mutation_upgrade/New(mob/living/carbon/xenomorph/new_xenomorph_owner)
-	if(!new_xenomorph_owner)
-		CRASH("/datum/mutation_upgrade created with no owner.")
-	xenomorph_owner = new_xenomorph_owner
-	xenomorph_owner.owned_mutations += src
-	alert = xenomorph_owner.throw_alert("mutation_[category]", alert_typepath)
-	switch(required_structure)
-		if(MUTATION_SHELL)
-			RegisterSignal(SSdcs, COMSIG_GLOB_MUTATION_CHAMBER_SHELL, PROC_REF(on_structure_change))
-		if(MUTATION_SPUR)
-			RegisterSignal(SSdcs, COMSIG_GLOB_MUTATION_CHAMBER_SPUR, PROC_REF(on_structure_change))
-		if(MUTATION_VEIL)
-			RegisterSignal(SSdcs, COMSIG_GLOB_MUTATION_CHAMBER_VEIL, PROC_REF(on_structure_change))
-	RegisterSignal(xenomorph_owner, COMSIG_XENOMORPH_ABILITY_ON_UPGRADE, TYPE_PROC_REF(/datum/mutation_upgrade, on_xenomorph_upgrade))
-	on_structure_change(null, MUTATION_CHAMBER_MINIMUM, get_total_structures())
+	if(!length(allowed_caste_names))
+		return
+	var/list/saner_caste_names = list()
+	for(var/possible_caste_type AS in allowed_caste_names)
+		if(ispath(possible_caste_type, /datum/xeno_caste))
+			var/datum/xeno_caste/caste_type = possible_caste_type
+			saner_caste_names += caste_type.caste_name // We use names because we want to differentiate between the caste + caste primo vs. strain + strain primo.
+			continue
+		saner_caste_names += possible_caste_type // We are assuming that it is the caste's name.
+	allowed_caste_names.Cut()
+	allowed_caste_names = saner_caste_names
 
-/// Removes the status effect for having the mutation, unregisters various signals, and then updates with zero structures.
-/datum/mutation_upgrade/Destroy(force)
-	if(alert)
-		xenomorph_owner.clear_alert("mutation_[category]")
-	if(xenomorph_owner.owned_mutations.Find(src))
-		xenomorph_owner.owned_mutations -= src
-	switch(required_structure)
-		if(MUTATION_SHELL)
-			UnregisterSignal(SSdcs, COMSIG_GLOB_MUTATION_CHAMBER_SHELL)
-		if(MUTATION_SPUR)
-			UnregisterSignal(SSdcs, COMSIG_GLOB_MUTATION_CHAMBER_SPUR)
-		if(MUTATION_VEIL)
-			UnregisterSignal(SSdcs, COMSIG_GLOB_MUTATION_CHAMBER_VEIL)
-	UnregisterSignal(xenomorph_owner, COMSIG_XENOMORPH_ABILITY_ON_UPGRADE)
-	on_structure_change(null, get_total_structures())
-	return ..()
+/// Called when the mutation is gained.
+/datum/mutation_upgrade/proc/on_gain(mob/living/carbon/xenomorph/mutated_xenomorph)
+	SHOULD_CALL_PARENT(TRUE)
+	var/atom/movable/screen/alert/alert = mutated_xenomorph.throw_alert("mutation_[initial(name)]", alert_typepath)
+	alert.name = name
+	alert.desc = desc
+	mutated_xenomorph.owned_mutations += type
+	RegisterSignal(mutated_xenomorph, COMSIG_XENOMORPH_ABILITY_ON_UPGRADE, TYPE_PROC_REF(/datum/mutation_upgrade, on_xenomorph_upgrade))
 
-/// Called whenever the mutation is created/deleted or when the amount of structures has changed.
-/datum/mutation_upgrade/proc/on_structure_change(datum/source, previous_amount, new_amount)
-	SIGNAL_HANDLER
-	if(previous_amount == new_amount) // No change.
-		return FALSE
-	if(!previous_amount && new_amount) // The mutation is now enabled.
-		on_mutation_enabled()
-	if(previous_amount && !new_amount) // The mutation is now disabled.
-		on_mutation_disabled()
-	on_structure_update(previous_amount, new_amount)
-	if(alert)
-		handle_alert(new_amount)
-	return TRUE
-
-/// Called whenever the mutation becomes enabled (going from zero structures to non-zero structures).
-/datum/mutation_upgrade/proc/on_mutation_enabled()
-	return
-
-/// Called whenever the mutation becomes disabled (going from non-zero structures to zero structures).
-/datum/mutation_upgrade/proc/on_mutation_disabled()
-	return
-
-/// Called whenever when the amount of structures has changed.
-/datum/mutation_upgrade/proc/on_structure_update(previous_amount, new_amount)
-	return
-
-/// Updates the status effect alert's name and description.
-/datum/mutation_upgrade/proc/handle_alert(new_amount)
-	alert.name = get_name_for_alert(new_amount)
-	alert.desc = get_desc_for_alert(new_amount)
-
-/// The name that the alert will have after updating.
-/datum/mutation_upgrade/proc/get_name_for_alert(new_amount)
-	return name
-
-/// The desc that the alert will have after updating.
-/datum/mutation_upgrade/proc/get_desc_for_alert(new_amount)
-	if(!new_amount)
-		return "This mutation has no effect as there are are no active [category] structures!"
-	return desc
+/// Called when the mutation is lost.
+/datum/mutation_upgrade/proc/on_loss(mob/living/carbon/xenomorph/mutated_xenomorph)
+	SHOULD_CALL_PARENT(TRUE)
+	mutated_xenomorph.clear_alert("mutation_[initial(name)]")
+	mutated_xenomorph.owned_mutations -= type
+	UnregisterSignal(mutated_xenomorph, COMSIG_XENOMORPH_ABILITY_ON_UPGRADE)
 
 /// Called whenever the xenomorph owner is upgraded (e.g. normal to primordial).
-/datum/mutation_upgrade/proc/on_xenomorph_upgrade()
-	return TRUE
+/datum/mutation_upgrade/proc/on_xenomorph_upgrade(mob/living/carbon/xenomorph/mutated_xenomorph)
+	return
 
-/// Gets the total amount of structures for the mutation.
-/datum/mutation_upgrade/proc/get_total_structures()
-	if(!xenomorph_owner || !required_structure)
-		return 0
-	switch(required_structure)
-		if(MUTATION_SHELL)
-			return clamp(length(xenomorph_owner.hive.shell_chambers), MUTATION_CHAMBER_MINIMUM, MUTATION_CHAMBER_MAXIMUM)
-		if(MUTATION_SPUR)
-			return clamp(length(xenomorph_owner.hive.spur_chambers), MUTATION_CHAMBER_MINIMUM, MUTATION_CHAMBER_MAXIMUM)
-		if(MUTATION_VEIL)
-			return clamp(length(xenomorph_owner.hive.veil_chambers), MUTATION_CHAMBER_MINIMUM, MUTATION_CHAMBER_MAXIMUM)
+/datum/mutation_upgrade/defense
+	category = MUTATION_DEFENSE
+	alert_typepath = MUTATION_DEFENSE_ALERT
 
-/**
- * Shell
- */
-/datum/mutation_upgrade/shell
-	category = MUTATION_SHELL
-	required_structure = MUTATION_SHELL
-	alert_typepath = MUTATION_SHELL_ALERT
+/datum/mutation_upgrade/offense
+	category = MUTATION_OFFENSE
+	alert_typepath = MUTATION_OFFENSE_ALERT
 
+/datum/mutation_upgrade/utility
+	category = MUTATION_UTILITY
+	alert_typepath = MUTATION_UTILITY_ALERT
 
-/atom/movable/screen/alert/shell
-	name = "Shell Mutation"
-	desc = "Your Shell Mutation is taking effect."
-	icon_state = "xeno_mutation_shell"
+/atom/movable/screen/alert/defense_mutation
+	name = "defense mutation"
+	icon_state = "xeno_mutation_defense"
 
-/**
- * Spur
- */
-/datum/mutation_upgrade/spur
-	category = MUTATION_SPUR
-	required_structure = MUTATION_SPUR
-	alert_typepath = MUTATION_SPUR_ALERT
+/atom/movable/screen/alert/offense_mutation
+	name = "offense mutation"
+	icon_state = "xeno_mutation_offense"
 
-/atom/movable/screen/alert/spur
-	name = "Spur Mutation"
-	desc = "Your Spur Mutation is taking effect."
-	icon_state = "xeno_mutation_spur"
-
-/**
- * Veil
- */
-/datum/mutation_upgrade/veil
-	category = MUTATION_VEIL
-	required_structure = MUTATION_VEIL
-	alert_typepath = MUTATION_VEIL_ALERT
-
-/atom/movable/screen/alert/veil
-	name = "Veil Mutation"
-	desc = "Your Veil Mutation is taking effect."
-	icon_state = "xeno_mutation_veil"
-
+/atom/movable/screen/alert/utility_mutation
+	name = "utility mutation"
+	icon_state = "xeno_mutation_utility"

@@ -752,6 +752,7 @@ GLOBAL_VAR_INIT(observer_default_invisibility, INVISIBILITY_OBSERVER)
 		new_xeno.apply_assigned_role_to_spawn(xallhala_job)
 		SSpoints.xeno_strategic_points_by_hive[XENO_HIVE_FALLEN] = 10000
 		SSpoints.xeno_tactical_points_by_hive[XENO_HIVE_FALLEN] = 10000
+		GLOB.hive_datums[XENO_HIVE_FALLEN].mutation_points = MUTATION_MAXIMUM_POINTS
 		mind.transfer_to(new_xeno, TRUE)
 		xallhala_job.after_spawn(new_xeno)
 		return
