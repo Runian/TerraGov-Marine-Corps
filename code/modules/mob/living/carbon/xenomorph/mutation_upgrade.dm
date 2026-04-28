@@ -7,41 +7,56 @@
 	var/category
 	/// The typepath of the alert to be given.
 	var/atom/movable/screen/alert/alert_typepath
-	/// If the xenomorph is one of these castes (compared via name), they can view and potentially buy this mutation. Any /datum/xeno_caste are converted to names during /New().
+	/// The alert that was given.
+	var/atom/movable/screen/alert/alert
+	/// The xenomorph owner of this mutation upgrade.
+	var/mob/living/carbon/xenomorph/xenomorph_owner
+	/// If the prospective xenomorph owner is one of these castes (compared via name), they can view and potentially buy this mutation. Any /datum/xeno_caste are converted to names during /New().
 	var/list/allowed_caste_names = list()
-	/// If the xenomorph already has one of these mutation types, they cannot get this mutation.
+	/// If the prospective xenomorph owner already has one of these mutation types, they cannot get this mutation.
 	var/list/datum/mutation_upgrade/conflicting_mutation_types = list()
-	/// If the xenomorph does not have all of these abilities types, they cannot get this mutation.
+	/// If the prospective xenomorph owner does not have all of these abilities types, they cannot get this mutation.
 	var/list/datum/action/ability/required_abilities_types = list()
 
 /datum/mutation_upgrade/New(mob/living/carbon/xenomorph/new_xenomorph_owner)
-	if(!length(allowed_caste_names))
+	if(length(allowed_caste_names))
+		var/list/saner_caste_names = list()
+		for(var/possible_caste_type AS in allowed_caste_names)
+			if(ispath(possible_caste_type, /datum/xeno_caste))
+				var/datum/xeno_caste/caste_type = possible_caste_type
+				saner_caste_names += caste_type.caste_name // We use names because we want to differentiate between the caste + caste primo vs. strain + strain primo.
+				continue
+			saner_caste_names += possible_caste_type
+		allowed_caste_names.Cut()
+		allowed_caste_names = saner_caste_names
+	if(!new_xenomorph_owner)
 		return
-	var/list/saner_caste_names = list()
-	for(var/possible_caste_type AS in allowed_caste_names)
-		if(ispath(possible_caste_type, /datum/xeno_caste))
-			var/datum/xeno_caste/caste_type = possible_caste_type
-			saner_caste_names += caste_type.caste_name // We use names because we want to differentiate between the caste + caste primo vs. strain + strain primo.
-			continue
-		saner_caste_names += possible_caste_type
-	allowed_caste_names.Cut()
-	allowed_caste_names = saner_caste_names
+	xenomorph_owner = new_xenomorph_owner
+	alert = xenomorph_owner.throw_alert("mutation_[initial(name)]", alert_typepath)
+	alert.name = name
+	alert.desc = desc
+	xenomorph_owner.owned_mutations += src
+	RegisterSignal(xenomorph_owner, COMSIG_XENOMORPH_ABILITY_ON_UPGRADE, TYPE_PROC_REF(/datum/mutation_upgrade, on_xenomorph_upgrade))
+	on_gain()
+
+/datum/mutation_upgrade/Destroy(force, ...)
+	if(!xenomorph_owner)
+		return ..()
+	if(alert)
+		xenomorph_owner.clear_alert("mutation_[initial(name)]")
+	if(src in xenomorph_owner.owned_mutations)
+		xenomorph_owner.owned_mutations -= src
+	UnregisterSignal(xenomorph_owner, COMSIG_XENOMORPH_ABILITY_ON_UPGRADE)
+	on_loss()
+	return ..()
 
 /// Called when the mutation is gained.
 /datum/mutation_upgrade/proc/on_gain(mob/living/carbon/xenomorph/mutated_xenomorph)
-	SHOULD_CALL_PARENT(TRUE)
-	var/atom/movable/screen/alert/alert = mutated_xenomorph.throw_alert("mutation_[initial(name)]", alert_typepath)
-	alert.name = name
-	alert.desc = desc
-	mutated_xenomorph.owned_mutations += type
-	RegisterSignal(mutated_xenomorph, COMSIG_XENOMORPH_ABILITY_ON_UPGRADE, TYPE_PROC_REF(/datum/mutation_upgrade, on_xenomorph_upgrade))
+	return
 
 /// Called when the mutation is lost.
 /datum/mutation_upgrade/proc/on_loss(mob/living/carbon/xenomorph/mutated_xenomorph)
-	SHOULD_CALL_PARENT(TRUE)
-	mutated_xenomorph.clear_alert("mutation_[initial(name)]")
-	mutated_xenomorph.owned_mutations -= type
-	UnregisterSignal(mutated_xenomorph, COMSIG_XENOMORPH_ABILITY_ON_UPGRADE)
+	return
 
 /// Called whenever the xenomorph owner is upgraded (e.g. normal to primordial).
 /datum/mutation_upgrade/proc/on_xenomorph_upgrade(mob/living/carbon/xenomorph/mutated_xenomorph)

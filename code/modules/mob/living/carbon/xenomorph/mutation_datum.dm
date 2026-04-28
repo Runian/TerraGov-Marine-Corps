@@ -118,7 +118,7 @@
 			return FALSE
 	to_chat(xenomorph_purchaser, span_xenonotice("Mutation gained."))
 	xenomorph_purchaser.do_jitter_animation(500)
-	mutation.on_gain(xenomorph_purchaser)
+	new mutation_typepath(xenomorph_purchaser) // Everything else in handled during the mutation's New()
 
 /// Called when a disk is printed.
 /datum/mutation_datum/proc/on_disk_printed(datum/source, obj/machinery/computer/code_generator/nuke/printing_computer)
