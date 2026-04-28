@@ -73,7 +73,7 @@
 	cure_ability.resin_jelly_duration -= 40 SECONDS
 
 //*********************//
-//         Spur        //
+//       Offense       //
 //*********************//
 /datum/mutation_upgrade/offense/shrike/smashing_fling
 	name = "Smashing Fling"
@@ -143,7 +143,7 @@
 	fling_ability.collusion_xenos_only = initial(fling_ability.collusion_xenos_only)
 
 //*********************//
-//         Veil        //
+//       Utility       //
 //*********************//
 /datum/mutation_upgrade/utility/shrike/delayed_condition
 	name = "Delayed Condition"
