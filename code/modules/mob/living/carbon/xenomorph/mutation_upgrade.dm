@@ -25,7 +25,7 @@
 		for(var/possible_caste_type AS in allowed_caste_names)
 			if(ispath(possible_caste_type, /datum/xeno_caste))
 				var/datum/xeno_caste/caste_type = possible_caste_type
-				saner_caste_names += caste_type.caste_name
+				saner_caste_names += caste_type.caste_name // We use names because we want to differentiate between the caste + caste primo vs. strain + strain primo.
 				continue
 			saner_caste_names += possible_caste_type // We are assuming that it is the caste's name.
 		allowed_caste_names.Cut()
