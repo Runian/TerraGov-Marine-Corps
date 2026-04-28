@@ -127,14 +127,14 @@
 	/// If a projectile's accuracy is above this value, then the dodge chance is decreased by each point above it.
 	var/accuracy_reduction_threshold = 75
 
-/datum/mutation_upgrade/defense/runner/ingrained_evasion/on_mutation_enabled()
+/datum/mutation_upgrade/defense/runner/ingrained_evasion/on_gain()
 	var/datum/action/ability/xeno_action/evasion/ability = xenomorph_owner.actions_by_path[/datum/action/ability/xeno_action/evasion]
 	if(ability)
 		ability.remove_action(xenomorph_owner)
 	RegisterSignal(xenomorph_owner, COMSIG_XENO_PROJECTILE_HIT, PROC_REF(dodge_projectile))
 	RegisterSignal(xenomorph_owner, COMSIG_PRE_MOVABLE_IMPACT, PROC_REF(dodge_thrown_item))
 
-/datum/mutation_upgrade/defense/runner/ingrained_evasion/on_mutation_disabled()
+/datum/mutation_upgrade/defense/runner/ingrained_evasion/on_loss()
 	var/datum/action/ability/xeno_action/evasion/ability = new()
 	ability.give_action(xenomorph_owner)
 	UnregisterSignal(xenomorph_owner, list(COMSIG_XENO_PROJECTILE_HIT, COMSIG_PRE_MOVABLE_IMPACT))
@@ -271,7 +271,7 @@
 		/datum/action/ability/activable/xeno/pounce/runner
 	)
 
-/datum/mutation_upgrade/utility/runner/headslam/on_mutation_enabled()
+/datum/mutation_upgrade/utility/runner/headslam/on_gain()
 	var/datum/action/ability/activable/xeno/pounce/runner/ability = xenomorph_owner.actions_by_path[/datum/action/ability/activable/xeno/pounce/runner]
 	if(!ability)
 		return
@@ -279,7 +279,7 @@
 	ability.self_immobilize_duration *= 0.25
 	ability.savage_debuff_amount += 2 SECONDS
 
-/datum/mutation_upgrade/utility/runner/headslam/on_mutation_disabled()
+/datum/mutation_upgrade/utility/runner/headslam/on_loss()
 	var/datum/action/ability/activable/xeno/pounce/runner/ability = xenomorph_owner.actions_by_path[/datum/action/ability/activable/xeno/pounce/runner]
 	if(!ability)
 		return
@@ -294,13 +294,13 @@
 		/datum/action/ability/activable/xeno/pounce/runner
 	)
 
-/datum/mutation_upgrade/utility/runner/frenzy/on_mutation_enabled()
+/datum/mutation_upgrade/utility/runner/frenzy/on_gain()
 	var/datum/action/ability/activable/xeno/pounce/runner/ability = xenomorph_owner.actions_by_path[/datum/action/ability/activable/xeno/pounce/runner]
 	if(!ability)
 		return
 	ability.savage_damage_conversion_rate += 0.005
 
-/datum/mutation_upgrade/utility/runner/frenzy/on_mutation_disabled()
+/datum/mutation_upgrade/utility/runner/frenzy/on_loss()
 	var/datum/action/ability/activable/xeno/pounce/runner/ability = xenomorph_owner.actions_by_path[/datum/action/ability/activable/xeno/pounce/runner]
 	if(!ability)
 		return
