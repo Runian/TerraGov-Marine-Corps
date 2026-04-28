@@ -66,7 +66,7 @@
 		/datum/action/ability/activable/xeno/essence_link
 	)
 
-/datum/mutation_upgrade/shell/together_in_claws/on_gain()
+/datum/mutation_upgrade/defense/drone/together_in_claws/on_gain()
 	. = ..()
 	var/datum/action/ability/activable/xeno/essence_link/ability = xenomorph_owner.actions_by_path[/datum/action/ability/activable/xeno/essence_link]
 	if(!ability)
@@ -76,7 +76,7 @@
 		return
 	ability.existing_link.set_lifesteal(ability.lifesteal_percentage)
 
-/datum/mutation_upgrade/shell/together_in_claws/on_loss()
+/datum/mutation_upgrade/defense/drone/together_in_claws/on_loss()
 	. = ..()
 	var/datum/action/ability/activable/xeno/essence_link/ability = xenomorph_owner.actions_by_path[/datum/action/ability/activable/xeno/essence_link]
 	if(!ability)
