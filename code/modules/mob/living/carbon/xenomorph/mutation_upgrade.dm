@@ -23,7 +23,7 @@
 			var/datum/xeno_caste/caste_type = possible_caste_type
 			saner_caste_names += caste_type.caste_name // We use names because we want to differentiate between the caste + caste primo vs. strain + strain primo.
 			continue
-		saner_caste_names += possible_caste_type // We are assuming that it is the caste's name.
+		saner_caste_names += possible_caste_type
 	allowed_caste_names.Cut()
 	allowed_caste_names = saner_caste_names
 
