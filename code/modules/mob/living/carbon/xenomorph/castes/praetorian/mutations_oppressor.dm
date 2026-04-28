@@ -39,7 +39,7 @@
 		return ..()
 	return "Dislocate, Advance, and Tail Lash now causes thrown humans that hit a wall to take damage equal to [PERCENT(get_percentage(new_amount))]% of your slash damage."
 
-/datum/mutation_upgrade/spur/wall_bang/on_mutation_enabled()
+/datum/mutation_upgrade/spur/wall_bang/on_gain()
 	. = ..()
 	var/datum/action/ability/activable/xeno/oppressor/dislocate/dislocate_ability = xenomorph_owner.actions_by_path[/datum/action/ability/activable/xeno/oppressor/dislocate]
 	if(!dislocate_ability)
@@ -54,7 +54,7 @@
 	tail_ability.wallbang_multiplier += get_percentage(0)
 	advance_ability.wallbang_multiplier += get_percentage(0)
 
-/datum/mutation_upgrade/spur/wall_bang/on_mutation_disabled()
+/datum/mutation_upgrade/spur/wall_bang/on_loss()
 	. = ..()
 	var/datum/action/ability/activable/xeno/oppressor/dislocate/dislocate_ability = xenomorph_owner.actions_by_path[/datum/action/ability/activable/xeno/oppressor/dislocate]
 	if(!dislocate_ability)
@@ -105,7 +105,7 @@
 		return ..()
 	return "Advance's cast time is [PERCENT(1 + get_multiplier(new_amount))]% of its original value, but it stuns for half as long and flings humans away half the distance."
 
-/datum/mutation_upgrade/veil/low_charge/on_mutation_enabled()
+/datum/mutation_upgrade/veil/low_charge/on_gain()
 	. = ..()
 	var/datum/action/ability/activable/xeno/oppressor/advance/advance_ability = xenomorph_owner.actions_by_path[/datum/action/ability/activable/xeno/oppressor/advance]
 	if(!advance_ability)
@@ -114,7 +114,7 @@
 	advance_ability.throw_range /= 2
 	advance_ability.paralyze_duration /= 2
 
-/datum/mutation_upgrade/veil/low_charge/on_mutation_disabled()
+/datum/mutation_upgrade/veil/low_charge/on_loss()
 	. = ..()
 	var/datum/action/ability/activable/xeno/oppressor/advance/advance_ability = xenomorph_owner.actions_by_path[/datum/action/ability/activable/xeno/oppressor/advance]
 	if(!advance_ability)

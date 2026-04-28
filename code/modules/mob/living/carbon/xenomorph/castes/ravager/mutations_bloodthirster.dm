@@ -14,7 +14,7 @@
 		return ..()
 	return "Endure can be used in critical. It now costs [PERCENT(1 + get_multiplier(new_amount))]% of its original plasma cost."
 
-/datum/mutation_upgrade/shell/no_end/on_mutation_enabled()
+/datum/mutation_upgrade/shell/no_end/on_gain()
 	. = ..()
 	var/datum/action/ability/xeno_action/endure/endure_ability = xenomorph_owner.actions_by_path[/datum/action/ability/xeno_action/endure]
 	if(!endure_ability)
@@ -22,7 +22,7 @@
 	endure_ability.use_state_flags |= (ABILITY_USE_INCAP|ABILITY_USE_LYING)
 	endure_ability.ability_cost += initial(endure_ability.ability_cost) * get_multiplier(0)
 
-/datum/mutation_upgrade/shell/no_end/on_mutation_disabled()
+/datum/mutation_upgrade/shell/no_end/on_loss()
 	. = ..()
 	var/datum/action/ability/xeno_action/endure/endure_ability = xenomorph_owner.actions_by_path[/datum/action/ability/xeno_action/endure]
 	if(!endure_ability)
@@ -83,7 +83,7 @@
 		return ..()
 	return "Endure further decreases your critical and death threshold by [-get_threshold(new_amount)]. If Endure ends while your health is under the default death threshold, you die instead."
 
-/datum/mutation_upgrade/veil/safety_trap/on_mutation_enabled()
+/datum/mutation_upgrade/veil/safety_trap/on_gain()
 	. = ..()
 	var/datum/action/ability/xeno_action/endure/endure_ability = xenomorph_owner.actions_by_path[/datum/action/ability/xeno_action/endure]
 	if(!endure_ability)
@@ -91,7 +91,7 @@
 	endure_ability.endure_threshold += get_threshold(0)
 	endure_ability.death_beyond_threshold = TRUE
 
-/datum/mutation_upgrade/veil/safety_trap/on_mutation_disabled()
+/datum/mutation_upgrade/veil/safety_trap/on_loss()
 	. = ..()
 	var/datum/action/ability/xeno_action/endure/endure_ability = xenomorph_owner.actions_by_path[/datum/action/ability/xeno_action/endure]
 	if(!endure_ability)

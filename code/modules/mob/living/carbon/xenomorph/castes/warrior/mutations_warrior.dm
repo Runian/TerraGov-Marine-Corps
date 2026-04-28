@@ -81,7 +81,7 @@
 		return ..()
 	return "Fling and Grapple Toss's cooldown is set to [PERCENT(1 + get_cooldown(new_amount))]% of its original cooldown if it was used on allies."
 
-/datum/mutation_upgrade/veil/friendly_toss/on_mutation_enabled()
+/datum/mutation_upgrade/veil/friendly_toss/on_gain()
 	var/datum/action/ability/activable/xeno/warrior/fling/fling_ability = xenomorph_owner.actions_by_path[/datum/action/ability/activable/xeno/warrior/fling]
 	if(!fling_ability)
 		return
@@ -92,7 +92,7 @@
 	toss_ability.ally_cooldown_multiplier += get_cooldown(0)
 	return ..()
 
-/datum/mutation_upgrade/veil/friendly_toss/on_mutation_disabled()
+/datum/mutation_upgrade/veil/friendly_toss/on_loss()
 	var/datum/action/ability/activable/xeno/warrior/fling/fling_ability = xenomorph_owner.actions_by_path[/datum/action/ability/activable/xeno/warrior/fling]
 	if(!fling_ability)
 		return

@@ -18,13 +18,13 @@
 		return ..()
 	return "When your health is [PERCENT(max_health_percentage_threshold)]% or lower, gain [get_armor(new_amount)] hard armor."
 
-/datum/mutation_upgrade/shell/rocky_layers/on_mutation_enabled()
+/datum/mutation_upgrade/shell/rocky_layers/on_gain()
 	RegisterSignal(xenomorph_owner, COMSIG_LIVING_UPDATE_HEALTH, PROC_REF(on_update_health))
 	if(xenomorph_owner.health <= (xenomorph_owner.maxHealth * max_health_percentage_threshold))
 		toggle()
 	return ..()
 
-/datum/mutation_upgrade/shell/rocky_layers/on_mutation_disabled()
+/datum/mutation_upgrade/shell/rocky_layers/on_loss()
 	UnregisterSignal(xenomorph_owner, COMSIG_LIVING_UPDATE_HEALTH)
 	if(attached_armor)
 		toggle()
@@ -76,11 +76,11 @@
 		return ..()
 	return "Your slashes deal an additional [get_multiplier(new_amount)]x damage to barricades."
 
-/datum/mutation_upgrade/spur/refined_palate/on_mutation_enabled()
+/datum/mutation_upgrade/spur/refined_palate/on_gain()
 	RegisterSignal(xenomorph_owner, COMSIG_XENOMORPH_ATTACK_OBJ, PROC_REF(on_attack_obj))
 	return ..()
 
-/datum/mutation_upgrade/spur/refined_palate/on_mutation_disabled()
+/datum/mutation_upgrade/spur/refined_palate/on_loss()
 	UnregisterSignal(xenomorph_owner, COMSIG_XENOMORPH_ATTACK_OBJ)
 	return ..()
 
@@ -110,7 +110,7 @@
 		return ..()
 	return "Earth Riser can have [get_amount(new_amount)] more pillars active at a time, but its cooldown duration is doubled."
 
-/datum/mutation_upgrade/veil/avalanche/on_mutation_enabled()
+/datum/mutation_upgrade/veil/avalanche/on_gain()
 	. = ..()
 	var/datum/action/ability/activable/xeno/earth_riser/earth_ability = xenomorph_owner.actions_by_path[/datum/action/ability/activable/xeno/earth_riser]
 	if(!earth_ability)
@@ -121,7 +121,7 @@
 		return
 	earth_ability.cooldown_duration += initial(earth_ability.cooldown_duration)
 
-/datum/mutation_upgrade/veil/avalanche/on_mutation_disabled()
+/datum/mutation_upgrade/veil/avalanche/on_loss()
 	. = ..()
 	var/datum/action/ability/activable/xeno/earth_riser/earth_ability = xenomorph_owner.actions_by_path[/datum/action/ability/activable/xeno/earth_riser]
 	if(!earth_ability)

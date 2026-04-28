@@ -12,11 +12,11 @@
 		return ..()
 	return "Whenever you regenerate health, you will also gain [PERCENT(get_percentage(new_amount))]% of your maximum plasma. This scales with regenerative power."
 
-/datum/mutation_upgrade/shell/regenerative_armor/on_mutation_enabled()
+/datum/mutation_upgrade/shell/regenerative_armor/on_gain()
 	RegisterSignal(xenomorph_owner, COMSIG_XENOMORPH_HEALTH_REGEN, PROC_REF(on_health_regeneration))
 	return ..()
 
-/datum/mutation_upgrade/shell/regenerative_armor/on_mutation_disabled()
+/datum/mutation_upgrade/shell/regenerative_armor/on_loss()
 	UnregisterSignal(xenomorph_owner, list(COMSIG_XENOMORPH_HEALTH_REGEN))
 	return ..()
 
@@ -47,7 +47,7 @@
 		return ..()
 	return "Dragon Breath can switch between additional fire types to replace it with different effects: shatter or melting acid. Dragon Breath's cooldown is set to 150/125/100% [PERCENT((1 + get_multiplier(new_amount)))] of its original cooldown."
 
-/datum/mutation_upgrade/spur/breath_of_variety/on_mutation_enabled()
+/datum/mutation_upgrade/spur/breath_of_variety/on_gain()
 	. = ..()
 	var/datum/action/ability/activable/xeno/backhand/dragon_breath/breath_ability = xenomorph_owner.actions_by_path[/datum/action/ability/activable/xeno/backhand/dragon_breath]
 	if(!breath_ability)
@@ -56,7 +56,7 @@
 	breath_ability.selectable_fire_images_list[DRAGON_BREATH_SHATTERING] = image('icons/effects/fire.dmi', icon_state = "violet_3")
 	breath_ability.selectable_fire_images_list[DRAGON_BREATH_MELTING_ACID] = image('icons/effects/fire.dmi', icon_state = "green_3")
 
-/datum/mutation_upgrade/spur/breath_of_variety/on_mutation_disabled()
+/datum/mutation_upgrade/spur/breath_of_variety/on_loss()
 	. = ..()
 	var/datum/action/ability/activable/xeno/backhand/dragon_breath/breath_ability = xenomorph_owner.actions_by_path[/datum/action/ability/activable/xeno/backhand/dragon_breath]
 	if(!breath_ability)

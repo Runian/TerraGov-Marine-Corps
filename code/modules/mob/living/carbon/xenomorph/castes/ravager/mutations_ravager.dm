@@ -14,14 +14,14 @@
 		return ..()
 	return "Endure further decreases your critical and death threshold by [-get_threshold(new_amount)]."
 
-/datum/mutation_upgrade/shell/little_more/on_mutation_enabled()
+/datum/mutation_upgrade/shell/little_more/on_gain()
 	. = ..()
 	var/datum/action/ability/xeno_action/endure/endure_ability = xenomorph_owner.actions_by_path[/datum/action/ability/xeno_action/endure]
 	if(!endure_ability)
 		return
 	endure_ability.endure_threshold += get_threshold(0)
 
-/datum/mutation_upgrade/shell/little_more/on_mutation_disabled()
+/datum/mutation_upgrade/shell/little_more/on_loss()
 	. = ..()
 	var/datum/action/ability/xeno_action/endure/endure_ability = xenomorph_owner.actions_by_path[/datum/action/ability/xeno_action/endure]
 	if(!endure_ability)
@@ -52,7 +52,7 @@
 		return ..()
 	return "Endure lasts [PERCENT(1 + get_multiplier(new_amount))]% as long, but duration-increasing slashes is now available during normal Rage."
 
-/datum/mutation_upgrade/shell/keep_going/on_mutation_enabled()
+/datum/mutation_upgrade/shell/keep_going/on_gain()
 	. = ..()
 	var/datum/action/ability/xeno_action/endure/endure_ability = xenomorph_owner.actions_by_path[/datum/action/ability/xeno_action/endure]
 	if(!endure_ability)
@@ -63,7 +63,7 @@
 	endure_ability.endure_duration += initial(endure_ability.endure_duration) * get_multiplier(0)
 	rage_ability.extends_via_normal_rage = TRUE
 
-/datum/mutation_upgrade/shell/keep_going/on_mutation_disabled()
+/datum/mutation_upgrade/shell/keep_going/on_loss()
 	. = ..()
 	var/datum/action/ability/xeno_action/endure/endure_ability = xenomorph_owner.actions_by_path[/datum/action/ability/xeno_action/endure]
 	if(!endure_ability)
@@ -98,7 +98,7 @@
 		return ..()
 	return "Endure no longer grants stagger immunity nor can be activated while staggered. Endure grants [get_armor(new_amount)] all soft armor while active."
 
-/datum/mutation_upgrade/shell/inward_focus/on_mutation_enabled()
+/datum/mutation_upgrade/shell/inward_focus/on_gain()
 	. = ..()
 	var/datum/action/ability/xeno_action/endure/endure_ability = xenomorph_owner.actions_by_path[/datum/action/ability/xeno_action/endure]
 	if(!endure_ability)
@@ -109,7 +109,7 @@
 	if(endure_ability.endure_timer)
 		REMOVE_TRAIT(xenomorph_owner, TRAIT_STAGGERIMMUNE, ENDURE_TRAIT)
 
-/datum/mutation_upgrade/shell/inward_focus/on_mutation_disabled()
+/datum/mutation_upgrade/shell/inward_focus/on_loss()
 	. = ..()
 	var/datum/action/ability/xeno_action/endure/endure_ability = xenomorph_owner.actions_by_path[/datum/action/ability/xeno_action/endure]
 	if(!endure_ability)
@@ -154,14 +154,14 @@
 		return ..()
 	return "Ravage now has an additional [get_ap(new_amount)] armor penetration."
 
-/datum/mutation_upgrade/spur/deep_slash/on_mutation_enabled()
+/datum/mutation_upgrade/spur/deep_slash/on_gain()
 	. = ..()
 	var/datum/action/ability/activable/xeno/ravage/ravage_ability = xenomorph_owner.actions_by_path[/datum/action/ability/activable/xeno/ravage]
 	if(!ravage_ability)
 		return
 	ravage_ability.armor_penetration += get_ap(0)
 
-/datum/mutation_upgrade/spur/deep_slash/on_mutation_disabled()
+/datum/mutation_upgrade/spur/deep_slash/on_loss()
 	. = ..()
 	var/datum/action/ability/activable/xeno/ravage/ravage_ability = xenomorph_owner.actions_by_path[/datum/action/ability/activable/xeno/ravage]
 	if(!ravage_ability)
@@ -192,7 +192,7 @@
 		return ..()
 	return "Ravage now slashes in all directions, but has a cast time of [get_time(new_amount) / 10] seconds."
 
-/datum/mutation_upgrade/spur/super_cut/on_mutation_enabled()
+/datum/mutation_upgrade/spur/super_cut/on_gain()
 	. = ..()
 	var/datum/action/ability/activable/xeno/ravage/ravage_ability = xenomorph_owner.actions_by_path[/datum/action/ability/activable/xeno/ravage]
 	if(!ravage_ability)
@@ -200,7 +200,7 @@
 	ravage_ability.cast_time += get_time(0)
 	ravage_ability.aoe = TRUE
 
-/datum/mutation_upgrade/spur/super_cut/on_mutation_disabled()
+/datum/mutation_upgrade/spur/super_cut/on_loss()
 	. = ..()
 	var/datum/action/ability/activable/xeno/ravage/ravage_ability = xenomorph_owner.actions_by_path[/datum/action/ability/activable/xeno/ravage]
 	if(!ravage_ability)
@@ -232,7 +232,7 @@
 		return ..()
 	return "Eviscerating Charge's cooldown duration is set to [PERCENT(1 + get_multiplier(new_amount))]% of its original value, but it no longer stuns."
 
-/datum/mutation_upgrade/spur/onslaught/on_mutation_enabled()
+/datum/mutation_upgrade/spur/onslaught/on_gain()
 	. = ..()
 	var/datum/action/ability/activable/xeno/charge/charge_ability = xenomorph_owner.actions_by_path[/datum/action/ability/activable/xeno/charge]
 	if(!charge_ability)
@@ -240,7 +240,7 @@
 	charge_ability.cooldown_duration += initial(charge_ability.cooldown_duration) * get_multiplier(0)
 	charge_ability.paralyze_duration -= initial(charge_ability.paralyze_duration)
 
-/datum/mutation_upgrade/spur/onslaught/on_mutation_disabled()
+/datum/mutation_upgrade/spur/onslaught/on_loss()
 	. = ..()
 	var/datum/action/ability/activable/xeno/charge/charge_ability = xenomorph_owner.actions_by_path[/datum/action/ability/activable/xeno/charge]
 	if(!charge_ability)
@@ -275,7 +275,7 @@
 		return ..()
 	return "Rage will automatically attempt to activate when your health reaches the minimum required threshold. Rage's cooldown duration is [PERCENT(1 + get_multiplier(new_amount))]% of its original value."
 
-/datum/mutation_upgrade/veil/recurring_rage/on_mutation_enabled()
+/datum/mutation_upgrade/veil/recurring_rage/on_gain()
 	. = ..()
 	var/datum/action/ability/xeno_action/rage/rage_ability = xenomorph_owner.actions_by_path[/datum/action/ability/xeno_action/rage]
 	if(!rage_ability)
@@ -283,7 +283,7 @@
 	rage_ability.cooldown_duration += initial(rage_ability.cooldown_duration) * get_multiplier(0)
 	RegisterSignal(xenomorph_owner, list(COMSIG_LIVING_UPDATE_HEALTH), PROC_REF(on_update_health))
 
-/datum/mutation_upgrade/veil/recurring_rage/on_mutation_disabled()
+/datum/mutation_upgrade/veil/recurring_rage/on_loss()
 	. = ..()
 	var/datum/action/ability/xeno_action/rage/rage_ability = xenomorph_owner.actions_by_path[/datum/action/ability/xeno_action/rage]
 	if(!rage_ability)
@@ -330,7 +330,7 @@
 		return ..()
 	return "You lose 70 fire armor. The plasma gain from stepping into fire is now also given for being on fire. This plasma gain is increased by [get_plasma(new_amount)]."
 
-/datum/mutation_upgrade/veil/fight_in_flames/on_mutation_enabled()
+/datum/mutation_upgrade/veil/fight_in_flames/on_gain()
 	. = ..()
 	if(!isxenoravager(xenomorph_owner))
 		return
@@ -340,7 +340,7 @@
 	var/mob/living/carbon/xenomorph/ravager/ravager_owner = xenomorph_owner
 	ravager_owner.plasma_gain_from_fire += get_plasma(0)
 
-/datum/mutation_upgrade/veil/fight_in_flames/on_mutation_disabled()
+/datum/mutation_upgrade/veil/fight_in_flames/on_loss()
 	. = ..()
 	if(!isxenoravager(xenomorph_owner))
 		return
@@ -382,7 +382,7 @@
 		return ..()
 	return "Endure now costs health to activate, but will consume plasma first. This damage is non-lethal. Endure's cooldown duration is set to [PERCENT(1 + get_multiplier(new_amount))]% of its original value."
 
-/datum/mutation_upgrade/veil/bloody_endure/on_mutation_enabled()
+/datum/mutation_upgrade/veil/bloody_endure/on_gain()
 	. = ..()
 	var/datum/action/ability/xeno_action/endure/endure_ability = xenomorph_owner.actions_by_path[/datum/action/ability/xeno_action/endure]
 	if(!endure_ability)
@@ -391,7 +391,7 @@
 	endure_ability.use_state_flags |= ABILITY_IGNORE_PLASMA
 	endure_ability.uses_health_as_necessary = TRUE
 
-/datum/mutation_upgrade/veil/bloody_endure/on_mutation_disabled()
+/datum/mutation_upgrade/veil/bloody_endure/on_loss()
 	. = ..()
 	var/datum/action/ability/xeno_action/endure/endure_ability = xenomorph_owner.actions_by_path[/datum/action/ability/xeno_action/endure]
 	if(!endure_ability)

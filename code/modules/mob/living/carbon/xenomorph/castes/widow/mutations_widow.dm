@@ -16,12 +16,12 @@
 		return ..()
 	return "Being adjacent to any resin wall now also grants [get_armor(new_amount)] soft armor in all categories."
 
-/datum/mutation_upgrade/shell/hive_toughness/on_mutation_enabled()
+/datum/mutation_upgrade/shell/hive_toughness/on_gain()
 	RegisterSignal(xenomorph_owner, COMSIG_MOVABLE_MOVED, PROC_REF(on_movement))
 	on_movement() // Don't wanna wait until they move.
 	return ..()
 
-/datum/mutation_upgrade/shell/hive_toughness/on_mutation_disabled()
+/datum/mutation_upgrade/shell/hive_toughness/on_loss()
 	UnregisterSignal(xenomorph_owner, COMSIG_MOVABLE_MOVED)
 	if(attached_armor)
 		xenomorph_owner.soft_armor.detachArmor(attached_armor)
@@ -72,7 +72,7 @@
 		return ..()
 	return "Leash Ball's cooldown is set to [PERCENT(1 + get_multiplier(new_amount))]% of its original cooldown. Interacting with any Snaring Web will cause you to channel for 1 second which will stun and pull in leashed humans."
 
-/datum/mutation_upgrade/spur/web_yank/on_mutation_enabled()
+/datum/mutation_upgrade/spur/web_yank/on_gain()
 	. = ..()
 	var/datum/action/ability/activable/xeno/leash_ball/leash_ability = xenomorph_owner.actions_by_path[/datum/action/ability/activable/xeno/leash_ball]
 	if(!leash_ability)
@@ -80,7 +80,7 @@
 	leash_ability.cooldown_duration += initial(leash_ability.cooldown_duration) * get_multiplier(0)
 	ADD_TRAIT(xenomorph_owner, TRAIT_WEB_PULLER, MUTATION_TRAIT)
 
-/datum/mutation_upgrade/spur/web_yank/on_mutation_disabled()
+/datum/mutation_upgrade/spur/web_yank/on_loss()
 	. = ..()
 	var/datum/action/ability/activable/xeno/leash_ball/leash_ability = xenomorph_owner.actions_by_path[/datum/action/ability/activable/xeno/leash_ball]
 	if(!leash_ability)
@@ -115,14 +115,14 @@
 		return ..()
 	return "Birth Spiderling's cooldown is set to [PERCENT(1 + get_multiplier(new_amount))]% of its original cooldown."
 
-/datum/mutation_upgrade/veil/incubator/on_mutation_enabled()
+/datum/mutation_upgrade/veil/incubator/on_gain()
 	. = ..()
 	var/datum/action/ability/xeno_action/create_spiderling/spiderling_ability = xenomorph_owner.actions_by_path[/datum/action/ability/xeno_action/create_spiderling]
 	if(!spiderling_ability)
 		return
 	spiderling_ability.cooldown_duration += initial(spiderling_ability.cooldown_duration) * get_multiplier(0)
 
-/datum/mutation_upgrade/veil/incubator/on_mutation_disabled()
+/datum/mutation_upgrade/veil/incubator/on_loss()
 	. = ..()
 	var/datum/action/ability/xeno_action/create_spiderling/spiderling_ability = xenomorph_owner.actions_by_path[/datum/action/ability/xeno_action/create_spiderling]
 	if(!spiderling_ability)

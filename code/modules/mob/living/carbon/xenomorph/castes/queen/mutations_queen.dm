@@ -14,7 +14,7 @@
 		return ..()
 	return "Bulwark no longer grants armor. Bulwark now grants overheal of [get_overheal(new_amount)] for entering the affected area for the first time. This overheal is subtracted when leaving the affected area or when Bulwark ends."
 
-/datum/mutation_upgrade/shell/healthy_bulwark/on_mutation_enabled()
+/datum/mutation_upgrade/shell/healthy_bulwark/on_gain()
 	. = ..()
 	var/datum/action/ability/xeno_action/bulwark/bulwark_ability = xenomorph_owner.actions_by_path[/datum/action/ability/xeno_action/bulwark]
 	if(!bulwark_ability)
@@ -22,7 +22,7 @@
 	bulwark_ability.armor_multiplier = 0
 	bulwark_ability.flat_overheal += get_overheal(0)
 
-/datum/mutation_upgrade/shell/healthy_bulwark/on_mutation_disabled()
+/datum/mutation_upgrade/shell/healthy_bulwark/on_loss()
 	. = ..()
 	var/datum/action/ability/xeno_action/bulwark/bulwark_ability = xenomorph_owner.actions_by_path[/datum/action/ability/xeno_action/bulwark]
 	if(!bulwark_ability)
@@ -54,7 +54,7 @@
 		return ..()
 	return "Bulwark no longer requires you to stand still, but ends when you leave the radius. It grants [PERCENT(1 + get_multiplier(new_amount))]% of its original armor."
 
-/datum/mutation_upgrade/shell/bulwark_zone/on_mutation_enabled()
+/datum/mutation_upgrade/shell/bulwark_zone/on_gain()
 	. = ..()
 	var/datum/action/ability/xeno_action/bulwark/bulwark_ability = xenomorph_owner.actions_by_path[/datum/action/ability/xeno_action/bulwark]
 	if(!bulwark_ability)
@@ -62,7 +62,7 @@
 	bulwark_ability.channel_required = FALSE
 	bulwark_ability.armor_multiplier += initial(bulwark_ability.armor_multiplier) * get_multiplier(0)
 
-/datum/mutation_upgrade/shell/bulwark_zone/on_mutation_disabled()
+/datum/mutation_upgrade/shell/bulwark_zone/on_loss()
 	. = ..()
 	var/datum/action/ability/xeno_action/bulwark/bulwark_ability = xenomorph_owner.actions_by_path[/datum/action/ability/xeno_action/bulwark]
 	if(!bulwark_ability)
@@ -95,7 +95,7 @@
 		return ..()
 	return "Ozelomelyn Sting is replaced with Neurotoxin Sting. Each interval gives [PERCENT(get_multiplier(new_amount))]% more chemicals."
 
-/datum/mutation_upgrade/spur/alternative_sting/on_mutation_enabled()
+/datum/mutation_upgrade/spur/alternative_sting/on_gain()
 	var/datum/action/ability/activable/xeno/neurotox_sting/ozelomelyn/ozelomelyn_ability = xenomorph_owner.actions_by_path[/datum/action/ability/activable/xeno/neurotox_sting/ozelomelyn]
 	if(ozelomelyn_ability)
 		ozelomelyn_ability.remove_action(xenomorph_owner)
@@ -106,7 +106,7 @@
 		neurotox_ability.give_action(xenomorph_owner)
 	return ..()
 
-/datum/mutation_upgrade/spur/alternative_sting/on_mutation_disabled()
+/datum/mutation_upgrade/spur/alternative_sting/on_loss()
 	var/datum/action/ability/activable/xeno/neurotox_sting/neurotox_ability = xenomorph_owner.actions_by_path[/datum/action/ability/activable/xeno/neurotox_sting]
 	if(neurotox_ability)
 		neurotox_ability.remove_action(xenomorph_owner)
@@ -150,14 +150,14 @@
 		return ..()
 	return "Screech grant all xenomorphs within a 20-tile radius gain [get_movement(new_amount)] speed for 4 seconds."
 
-/datum/mutation_upgrade/veil/rallying_cry/on_mutation_enabled()
+/datum/mutation_upgrade/veil/rallying_cry/on_gain()
 	. = ..()
 	var/datum/action/ability/activable/xeno/screech/screech_ability = xenomorph_owner.actions_by_path[/datum/action/ability/activable/xeno/screech]
 	if(!screech_ability)
 		return
 	screech_ability.movement_speed_modifier += get_movement(0)
 
-/datum/mutation_upgrade/veil/rallying_cry/on_mutation_disabled()
+/datum/mutation_upgrade/veil/rallying_cry/on_loss()
 	. = ..()
 	var/datum/action/ability/activable/xeno/screech/screech_ability = xenomorph_owner.actions_by_path[/datum/action/ability/activable/xeno/screech]
 	if(!screech_ability)

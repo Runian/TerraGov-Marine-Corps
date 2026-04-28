@@ -41,7 +41,7 @@
 		return ..()
 	return "Smokescreen Spit does stamina damage and emits Neurotoxin instead. Smokescreen Spit's plasma cost is [PERCENT(1 + get_cost_multiplier(new_amount))]% of its original cost."
 
-/datum/mutation_upgrade/spur/neurotoxin_swap/on_mutation_enabled()
+/datum/mutation_upgrade/spur/neurotoxin_swap/on_gain()
 	var/datum/action/ability/activable/xeno/smokescreen_spit/smokescreen_ability = xenomorph_owner.actions_by_path[/datum/action/ability/activable/xeno/smokescreen_spit]
 	if(!smokescreen_ability)
 		return
@@ -49,7 +49,7 @@
 	smokescreen_ability.ability_cost += initial(smokescreen_ability.ability_cost) * get_cost_multiplier(0)
 	return ..()
 
-/datum/mutation_upgrade/spur/neurotoxin_swap/on_mutation_disabled()
+/datum/mutation_upgrade/spur/neurotoxin_swap/on_loss()
 	var/datum/action/ability/activable/xeno/smokescreen_spit/smokescreen_ability = xenomorph_owner.actions_by_path[/datum/action/ability/activable/xeno/smokescreen_spit]
 	if(!smokescreen_ability)
 		return

@@ -14,7 +14,7 @@
 		return ..()
 	return "While Psychic Link is active, you gain maximum movement resistance and gain [get_armor(new_amount)] armor."
 
-/datum/mutation_upgrade/shell/unmoving_link/on_mutation_enabled()
+/datum/mutation_upgrade/shell/unmoving_link/on_gain()
 	. = ..()
 	var/datum/action/ability/activable/xeno/psychic_link/link_ability = xenomorph_owner.actions_by_path[/datum/action/ability/activable/xeno/psychic_link]
 	if(!link_ability)
@@ -28,7 +28,7 @@
 		link_ability.attached_armor = getArmor(link_ability.armor_amount, link_ability.armor_amount, link_ability.armor_amount, link_ability.armor_amount, link_ability.armor_amount, link_ability.armor_amount, link_ability.armor_amount, link_ability.armor_amount)
 		xenomorph_owner.soft_armor = xenomorph_owner.soft_armor.attachArmor(link_ability.attached_armor)
 
-/datum/mutation_upgrade/shell/unmoving_link/on_mutation_disabled()
+/datum/mutation_upgrade/shell/unmoving_link/on_loss()
 	var/datum/action/ability/activable/xeno/psychic_link/link_ability = xenomorph_owner.actions_by_path[/datum/action/ability/activable/xeno/psychic_link]
 	if(!link_ability)
 		return
@@ -73,7 +73,7 @@
 		return ..()
 	return "Psychic Link no longer forces you to rest. While it is active, Drain is only [PERCENT(1 + get_multiplier(new_amount))]% effective on corpses."
 
-/datum/mutation_upgrade/spur/necrotic_link/on_mutation_enabled()
+/datum/mutation_upgrade/spur/necrotic_link/on_gain()
 	. = ..()
 	var/datum/action/ability/activable/xeno/psychic_link/link_ability = xenomorph_owner.actions_by_path[/datum/action/ability/activable/xeno/psychic_link]
 	if(!link_ability)
@@ -81,7 +81,7 @@
 	link_ability.set_required_rest(FALSE)
 	link_ability.drain_healing_multiplier += get_multiplier(0)
 
-/datum/mutation_upgrade/spur/necrotic_link/on_mutation_disabled()
+/datum/mutation_upgrade/spur/necrotic_link/on_loss()
 	var/datum/action/ability/activable/xeno/psychic_link/link_ability = xenomorph_owner.actions_by_path[/datum/action/ability/activable/xeno/psychic_link]
 	if(!link_ability)
 		return
@@ -119,7 +119,7 @@
 		return ..()
 	return "Transfusion heals an additional [PERCENT(get_amount(new_amount))]% maximum health, but requires twice as much plasma."
 
-/datum/mutation_upgrade/veil/burst_healing/on_mutation_enabled()
+/datum/mutation_upgrade/veil/burst_healing/on_gain()
 	. = ..()
 	var/datum/action/ability/activable/xeno/transfusion/transfusion_ability = xenomorph_owner.actions_by_path[/datum/action/ability/activable/xeno/transfusion]
 	if(!transfusion_ability)
@@ -127,7 +127,7 @@
 	transfusion_ability.ability_cost += initial(transfusion_ability.ability_cost) * get_multiplier(0)
 	transfusion_ability.heal_percentage += get_amount(0)
 
-/datum/mutation_upgrade/veil/burst_healing/on_mutation_disabled()
+/datum/mutation_upgrade/veil/burst_healing/on_loss()
 	. = ..()
 	var/datum/action/ability/activable/xeno/transfusion/transfusion_ability = xenomorph_owner.actions_by_path[/datum/action/ability/activable/xeno/transfusion]
 	if(!transfusion_ability)

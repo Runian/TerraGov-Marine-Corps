@@ -608,7 +608,7 @@
 		movable_victim.throw_at(targetturf, 4, 1, owner, FALSE, FALSE)
 
 
-#define PSYCHIC_CHOKE_DAMAGE_THRESHOLD 5
+#define PSYCHIC_CHOKE_DAMAGE_THRESHOLD 15
 
 // ***************************************
 // *********** Psychic Choke

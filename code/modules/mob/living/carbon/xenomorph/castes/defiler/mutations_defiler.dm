@@ -16,13 +16,13 @@
 		return ..()
 	return "While you have more than [PERCENT(get_percentage(new_amount))]% of your maximum plasma, getting staggered will consume that much plasma to release non-opaque gas of your last selected gas. This resets upon reaching maximum health."
 
-/datum/mutation_upgrade/shell/panic_gas/on_mutation_enabled()
+/datum/mutation_upgrade/shell/panic_gas/on_gain()
 	RegisterSignal(xenomorph_owner, COMSIG_LIVING_UPDATE_HEALTH, PROC_REF(on_health_update))
 	RegisterSignal(xenomorph_owner, COMSIG_LIVING_STATUS_STAGGER, PROC_REF(on_staggered))
 	can_be_activated = xenomorph_owner.health >= xenomorph_owner.maxHealth
 	return ..()
 
-/datum/mutation_upgrade/shell/panic_gas/on_mutation_disabled()
+/datum/mutation_upgrade/shell/panic_gas/on_loss()
 	UnregisterSignal(xenomorph_owner, list(COMSIG_LIVING_UPDATE_HEALTH, COMSIG_LIVING_STATUS_STAGGER))
 	can_be_activated = FALSE
 	return ..()
@@ -79,7 +79,7 @@
 		return ..()
 	return "All slashes against humans will consume [plasma_per_slash] plasma and inject your selected reagent equal to [PERCENT(get_percentage(new_amount))]% of a regular reagent slash. You no longer have the ability, Reagent Slash."
 
-/datum/mutation_upgrade/spur/envenomed/on_mutation_enabled()
+/datum/mutation_upgrade/spur/envenomed/on_gain()
 	var/datum/action/ability/xeno_action/reagent_slash/slash_ability = xenomorph_owner.actions_by_path[/datum/action/ability/xeno_action/reagent_slash]
 	if(slash_ability)
 		slash_ability.remove_action(xenomorph_owner)
@@ -89,7 +89,7 @@
 	on_selected_reagent(null, null, xenomorph_owner.selected_reagent) // Got to get our particles.
 	return ..()
 
-/datum/mutation_upgrade/spur/envenomed/on_mutation_disabled()
+/datum/mutation_upgrade/spur/envenomed/on_loss()
 	var/datum/action/ability/xeno_action/reagent_slash/slash_ability = xenomorph_owner.actions_by_path[/datum/action/ability/xeno_action/reagent_slash]
 	if(!slash_ability)
 		slash_ability = new()
@@ -153,7 +153,7 @@
 		return ..()
 	return "Emit Noxious Gas now emits non-opaque gas instead. The radius of the gas is increased by [get_radius(new_amount)] tiles."
 
-/datum/mutation_upgrade/veil/wide_gas/on_mutation_enabled()
+/datum/mutation_upgrade/veil/wide_gas/on_gain()
 	. = ..()
 	var/datum/action/ability/xeno_action/emit_neurogas/gas_ability = xenomorph_owner.actions_by_path[/datum/action/ability/xeno_action/emit_neurogas]
 	if(!gas_ability)
@@ -161,7 +161,7 @@
 	gas_ability.radius += get_radius(0)
 	gas_ability.opaque = FALSE
 
-/datum/mutation_upgrade/veil/wide_gas/on_mutation_disabled()
+/datum/mutation_upgrade/veil/wide_gas/on_loss()
 	. = ..()
 	var/datum/action/ability/xeno_action/emit_neurogas/gas_ability = xenomorph_owner.actions_by_path[/datum/action/ability/xeno_action/emit_neurogas]
 	if(!gas_ability)

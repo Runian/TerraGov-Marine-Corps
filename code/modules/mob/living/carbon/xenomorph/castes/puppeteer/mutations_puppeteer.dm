@@ -14,11 +14,11 @@
 		return ..()
 	return "If damage taken would put you into critical, lose [get_plasma_per_damage(new_amount)]x amount of plasma instead."
 
-/datum/mutation_upgrade/shell/flesh_for_life/on_mutation_enabled()
+/datum/mutation_upgrade/shell/flesh_for_life/on_gain()
 	RegisterSignals(xenomorph_owner, list(COMSIG_XENOMORPH_BRUTE_DAMAGE, COMSIG_XENOMORPH_BURN_DAMAGE), PROC_REF(on_damage))
 	return ..()
 
-/datum/mutation_upgrade/shell/flesh_for_life/on_mutation_disabled()
+/datum/mutation_upgrade/shell/flesh_for_life/on_loss()
 	UnregisterSignal(xenomorph_owner, list(COMSIG_XENOMORPH_BRUTE_DAMAGE, COMSIG_XENOMORPH_BURN_DAMAGE))
 	return ..()
 
@@ -55,14 +55,14 @@
 		return ..()
 	return "Dreadful Presence will inflict a temporary effect that deals [get_damage(new_amount)] stamina damage every second instead."
 
-/datum/mutation_upgrade/spur/suffocating_presence/on_mutation_enabled()
+/datum/mutation_upgrade/spur/suffocating_presence/on_gain()
 	. = ..()
 	var/datum/action/ability/xeno_action/dreadful_presence/dreadful_ability = xenomorph_owner.actions_by_path[/datum/action/ability/xeno_action/dreadful_presence]
 	if(!dreadful_ability)
 		return
 	dreadful_ability.stamina_draining += get_damage(0)
 
-/datum/mutation_upgrade/spur/suffocating_presence/on_mutation_disabled()
+/datum/mutation_upgrade/spur/suffocating_presence/on_loss()
 	. = ..()
 	var/datum/action/ability/xeno_action/dreadful_presence/dreadful_ability = xenomorph_owner.actions_by_path[/datum/action/ability/xeno_action/dreadful_presence]
 	if(!dreadful_ability)
@@ -98,7 +98,7 @@
 		return ..()
 	return "Stitch Puppet's cost is [PERCENT(1 + puppet_multiplier_initial)]% of its original cost. Bestow Blessings' cost is [PERCENT(1 + get_blessings_multiplier(new_amount))]% of its original cost."
 
-/datum/mutation_upgrade/veil/shifting_costs/on_mutation_enabled()
+/datum/mutation_upgrade/veil/shifting_costs/on_gain()
 	. = ..()
 	var/datum/action/ability/activable/xeno/puppet/puppet_ability = xenomorph_owner.actions_by_path[/datum/action/ability/activable/xeno/puppet]
 	if(!puppet_ability)
@@ -109,7 +109,7 @@
 	puppet_ability.ability_cost += initial(puppet_ability.ability_cost) * puppet_multiplier_initial
 	blessings_ability.ability_cost += initial(blessings_ability.ability_cost) * get_blessings_multiplier(0)
 
-/datum/mutation_upgrade/veil/shifting_costs/on_mutation_disabled()
+/datum/mutation_upgrade/veil/shifting_costs/on_loss()
 	. = ..()
 	var/datum/action/ability/activable/xeno/puppet/puppet_ability = xenomorph_owner.actions_by_path[/datum/action/ability/activable/xeno/puppet]
 	if(!puppet_ability)
