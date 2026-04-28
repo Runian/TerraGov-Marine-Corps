@@ -89,7 +89,7 @@
 	ability.existing_link.set_lifesteal(ability.lifesteal_percentage)
 
 //*********************//
-//         Spur        //
+//       Offense       //
 //*********************//
 /datum/mutation_upgrade/offense/drone/revenge
 	name = "Revenge"
@@ -119,7 +119,7 @@
 	ability.existing_link.revenge_modifier = ability.revenge_modifier
 
 //*********************//
-//         Veil        //
+//       Utility       //
 //*********************//
 /datum/mutation_upgrade/utility/drone/saving_grace
 	name = "Saving Grace"
