@@ -45,7 +45,7 @@
 	xenomorph_owner.soft_armor = xenomorph_owner.soft_armor.detachArmor(attached_armor)
 	attached_armor = null
 
-/// Grant armor if they entered somewhere that has no weeds.
+/// Grants or removes armor depending on if there was any weeds where they moved onto.
 /datum/mutation_upgrade/defense/drone/scout/proc/on_movement(datum/source, atom/old_loc, movement_dir, forced, list/old_locs)
 	SIGNAL_HANDLER
 	var/obj/alien/weeds/found_weed = locate(/obj/alien/weeds) in xenomorph_owner.loc
@@ -54,7 +54,7 @@
 		return
 	grant_armor(xenomorph_owner)
 
-/// Revokes armor if they entered somewhere that has weeds.
+/// Removes armor if they entered somewhere that has weeds.
 /datum/mutation_upgrade/defense/drone/scout/proc/entered_weeds(datum/source, obj/alien/weeds/location_weeds)
 	SIGNAL_HANDLER
 	revoke_armor(xenomorph_owner)
@@ -71,7 +71,7 @@
 	var/datum/action/ability/activable/xeno/essence_link/ability = xenomorph_owner.actions_by_path[/datum/action/ability/activable/xeno/essence_link]
 	if(!ability)
 		return
-	ability.lifesteal_percentage = 0.1
+	ability.lifesteal_percentage += 0.1
 	if(!ability.existing_link)
 		return
 	ability.existing_link.set_lifesteal(ability.lifesteal_percentage)
@@ -81,7 +81,7 @@
 	var/datum/action/ability/activable/xeno/essence_link/ability = xenomorph_owner.actions_by_path[/datum/action/ability/activable/xeno/essence_link]
 	if(!ability)
 		return
-	ability.lifesteal_percentage = initial(ability.lifesteal_percentage)
+	ability.lifesteal_percentage -= 0.1
 	if(!ability.existing_link)
 		return
 	ability.existing_link.set_lifesteal(ability.lifesteal_percentage)
@@ -101,7 +101,7 @@
 	var/datum/action/ability/activable/xeno/essence_link/ability = xenomorph_owner.actions_by_path[/datum/action/ability/activable/xeno/essence_link]
 	if(!ability)
 		return
-	ability.revenge_modifier = 0.75
+	ability.revenge_modifier += 0.75
 	if(!ability.existing_link)
 		return
 	ability.existing_link.revenge_modifier = ability.revenge_modifier
@@ -111,7 +111,7 @@
 	var/datum/action/ability/activable/xeno/essence_link/ability = xenomorph_owner.actions_by_path[/datum/action/ability/activable/xeno/essence_link]
 	if(!ability)
 		return
-	ability.revenge_modifier = initial(ability.revenge_modifier)
+	ability.revenge_modifier -= 0.75
 	if(!ability.existing_link)
 		return
 	ability.existing_link.revenge_modifier = ability.revenge_modifier
@@ -153,11 +153,11 @@
 	var/datum/action/ability/activable/xeno/essence_link/ability = xenomorph_owner.actions_by_path[/datum/action/ability/activable/xeno/essence_link]
 	if(!ability)
 		return
-	ability.disconnection_heal_percentage = 0.05
+	ability.disconnection_heal_percentage += 0.05
 
 /datum/mutation_upgrade/utility/drone/vitality_transfer/on_loss()
 	. = ..()
 	var/datum/action/ability/activable/xeno/essence_link/ability = xenomorph_owner.actions_by_path[/datum/action/ability/activable/xeno/essence_link]
 	if(!ability)
 		return
-	ability.disconnection_heal_percentage = initial(ability.disconnection_heal_percentage)
+	ability.disconnection_heal_percentage -= 0.05
