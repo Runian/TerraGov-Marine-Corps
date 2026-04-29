@@ -14,7 +14,7 @@
 	)
 	respawn_time = 10 MINUTES
 	whitelist_ground_maps = list(MAP_WAVE_DEFENSE)
-	/// The amount of deciseconds before xenomorphs begin to spawn.
+	/// The amount of deciseconds before the first spawn wave occurs.
 	var/grace_period = 8 MINUTES
 	/// The amount of deciseconds between spawn waves.
 	var/wave_time = 1 MINUTES
