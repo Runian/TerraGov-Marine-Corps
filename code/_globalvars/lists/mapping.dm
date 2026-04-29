@@ -124,3 +124,6 @@ GLOBAL_LIST_EMPTY_TYPED(areas_by_type, /area)
 GLOBAL_LIST_INIT(diagonal_smoothing_conversion, list(\
 	"[NORTHEAST]" = N_NORTHEAST, "[NORTHWEST]" = N_NORTHWEST, "[SOUTHEAST]" = N_SOUTHEAST, "[SOUTHWEST]" = N_SOUTHWEST,\
 	"[N_NORTHEAST]" = NORTHEAST, "[N_NORTHWEST]" = NORTHWEST, "[N_SOUTHEAST]" = SOUTHEAST, "[N_SOUTHWEST]" = SOUTHWEST))
+
+/// Wave spawners for the Wave Defense gamemode.
+GLOBAL_LIST_EMPTY(wave_spawner_locs)

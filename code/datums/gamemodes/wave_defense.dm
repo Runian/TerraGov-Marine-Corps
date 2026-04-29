@@ -1,3 +1,5 @@
+#define WAVE_DEFENSE_GRACE_PERIOD 8 MINUTES
+
 /datum/game_mode/wave_defense
 	name = "Wave Defense"
 	config_tag = "Wave Defense"
@@ -15,7 +17,7 @@
 	respawn_time = 10 MINUTES
 	whitelist_ground_maps = list(MAP_WAVE_DEFENSE)
 	/// The amount of deciseconds before the first spawn wave occurs.
-	var/grace_period = 8 MINUTES
+	var/grace_period = WAVE_DEFENSE_GRACE_PERIOD
 	/// The amount of deciseconds between spawn waves.
 	var/wave_time = 1 MINUTES
 	/// The timer id of the callback proc that will create a new wave of xenomorphs.
@@ -106,8 +108,9 @@
 // TODO: Req groundside?
 // TODO: Random events?
 // TODO: Additional end check if marines don't meaningfully defend, but are still alive.
+// TODO: Pathfind the AI.
+// TODO: Check in case there are like 200+ xenomorphs that are alive.
 // TODO: Make walls unbuildable.
-// TODO: Create some wave_spawner(s)!
 
 /datum/wave_spawner
 	/// If the round has lasted this amount of deciseconds, then this wave can be spawned.
@@ -134,7 +137,71 @@
 		return
 	for(var/i in 1 to ROUND_UP(amount / point_cost))
 		var/mob/living/carbon/xenomorph/xenomorph_typepath = pick(xenomorph_typepaths)
-		var/mob/living/carbon/xenomorph/spawned_xenomorph = new xenomorph_typepath(pick(GLOB.waves_spawner_locs))
+		var/mob/living/carbon/xenomorph/spawned_xenomorph = new xenomorph_typepath(pick(GLOB.wave_spawner_locs))
 		spawned_xenomorph.maxHealth *= health_multiplier
 		spawned_xenomorph.health = xenomorph.maxHealth
 
+/datum/wave_spawner/minions
+	xenomorph_typepaths = list(
+		/mob/living/carbon/xenomorph/beetle/ai,
+		/mob/living/carbon/xenomorph/mantis/ai,
+		/mob/living/carbon/xenomorph/scorpion/ai,
+		/mob/living/carbon/xenomorph/nymph/ai,
+		/mob/living/carbon/xenomorph/baneling/ai,
+	)
+	point_cost = 0.5
+
+/datum/wave_spawner/t1
+	xenomorph_typepaths = list(
+		/mob/living/carbon/xenomorph/defender/ai,
+		/mob/living/carbon/xenomorph/sentinel/ai,
+		/mob/living/carbon/xenomorph/runner/ai,
+		/mob/living/carbon/xenomorph/drone/ai
+	)
+	minimum_spawn_time = (WAVE_DEFENSE_GRACE_PERIOD + 10 MINUTES)
+	point_cost = 0.75
+
+/datum/wave_spawner/t2
+	xenomorph_typepaths = list(
+		/mob/living/carbon/xenomorph/warrior/ai,
+		/mob/living/carbon/xenomorph/spitter/ai,
+		/mob/living/carbon/xenomorph/hunter/ai,
+		/mob/living/carbon/xenomorph/hivelord/ai
+	)
+	minimum_spawn_time = (WAVE_DEFENSE_GRACE_PERIOD + 15 MINUTES)
+	point_cost = 1
+
+/datum/wave_spawner/t3
+	spawn_types = list(
+		/mob/living/carbon/xenomorph/crusher/ai,
+		/mob/living/carbon/xenomorph/praetorian/ai,
+		/mob/living/carbon/xenomorph/ravager/ai,
+		/mob/living/carbon/xenomorph/boiler/ai,
+	)
+	minimum_spawn_time = (WAVE_DEFENSE_GRACE_PERIOD + 20 MINUTES)
+	point_cost = 1.5
+
+/datum/wave_spawner/random
+	spawn_types = list(
+		/mob/living/carbon/xenomorph/beetle/ai,
+		/mob/living/carbon/xenomorph/mantis/ai,
+		/mob/living/carbon/xenomorph/scorpion/ai,
+		/mob/living/carbon/xenomorph/nymph/ai,
+		/mob/living/carbon/xenomorph/baneling/ai,
+		/mob/living/carbon/xenomorph/defender/ai,
+		/mob/living/carbon/xenomorph/sentinel/ai,
+		/mob/living/carbon/xenomorph/runner/ai,
+		/mob/living/carbon/xenomorph/drone/ai,
+		/mob/living/carbon/xenomorph/warrior/ai,
+		/mob/living/carbon/xenomorph/spitter/ai,
+		/mob/living/carbon/xenomorph/hunter/ai,
+		/mob/living/carbon/xenomorph/hivelord/ai,
+		/mob/living/carbon/xenomorph/crusher/ai,
+		/mob/living/carbon/xenomorph/praetorian/ai,
+		/mob/living/carbon/xenomorph/ravager/ai,
+		/mob/living/carbon/xenomorph/boiler/ai,
+	)
+	minimum_spawn_time = (WAVE_DEFENSE_GRACE_PERIOD + 20 MINUTES)
+	point_cost = 1.25
+
+#undef WAVE_DEFENSE_GRACE_PERIOD
