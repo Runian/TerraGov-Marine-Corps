@@ -67,7 +67,6 @@
 	)
 
 /datum/mutation_upgrade/defense/drone/together_in_claws/on_gain()
-	. = ..()
 	var/datum/action/ability/activable/xeno/essence_link/ability = xenomorph_owner.actions_by_path[/datum/action/ability/activable/xeno/essence_link]
 	if(!ability)
 		return
@@ -77,7 +76,6 @@
 	ability.existing_link.set_lifesteal(ability.lifesteal_percentage)
 
 /datum/mutation_upgrade/defense/drone/together_in_claws/on_loss()
-	. = ..()
 	var/datum/action/ability/activable/xeno/essence_link/ability = xenomorph_owner.actions_by_path[/datum/action/ability/activable/xeno/essence_link]
 	if(!ability)
 		return
@@ -97,7 +95,6 @@
 	)
 
 /datum/mutation_upgrade/offense/drone/revenge/on_gain()
-	. = ..()
 	var/datum/action/ability/activable/xeno/essence_link/ability = xenomorph_owner.actions_by_path[/datum/action/ability/activable/xeno/essence_link]
 	if(!ability)
 		return
@@ -107,7 +104,6 @@
 	ability.existing_link.revenge_modifier = ability.revenge_modifier
 
 /datum/mutation_upgrade/offense/drone/revenge/on_loss()
-	. = ..()
 	var/datum/action/ability/activable/xeno/essence_link/ability = xenomorph_owner.actions_by_path[/datum/action/ability/activable/xeno/essence_link]
 	if(!ability)
 		return
@@ -149,14 +145,12 @@
 	)
 
 /datum/mutation_upgrade/utility/drone/vitality_transfer/on_gain()
-	. = ..()
 	var/datum/action/ability/activable/xeno/essence_link/ability = xenomorph_owner.actions_by_path[/datum/action/ability/activable/xeno/essence_link]
 	if(!ability)
 		return
 	ability.disconnection_heal_percentage += 0.05
 
 /datum/mutation_upgrade/utility/drone/vitality_transfer/on_loss()
-	. = ..()
 	var/datum/action/ability/activable/xeno/essence_link/ability = xenomorph_owner.actions_by_path[/datum/action/ability/activable/xeno/essence_link]
 	if(!ability)
 		return
