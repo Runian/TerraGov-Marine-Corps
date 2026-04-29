@@ -158,7 +158,7 @@
 		/mob/living/carbon/xenomorph/runner/ai,
 		/mob/living/carbon/xenomorph/drone/ai
 	)
-	minimum_spawn_time = (WAVE_DEFENSE_GRACE_PERIOD + 10 MINUTES)
+	minimum_spawn_time = (WAVE_DEFENSE_GRACE_PERIOD + 5 MINUTES)
 	point_cost = 0.75
 
 /datum/wave_spawner/t2
@@ -168,7 +168,7 @@
 		/mob/living/carbon/xenomorph/hunter/ai,
 		/mob/living/carbon/xenomorph/hivelord/ai
 	)
-	minimum_spawn_time = (WAVE_DEFENSE_GRACE_PERIOD + 15 MINUTES)
+	minimum_spawn_time = (WAVE_DEFENSE_GRACE_PERIOD + 10 MINUTES)
 	point_cost = 1
 
 /datum/wave_spawner/t3
@@ -178,7 +178,7 @@
 		/mob/living/carbon/xenomorph/ravager/ai,
 		/mob/living/carbon/xenomorph/boiler/ai,
 	)
-	minimum_spawn_time = (WAVE_DEFENSE_GRACE_PERIOD + 20 MINUTES)
+	minimum_spawn_time = (WAVE_DEFENSE_GRACE_PERIOD + 15 MINUTES)
 	point_cost = 1.5
 
 /datum/wave_spawner/random
@@ -201,7 +201,7 @@
 		/mob/living/carbon/xenomorph/ravager/ai,
 		/mob/living/carbon/xenomorph/boiler/ai,
 	)
-	minimum_spawn_time = (WAVE_DEFENSE_GRACE_PERIOD + 20 MINUTES)
+	minimum_spawn_time = (WAVE_DEFENSE_GRACE_PERIOD + 15 MINUTES)
 	point_cost = 1.25
 
 #undef WAVE_DEFENSE_GRACE_PERIOD
