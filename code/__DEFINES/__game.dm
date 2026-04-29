@@ -33,6 +33,7 @@
 
 #define MAP_FORT_PHOBOS "Fort Phobos"
 #define MAP_ITERON "Iteron"
+#define MAP_WAVE_DEFENSE "Wave Defense"
 
 //Object specific defines
 #define CANDLE_LUM 3 //For how bright candles are
