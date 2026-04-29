@@ -149,6 +149,7 @@
 		/mob/living/carbon/xenomorph/nymph/ai,
 		/mob/living/carbon/xenomorph/baneling/ai,
 	)
+	maximum_spawn_time = (WAVE_DEFENSE_GRACE_PERIOD + 15 MINUTES)
 	point_cost = 0.5
 
 /datum/wave_spawner/t1
