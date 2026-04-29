@@ -1041,3 +1041,32 @@
 /datum/status_effect/xenomorph_cloaking/on_remove()
 	var/mob/living/carbon/xenomorph/xenomorph_owner = owner
 	xenomorph_owner.remove_alpha_source(ALPHA_SOURCE_XENOMORPH_CLOAKING)
+
+
+/datum/status_effect/night_shade_invisibility
+	id = "night_shade_invisibility"
+	duration = 20 SECONDS
+	status_type = STATUS_EFFECT_REPLACE
+	alert_type = null
+
+/datum/status_effect/night_shade_invisibility/on_creation(mob/living/new_owner, new_duration)
+	if(new_owner)
+		owner = new_owner
+	if(new_duration)
+		duration = new_duration
+	return ..()
+
+/datum/status_effect/night_shade_invisibility/on_apply()
+	. = ..()
+	if(!isxeno(owner))
+		return FALSE
+	var/mob/living/carbon/xenomorph/xenomorph_owner = owner
+	xenomorph_owner.set_alpha_source(ALPHA_SOURCE_NIGHTSHADE, HUNTER_STEALTH_RUN_ALPHA)
+	balloon_alert(xenomorph_owner, "invisibility active!")
+	to_chat(xenomorph_owner, span_xenowarning("Our scales now blend with our surroundings."))
+
+/datum/status_effect/xenomorph_cloaking/on_remove()
+	var/mob/living/carbon/xenomorph/xenomorph_owner = owner
+	xenomorph_owner.remove_alpha_source(ALPHA_SOURCE_NIGHTSHADE)
+	balloon_alert(xenomorph_owner, "invisibility ended!")
+	to_chat(xenomorph_owner, span_xenowarning("Our scales no longer blend with our surroundings."))

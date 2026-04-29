@@ -46,6 +46,9 @@
 #define STATUS_EFFECT_MINDMEND /datum/status_effect/mindmeld
 
 #define STATUS_EFFECT_REKNIT_FORM /datum/status_effect/reknit_form
+
+#define STATUS_EFFECT_NIGHT_SHADE_INVISIBILITY /datum/status_effect/night_shade_invisibility
+
 /////////////
 // DEBUFFS //
 /////////////

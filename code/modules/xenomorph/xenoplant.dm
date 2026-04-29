@@ -199,8 +199,6 @@
 	var/on_cooldown = FALSE
 	///The list of passively camouflaged structures
 	var/list/obj/structure/xeno/camouflaged_structures = list()
-	////The list of actively camouflaged xenos by veil
-	var/list/mob/living/carbon/xenomorph/camouflaged_xenos = list()
 
 /obj/structure/xeno/plant/stealth_plant/on_mature(mob/user)
 	. = ..()
@@ -248,23 +246,12 @@
 		for(var/mob/living/carbon/xenomorph/X in tile)
 			if(X.stat == DEAD || isxenohunter(X) || X.alpha != 255) //We don't mess with xenos capable of going stealth by themselves
 				continue
-			X.set_alpha_source(ALPHA_SOURCE_NIGHTSHADE, HUNTER_STEALTH_RUN_ALPHA)
 			new /obj/effect/temp_visual/alien_fruit_eaten(get_turf(X))
-			balloon_alert(X, "We now blend in")
-			to_chat(X, span_xenowarning("The pollen from [src] reacts with our scales, we are blending with our surroundings!"))
-			camouflaged_xenos.Add(X)
+			X.apply_status_effect(STATUS_EFFECT_NIGHT_SHADE_INVISIBILITY, active_camouflage_duration)
 	on_cooldown = TRUE
-	addtimer(CALLBACK(src, PROC_REF(unveil)), active_camouflage_duration)
 	addtimer(CALLBACK(src, PROC_REF(ready)), cooldown)
 
 ///Called when veil() can be used once again
 /obj/structure/xeno/plant/stealth_plant/proc/ready()
 	visible_message(span_danger("[src] petals shift in hue, it is ready to release more pollen."))
 	on_cooldown = FALSE
-
-///Reveals all xenos hidden by veil()
-/obj/structure/xeno/plant/stealth_plant/proc/unveil()
-	for(var/mob/living/carbon/xenomorph/X AS in camouflaged_xenos)
-		X.remove_alpha_source(ALPHA_SOURCE_NIGHTSHADE)
-		balloon_alert(X, "Effect wears off")
-		to_chat(X, span_xenowarning("The effect of [src] wears off!"))
