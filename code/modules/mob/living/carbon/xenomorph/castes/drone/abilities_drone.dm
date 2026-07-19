@@ -36,7 +36,7 @@
 	var/lifesteal_percentage = 0
 	/// The additive amount to increase melee damage modifier to the survivor if the link ends due to death.
 	var/revenge_modifier = 0
-	/// The percentage of max health healed to the linked target (and dealt to owner) if it was disconnected via alternative action.
+	/// If it was disconnected via alternative action, the percentage of missing health per attunement bar to heal both the linked owner and linked target.
 	var/disconnection_heal_percentage = 0
 
 /datum/action/ability/activable/xeno/essence_link/can_use_ability(mob/living/carbon/xenomorph/target, silent = FALSE, override_flags)
@@ -79,11 +79,11 @@
 /datum/action/ability/activable/xeno/essence_link/proc/end_ability(was_manually_disconnected = FALSE)
 	var/datum/action/ability/xeno_action/enhancement/enhancement_action = xeno_owner.actions_by_path[/datum/action/ability/xeno_action/enhancement]
 	enhancement_action?.end_ability()
-	if(was_manually_disconnected && existing_link.stacks)
-		var/health_to_heal = linked_target.maxHealth * disconnection_heal_percentage * existing_link.stacks
-		var/leftover_healing = health_to_heal
-		HEAL_XENO_DAMAGE(linked_target, leftover_healing, TRUE)
-		xeno_owner.adjustBruteLoss(health_to_heal - leftover_healing, TRUE)
+	if(was_manually_disconnected && disconnection_heal_percentage && existing_link.stacks)
+		var/target_health_to_heal = (linked_target.getFireLoss() + linked_target.getBruteLoss()) * disconnection_heal_percentage * existing_link.stacks
+		HEAL_XENO_DAMAGE(linked_target, target_health_to_heal, TRUE)
+		var/owner_health_to_heal = (xeno_owner.getFireLoss() + xeno_owner.getBruteLoss()) * disconnection_heal_percentage * existing_link.stacks
+		HEAL_XENO_DAMAGE(xeno_owner, owner_health_to_heal, TRUE)
 	xeno_owner.remove_status_effect(STATUS_EFFECT_XENO_ESSENCE_LINK)
 	existing_link = null
 	linked_target = null

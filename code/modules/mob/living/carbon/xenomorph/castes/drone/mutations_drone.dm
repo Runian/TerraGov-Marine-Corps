@@ -52,6 +52,25 @@
 	ability.lifesteal_percentage -= 0.5
 	ability.existing_link?.set_lifesteal(ability.lifesteal_percentage)
 
+/datum/mutation_upgrade/defense/drone/emergency_heal
+	name = "Emergency Heal"
+	desc = "While actively linked with your Essence Link partner, disconnecting via alternative action will heal both you and your partner for 20% of missing health per attunement bar."
+	required_abilities_types = list(
+		/datum/action/ability/activable/xeno/essence_link
+	)
+
+/datum/mutation_upgrade/utility/drone/emergency_heal/on_gain()
+	var/datum/action/ability/activable/xeno/essence_link/ability = xenomorph_owner.actions_by_path[/datum/action/ability/activable/xeno/essence_link]
+	if(!ability)
+		return
+	ability.disconnection_heal_percentage += 0.1
+
+/datum/mutation_upgrade/utility/drone/emergency_heal/on_loss()
+	var/datum/action/ability/activable/xeno/essence_link/ability = xenomorph_owner.actions_by_path[/datum/action/ability/activable/xeno/essence_link]
+	if(!ability)
+		return
+	ability.disconnection_heal_percentage -= 0.1
+
 //*********************//
 //       Offense       //
 //*********************//
@@ -104,22 +123,3 @@
 		return
 	ability.bypass_cast_time_on_threshold = initial(ability.bypass_cast_time_on_threshold)
 	ability.bonus_healing_additive_multiplier -= 1
-
-/datum/mutation_upgrade/utility/drone/vitality_transfer
-	name = "Vitality Transfer"
-	desc = "While connected with Essence Link, you can manually disconnect to heal your partner for 5% of their maximum health multiplied by the attunement amount. However, you take true damage equal to the amount healed. This damage can kill you."
-	required_abilities_types = list(
-		/datum/action/ability/activable/xeno/essence_link
-	)
-
-/datum/mutation_upgrade/utility/drone/vitality_transfer/on_gain()
-	var/datum/action/ability/activable/xeno/essence_link/ability = xenomorph_owner.actions_by_path[/datum/action/ability/activable/xeno/essence_link]
-	if(!ability)
-		return
-	ability.disconnection_heal_percentage += 0.05
-
-/datum/mutation_upgrade/utility/drone/vitality_transfer/on_loss()
-	var/datum/action/ability/activable/xeno/essence_link/ability = xenomorph_owner.actions_by_path[/datum/action/ability/activable/xeno/essence_link]
-	if(!ability)
-		return
-	ability.disconnection_heal_percentage -= 0.05
