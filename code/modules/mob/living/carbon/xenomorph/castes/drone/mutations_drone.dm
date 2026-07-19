@@ -23,7 +23,7 @@
 /datum/mutation_upgrade/defense/drone/scout/on_loss()
 	UnregisterSignal(xenomorph_owner, COMSIG_MOVABLE_MOVED)
 
-/// Changes the next move slowdown if there was any weeds where they moved onto.
+/// Changes the next move slowdown if there isn't any weeds where they moved onto.
 /datum/mutation_upgrade/defense/drone/scout/proc/on_movement(datum/source, atom/old_loc, movement_dir, forced, list/old_locs)
 	SIGNAL_HANDLER
 	var/obj/alien/weeds/found_weed = locate(/obj/alien/weeds) in xenomorph_owner.loc
