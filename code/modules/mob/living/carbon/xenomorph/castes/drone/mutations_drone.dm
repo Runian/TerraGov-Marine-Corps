@@ -27,7 +27,7 @@
 /datum/mutation_upgrade/defense/drone/scout/proc/on_movement(datum/source, atom/old_loc, movement_dir, forced, list/old_locs)
 	SIGNAL_HANDLER
 	var/obj/alien/weeds/found_weed = locate(/obj/alien/weeds) in xenomorph_owner.loc
-	if(!found_weed)
+	if(found_weed)
 		return
 	xenomorph_owner.next_move_slowdown += xenomorph_owner.xeno_caste.weeds_speed_mod
 
