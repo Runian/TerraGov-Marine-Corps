@@ -248,6 +248,9 @@
 /datum/mutation_upgrade/offense/runner/mutilate
 	name = "Mutilate"
 	desc = "Savage's plasma-to-damage conversion rate is increased by 0.05. Savage will consume all of your plasma."
+	required_abilities_types = list(
+		/datum/action/ability/activable/xeno/pounce/runner
+	)
 
 /datum/mutation_upgrade/offense/runner/right_here/on_gain()
 	var/datum/action/ability/activable/xeno/pounce/runner/ability = xenomorph_owner.actions_by_path[/datum/action/ability/activable/xeno/pounce/runner]

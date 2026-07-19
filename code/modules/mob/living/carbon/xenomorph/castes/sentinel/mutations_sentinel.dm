@@ -16,6 +16,9 @@
 /datum/mutation_upgrade/defense/sentinel/comforting_acid
 	name = "Comforting Acid"
 	desc = "Toxic Slash will cause humans to passively heal you for 1 health per stack of Intoxicated as long you are adjacent to them."
+	required_abilities_types = list(
+		/datum/action/ability/xeno_action/toxic_slash
+	)
 
 /datum/mutation_upgrade/defense/sentinel/comforting_acid/on_gain()
 	var/datum/action/ability/xeno_action/toxic_slash/ability = xenomorph_owner.actions_by_path[/datum/action/ability/xeno_action/toxic_slash]
@@ -32,6 +35,9 @@
 /datum/mutation_upgrade/defense/sentinel/healing_sting
 	name = "Healing Sting"
 	desc = "Drain Sting's healing is increased by 50%. Any leftover healing is converted to overheal health."
+	required_abilities_types = list(
+		/datum/action/ability/activable/xeno/drain_sting
+	)
 
 /datum/mutation_upgrade/defense/sentinel/healing_sting/on_gain()
 	. = ..()
@@ -50,6 +56,9 @@
 /datum/mutation_upgrade/defense/sentinel/constant_surge
 	name = "Constant Surge"
 	desc = "Drain Sting always triggers Drain Surge. Drain Surge only gives 1/1.25/1.5 soft armor for each Intoxicated stack."
+	required_abilities_types = list(
+		/datum/action/ability/activable/xeno/drain_sting
+	)
 
 /datum/mutation_upgrade/defense/sentinel/constant_surge/on_gain()
 	. = ..()
@@ -74,7 +83,6 @@
 	name = "Acidic Slasher"
 	desc = "Your attack delay will be 0.05s faster and will always apply a stack of Intoxicated against humans, but all melee damage is reduced by 30%."
 
-
 /datum/mutation_upgrade/offense/sentinel/acidic_slasher/on_gain()
 	RegisterSignal(xenomorph_owner, COMSIG_XENOMORPH_POSTATTACK_LIVING, PROC_REF(on_postattack))
 	xenomorph_owner.xeno_melee_damage_modifier -= 0.3
@@ -97,6 +105,9 @@
 /datum/mutation_upgrade/offense/sentinel/far_sting
 	name = "Far Sting"
 	desc = "Drain Sting can be used at targets 1 additional tile away. If the target is at maximum range, Drain Sting is 50% effective."
+	required_abilities_types = list(
+		/datum/action/ability/activable/xeno/drain_sting
+	)
 
 /datum/mutation_upgrade/offense/sentinel/far_sting/on_gain()
 	var/datum/action/ability/activable/xeno/drain_sting/ability = xenomorph_owner.actions_by_path[/datum/action/ability/activable/xeno/drain_sting]
@@ -115,6 +126,9 @@
 /datum/mutation_upgrade/offense/sentinel/imbued_claws
 	name = "Imbued Claws"
 	desc = "Drain Surge's armor is converted to a melee damage modifier."
+	required_abilities_types = list(
+		/datum/action/ability/activable/xeno/drain_sting
+	)
 
 /datum/mutation_upgrade/offense/sentinel/imbued_claws/on_gain()
 	var/datum/action/ability/activable/xeno/drain_sting/ability = xenomorph_owner.actions_by_path[/datum/action/ability/activable/xeno/drain_sting]
@@ -134,6 +148,9 @@
 /datum/mutation_upgrade/utility/sentinel/toxic_compatibility
 	name = "Toxic Compatibility"
 	desc = "Every 5u of xeno-chemicals in your target will count as one stack of Intoxicated when calculating the the strength of your Drain Sting."
+	required_abilities_types = list(
+		/datum/action/ability/activable/xeno/drain_sting
+	)
 
 /datum/mutation_upgrade/utility/sentinel/toxic_compatibility/on_loss()
 	var/datum/action/ability/activable/xeno/drain_sting/ability = xenomorph_owner.actions_by_path[/datum/action/ability/activable/xeno/drain_sting]
@@ -180,6 +197,9 @@
 /datum/mutation_upgrade/utility/sentinel/automatic_sting
 	name = "Automatic Sting"
 	desc = "Drain Sting starts at 3 Intoxication stacks. It is automatically used against slashed humans if there are 12 Intoxication stacks or more."
+	required_abilities_types = list(
+		/datum/action/ability/activable/xeno/drain_sting
+	)
 	/// The amount of Intoxication stacks worth of potency to add to the ability.
 	var/potency_as_intoxication_stacks = 3
 

@@ -15,53 +15,25 @@
 //*********************//
 /datum/mutation_upgrade/defense/drone/scout
 	name = "Scout"
-	desc = "While you are not on weeds, you gain 5 soft armor."
-	/// The attached armor that been given, if any.
-	var/datum/armor/attached_armor
+	desc = "While on non-weeds, you gain the weed speed bonus as if you were on weeds."
 
 /datum/mutation_upgrade/defense/drone/scout/on_gain()
-	RegisterSignal(xenomorph_owner, COMSIG_LIVING_WEEDS_AT_LOC_CREATED, PROC_REF(entered_weeds))
 	RegisterSignal(xenomorph_owner, COMSIG_MOVABLE_MOVED, PROC_REF(on_movement))
-	if(!xenomorph_owner.loc_weeds_type)
-		grant_armor(xenomorph_owner)
-		return
-	entered_weeds(xenomorph_owner, xenomorph_owner.loc_weeds_type)
 
 /datum/mutation_upgrade/defense/drone/scout/on_loss()
-	UnregisterSignal(xenomorph_owner, list(COMSIG_LIVING_WEEDS_AT_LOC_CREATED, COMSIG_MOVABLE_MOVED))
-	revoke_armor(xenomorph_owner)
+	UnregisterSignal(xenomorph_owner, COMSIG_MOVABLE_MOVED)
 
-/// Grants armor if they do not have it.
-/datum/mutation_upgrade/defense/drone/scout/proc/grant_armor()
-	if(attached_armor)
-		return
-	attached_armor = new(5, 5, 5, 5, 5, 5, 5, 5)
-	xenomorph_owner.soft_armor = xenomorph_owner.soft_armor.attachArmor(attached_armor)
-
-/// Removes armor if they have it.
-/datum/mutation_upgrade/defense/drone/scout/proc/revoke_armor()
-	if(!attached_armor)
-		return
-	xenomorph_owner.soft_armor = xenomorph_owner.soft_armor.detachArmor(attached_armor)
-	attached_armor = null
-
-/// Grants or removes armor depending on if there was any weeds where they moved onto.
+/// Changes the next move slowdown if there was any weeds where they moved onto.
 /datum/mutation_upgrade/defense/drone/scout/proc/on_movement(datum/source, atom/old_loc, movement_dir, forced, list/old_locs)
 	SIGNAL_HANDLER
 	var/obj/alien/weeds/found_weed = locate(/obj/alien/weeds) in xenomorph_owner.loc
-	if(found_weed)
-		entered_weeds(xenomorph_owner, found_weed)
+	if(!found_weed)
 		return
-	grant_armor(xenomorph_owner)
-
-/// Removes armor if they entered somewhere that has weeds.
-/datum/mutation_upgrade/defense/drone/scout/proc/entered_weeds(datum/source, obj/alien/weeds/location_weeds)
-	SIGNAL_HANDLER
-	revoke_armor(xenomorph_owner)
+	xenomorph_owner.next_move_slowdown += xenomorph_owner.xeno_caste.weeds_speed_mod
 
 /datum/mutation_upgrade/defense/drone/together_in_claws
 	name = "Together In Claws"
-	desc = "While connected with Essence Link, you heal for 10% of your partner's damage when they slash a human."
+	desc = "While actively linked with your Essence Link partner, their slash attacks heal you for 50% of damage dealt."
 	required_abilities_types = list(
 		/datum/action/ability/activable/xeno/essence_link
 	)
@@ -70,19 +42,15 @@
 	var/datum/action/ability/activable/xeno/essence_link/ability = xenomorph_owner.actions_by_path[/datum/action/ability/activable/xeno/essence_link]
 	if(!ability)
 		return
-	ability.lifesteal_percentage += 0.1
-	if(!ability.existing_link)
-		return
-	ability.existing_link.set_lifesteal(ability.lifesteal_percentage)
+	ability.lifesteal_percentage += 0.5
+	ability.existing_link?.set_lifesteal(ability.lifesteal_percentage)
 
 /datum/mutation_upgrade/defense/drone/together_in_claws/on_loss()
 	var/datum/action/ability/activable/xeno/essence_link/ability = xenomorph_owner.actions_by_path[/datum/action/ability/activable/xeno/essence_link]
 	if(!ability)
 		return
-	ability.lifesteal_percentage -= 0.1
-	if(!ability.existing_link)
-		return
-	ability.existing_link.set_lifesteal(ability.lifesteal_percentage)
+	ability.lifesteal_percentage -= 0.5
+	ability.existing_link?.set_lifesteal(ability.lifesteal_percentage)
 
 //*********************//
 //       Offense       //
