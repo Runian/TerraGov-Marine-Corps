@@ -27,14 +27,14 @@
 		RegisterSignal(parent, COMSIG_ATTACHMENT_DETACHED, PROC_REF(on_suit_detach))
 	else
 		reloading_storage = parent
-		RegisterSignal(parent, COMSIG_ATOM_ATTACKBY_ALTERNATE, PROC_REF(on_parent_attackby_alternate))
+		RegisterSignal(parent, COMSIG_ATOM_ATTACKBY_SECONDARY, PROC_REF(on_parent_attackby_secondary))
 		RegisterSignal(parent, COMSIG_ATOM_EXAMINE, PROC_REF(on_examine))
 
 /datum/component/tac_reload_storage/UnregisterFromParent()
 	UnregisterSignal(parent, list(
 		COMSIG_ATTACHMENT_ATTACHED,
 		COMSIG_ATTACHMENT_DETACHED,
-		COMSIG_ATOM_ATTACKBY_ALTERNATE,
+		COMSIG_ATOM_ATTACKBY_SECONDARY,
 		COMSIG_ATOM_EXAMINE,
 	))
 
@@ -51,7 +51,7 @@
  * - user: The person attempting to reload the gun
  * - params: The params (distance, etc.)
  */
-/datum/component/tac_reload_storage/proc/on_parent_attackby_alternate(datum/source, obj/item/weapon/gun/reloading_gun, mob/user, params)
+/datum/component/tac_reload_storage/proc/on_parent_attackby_secondary(datum/source, obj/item/weapon/gun/reloading_gun, mob/user, params)
 	SIGNAL_HANDLER
 	if(!istype(reloading_gun))
 		return
@@ -80,7 +80,7 @@
 /datum/component/tac_reload_storage/proc/on_suit_attach(obj/item/armor_module/storage/source, obj/item/clothing/new_host, mob/attacher)
 	SIGNAL_HANDLER
 	reloading_storage = source.storage_datum
-	RegisterSignal(new_host, COMSIG_ATOM_ATTACKBY_ALTERNATE, PROC_REF(on_parent_attackby_alternate))
+	RegisterSignal(new_host, COMSIG_ATOM_ATTACKBY_SECONDARY, PROC_REF(on_parent_attackby_secondary))
 	RegisterSignal(new_host, COMSIG_ATOM_EXAMINE, PROC_REF(on_examine))
 
 /**
@@ -95,6 +95,6 @@
 	SIGNAL_HANDLER
 	reloading_storage = null
 	UnregisterSignal(old_host, list(
-		COMSIG_ATOM_ATTACKBY_ALTERNATE,
+		COMSIG_ATOM_ATTACKBY_SECONDARY,
 		COMSIG_ATOM_EXAMINE,
 	))

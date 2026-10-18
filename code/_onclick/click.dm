@@ -47,7 +47,6 @@
  * * mob/RangedAttack(atom, params) - used only ranged, only used for tk and laser eyes but could be changed
  */
 /mob/proc/ClickOn(atom/A, location, params)
-
 	if(world.time <= next_click)
 		return
 	next_click = world.time + 1
@@ -71,31 +70,36 @@
 	if(modifiers[BUTTON4] || modifiers[BUTTON5])
 		return
 
-	if(modifiers[SHIFT_CLICK] && modifiers[MIDDLE_CLICK])
-		ShiftMiddleClickOn(A)
-		return
-	if(modifiers[SHIFT_CLICK] && modifiers[CTRL_CLICK])
-		CtrlShiftClickOn(A)
-		return
-	if(modifiers[CTRL_CLICK] && modifiers[MIDDLE_CLICK])
-		CtrlMiddleClickOn(A)
-		return
-	if(modifiers[MIDDLE_CLICK] && MiddleClickOn(A))
-		return
-	if(modifiers[SHIFT_CLICK] && modifiers[RIGHT_CLICK])
-		ShiftRightClickOn(A)
-		return
-	if(modifiers[SHIFT_CLICK] && ShiftClickOn(A))
-		return
-	if(modifiers[ALT_CLICK] && modifiers[RIGHT_CLICK])
-		AltRightClickOn(A)
-		return
-	if(modifiers[ALT_CLICK] && AltClickOn(A))
-		return
-	if(modifiers[CTRL_CLICK])
+	if(LAZYACCESS(modifiers, SHIFT_CLICK))
+		if(LAZYACCESS(modifiers, MIDDLE_CLICK))
+			ShiftMiddleClickOn(A)
+			return
+		if(LAZYACCESS(modifiers, CTRL_CLICK))
+			CtrlShiftClickOn(A)
+			return
+		if(LAZYACCESS(modifiers, RIGHT_CLICK))
+			ShiftRightClickOn(A)
+			return
+		if(ShiftClickOn(A))
+			return
+
+	if(LAZYACCESS(modifiers, CTRL_CLICK))
+		if(LAZYACCESS(modifiers, MIDDLE_CLICK))
+			CtrlMiddleClickOn(A)
+			return
 		CtrlClickOn(A)
 		return
-	if(modifiers[RIGHT_CLICK] && RightClickOn(A))
+
+	if(LAZYACCESS(modifiers, ALT_CLICK))
+		if(LAZYACCESS(modifiers, RIGHT_CLICK))
+			AltRightClickOn(A)
+			return
+		if(AltClickOn(A))
+			return
+
+	if(LAZYACCESS(modifiers, MIDDLE_CLICK) && MiddleClickOn(A))
+		return
+	if(LAZYACCESS(modifiers, RIGHT_CLICK) && RightClickOn(A))
 		return
 
 	if(incapacitated(TRUE))
@@ -106,9 +110,8 @@
 	if(next_move > world.time)
 		return
 
-	if(!modifiers["catcher"] && A.IsObscured())
+	if(!LAZYACCESS(modifiers, "catcher") && A.IsObscured())
 		return
-
 
 	if(restrained())
 		changeNext_move(CLICK_CD_HANDCUFFED)
@@ -123,8 +126,8 @@
 	var/obj/item/W = get_active_held_item()
 
 	if(W == A)
-		if(modifiers[RIGHT_CLICK])
-			W.attack_self_alternate(src)
+		if(LAZYACCESS(modifiers, RIGHT_CLICK))
+			W.attack_self_secondary(src)
 		else
 			W.attack_self(src)
 
@@ -132,36 +135,38 @@
 		update_inv_r_hand()
 		return
 
-	//These are always reachable.
-	//User itself, current loc, and user inventory
+	// These are always reachable.
+	// User itself, current loc, and user inventory.
 	if(A in DirectAccess())
 		if(W)
-			W.melee_attack_chain(src, A, params, modifiers[RIGHT_CLICK])
+			W.melee_attack_chain(src, A, modifiers)
 		else
 			UnarmedAttack(A, FALSE, modifiers)
 		return
 
-	//Can't reach anything else in lockers or other weirdness
+	// Can't reach anything else in lockers or other weirdness.
 	if(!loc.AllowClick())
 		return
 
 	//Standard reach turf to turf or reaching inside storage
 	if(CanReach(A, W))
 		if(W)
-			W.melee_attack_chain(src, A, params, modifiers[RIGHT_CLICK])
+			W.melee_attack_chain(src, A, modifiers)
 		else
 			UnarmedAttack(A, TRUE, modifiers)
+		return
+
+	if(W)
+		var/proximity = A.Adjacent(src)
+		if(!proximity || !A.attackby(W, src, params))
+			W.afterattack(A, src, proximity, params)
+			RangedAttack(A, params)
+		return
+
+	if(A.Adjacent(src))
+		A.attack_hand(src)
 	else
-		if(W)
-			var/proximity = A.Adjacent(src)
-			if(!proximity || !A.attackby(W, src, params))
-				W.afterattack(A, src, proximity, params)
-				RangedAttack(A, params)
-		else
-			if(A.Adjacent(src))
-				A.attack_hand(src)
-			else
-				RangedAttack(A, params)
+		RangedAttack(A, params)
 
 
 /**

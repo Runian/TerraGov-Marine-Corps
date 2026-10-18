@@ -56,9 +56,13 @@
 	. = ..()
 	afterattack(user, user) //If player uses the container, use it on themselves
 
-/obj/item/reagent_containers/attack_self_alternate(mob/living/user)
+/obj/item/reagent_containers/attack_self_secondary(mob/living/user)
 	. = ..()
-	change_transfer_amount(user)
+	if(.)
+		return
+	if(!is_drainable())
+		return
+	return change_transfer_amount(user)
 
 /obj/item/reagent_containers/unique_action(mob/user, special_treatment)
 	. = ..()

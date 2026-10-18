@@ -95,20 +95,21 @@
 	var/building_time = LERP(2 SECONDS, 1 SECONDS, user.skills.getPercent(SKILL_CONSTRUCTION, SKILL_ENGINEER_EXPERT))
 	create_object(user, new/datum/stack_recipe("sandbag barricade", /obj/structure/barricade/sandbags, 5, time = building_time, crafting_flags = CRAFT_CHECK_DENSITY | CRAFT_CHECK_DIRECTION | CRAFT_ON_SOLID_GROUND), 1)
 
-/obj/item/stack/sandbags/attack_self_alternate(mob/user)
+/obj/item/stack/sandbags/attack_self_secondary(mob/user)
 	. = ..()
-	if(get_amount() < 1)
+	if(.)
 		return
+	if(get_amount() < 1)
+		return TRUE
 	if(LAZYLEN(user.do_actions))
 		user.balloon_alert(user, "busy!")
-		return
-
+		return TRUE
 	user.balloon_alert(user, "emptying...")
 	while(get_amount() > 0)
 		if(!do_after(user, 0.5 SECONDS, IGNORE_USER_LOC_CHANGE|IGNORE_TARGET_LOC_CHANGE, user))
 			user.balloon_alert(user, "stopped")
 			break
-		// check if we can stuff it into the user's hands
+		// Check if we can stuff it into the user's hands.
 		if(!use(1))
 			break
 		if(amount < 1)
@@ -116,7 +117,8 @@
 		var/obj/item/stack/sandbag = user.get_inactive_held_item()
 		if(istype(sandbag, /obj/item/stack/sandbags_empty) && sandbag.add(1))
 			continue
-		var/obj/item/stack/sandbags_empty/E = new(get_turf(user))
-		if(!sandbag && user.put_in_hands(E))
+		var/obj/item/stack/sandbags_empty/empty_sandbags = new(get_turf(user))
+		if(!sandbag && user.put_in_hands(empty_sandbags))
 			continue
-		E.add_to_stacks(user)
+		empty_sandbags.add_to_stacks(user)
+	return TRUE
