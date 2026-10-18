@@ -25,7 +25,7 @@ SUBSYSTEM_DEF(npcpool)
 		var/mob/living/simple_animal/SA = currentrun[length(currentrun)]
 		--currentrun.len
 
-		if(!SA.ckey && !SA.notransform)
+		if(!SA.ckey && !HAS_TRAIT(SA, TRAIT_NO_TRANSFORM))
 			if(SA.stat != DEAD)
 				SA.handle_automated_movement()
 			if(SA.stat != DEAD)

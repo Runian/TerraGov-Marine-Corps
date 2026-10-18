@@ -5,7 +5,7 @@
 	//update the current life tick, can be used to e.g. only do something every 4 ticks
 	life_tick++
 
-	if(notransform)
+	if(HAS_TRAIT(src, TRAIT_NO_TRANSFORM))
 		return
 
 	if(!HAS_TRAIT(src, TRAIT_STASIS))

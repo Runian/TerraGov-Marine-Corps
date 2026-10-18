@@ -1,5 +1,7 @@
 GLOBAL_LIST_EMPTY(cinematics)
 
+#define TRAIT_CINEMATIC "cinematic"
+
 // Use to play cinematics.
 // Watcher can be world,mob, or a list of mobs
 // Blocks until sequence is done.
@@ -31,7 +33,8 @@ GLOBAL_LIST_EMPTY(cinematics)
 /datum/cinematic
 	var/id = CINEMATIC_DEFAULT
 	var/list/watching = list() //List of clients watching this
-	var/list/locked = list() //Who had notransform set during the cinematic
+	/// List of mobs who were given TRAIT_NO_TRANSFORM during the cinematic.
+	var/list/locked = list()
 	var/is_global = FALSE //Global cinematics will override mob-specific ones
 	var/atom/movable/screen/cinematic/screen
 	var/datum/callback/special_callback //For special effects synced with animation (explosions after the countdown etc)
@@ -49,7 +52,7 @@ GLOBAL_LIST_EMPTY(cinematics)
 	GLOB.cinematics -= src
 	QDEL_NULL(screen)
 	for(var/mob/M in locked)
-		M.notransform = FALSE
+		REMOVE_TRAIT(M, TRAIT_NO_TRANSFORM, REF(src))
 	return ..()
 
 
@@ -76,13 +79,13 @@ GLOBAL_LIST_EMPTY(cinematics)
 	for(var/i in GLOB.mob_list)
 		var/mob/M = i
 		if(M in watchers)
-			M.notransform = TRUE //Should this be done for non-global cinematics or even at all ?
+			ADD_TRAIT(M, TRAIT_NO_TRANSFORM, REF(src)) //Should this be done for non-global cinematics or even at all ?
 			locked += M
 			if(M.client)
 				watching += M.client
 				M.client.screen += screen
 		else if(is_global)
-			M.notransform = TRUE
+			ADD_TRAIT(M, TRAIT_NO_TRANSFORM, REF(src))
 			locked += M
 
 	//Actually play it

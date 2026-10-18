@@ -209,7 +209,7 @@
 			minion_count--
 			var/minion_type = pick(minion_options)
 			var/mob/living/carbon/xenomorph/paratrooper = new minion_type(candidate)
-			paratrooper.notransform = TRUE
+			ADD_TRAIT(paratrooper, TRAIT_NO_TRANSFORM, REF(src))
 			paratrooper.density = FALSE
 			paratrooper.set_canmove(FALSE)
 			paratrooper.setDir(pick(GLOB.cardinals))
@@ -232,7 +232,7 @@
 ///mkminion activate and start moving/attacking
 /datum/maw_ammo/minion/proc/minion_activate()
 	for(var/mob/living/carbon/xenomorph/paratrooper AS in spawned_minions)
-		paratrooper.notransform = FALSE
+		REMOVE_TRAIT(paratrooper, TRAIT_NO_TRANSFORM, REF(src))
 		paratrooper.set_canmove(TRUE)
 
 /datum/maw_ammo/xeno_fire

@@ -10,7 +10,7 @@
 
 	..()
 
-	if(notransform) //If we're in true stasis don't bother processing life
+	if(HAS_TRAIT(src, TRAIT_NO_TRANSFORM)) //If we're in true stasis don't bother processing life
 		return
 
 	if(stat == DEAD)

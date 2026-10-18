@@ -101,7 +101,7 @@
 /datum/ai_behavior/human/process()
 	if(should_hold())
 		return
-	if(mob_parent.notransform)
+	if(HAS_TRAIT(mob_parent, TRAIT_NO_TRANSFORM))
 		return ..()
 
 	var/mob/living/carbon/human/human_parent = mob_parent

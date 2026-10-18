@@ -101,7 +101,7 @@
 			continue
 
 		var/mob/living/carbon/human/human = carbon_viewer
-		human.notransform = TRUE
+		ADD_TRAIT(human, TRAIT_NO_TRANSFORM, REF(src))
 		human.status_flags |= GODMODE
 		ADD_TRAIT(human, TRAIT_HANDS_BLOCKED, REF(src))
 		human.set_move_resist(MOVE_FORCE_OVERPOWERING)
@@ -144,7 +144,7 @@
 /datum/action/ability/xeno_action/petrify/proc/end_human_effect(mob/living/carbon/human/victim)
 	SIGNAL_HANDLER
 	UnregisterSignal(victim, COMSIG_QDELETING)
-	victim.notransform = FALSE
+	ADD_TRAIT(victim, TRAIT_NO_TRANSFORM, REF(src))
 	victim.status_flags &= ~GODMODE
 	REMOVE_TRAIT(victim, TRAIT_HANDS_BLOCKED, REF(src))
 	victim.set_move_resist(initial(victim.move_resist))

@@ -205,7 +205,7 @@
 	var/mob/living/carbon/carbon_target = target
 	playsound(owner, 'sound/effects/petrify_activate.ogg', 50)
 
-	carbon_target.notransform = TRUE
+	ADD_TRAIT(carbon_target, TRAIT_NO_TRANSFORM, REF(src))
 	carbon_target.status_flags |= GODMODE
 	ADD_TRAIT(carbon_target, TRAIT_HANDS_BLOCKED, REF(src))
 	carbon_target.set_move_resist(MOVE_FORCE_OVERPOWERING)
@@ -231,7 +231,7 @@
 
 ///ends all combat-relazted effects
 /datum/action/ability/activable/sectoid/stasis/proc/end_effects(mob/living/carbon/carbon_target, image/stone_overlay)
-	carbon_target.notransform = FALSE
+	REMOVE_TRAIT(carbon_target, TRAIT_NO_TRANSFORM, REF(src))
 	carbon_target.status_flags &= ~GODMODE
 	REMOVE_TRAIT(carbon_target, TRAIT_HANDS_BLOCKED, REF(src))
 	carbon_target.set_move_resist(initial(carbon_target.move_resist))

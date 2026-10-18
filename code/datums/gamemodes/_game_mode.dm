@@ -193,7 +193,7 @@ GLOBAL_VAR(common_report) //Contains common part of roundend report
 			continue
 		qdel(player)
 		living.client.init_verbs()
-		living.notransform = TRUE
+		ADD_TRAIT(living, TRAIT_NO_TRANSFORM, REF(src))
 		SEND_GLOBAL_SIGNAL(COMSIG_GLOB_PLAYER_ROUNDSTART_SPAWNED, living)
 		log_manifest(living.ckey, living.mind, living)
 		livings += living
@@ -204,8 +204,7 @@ GLOBAL_VAR(common_report) //Contains common part of roundend report
 /datum/game_mode/proc/release_characters(list/livings)
 	for(var/I in livings)
 		var/mob/living/L = I
-		L.notransform = FALSE
-
+		REMOVE_TRAIT(L, TRAIT_NO_TRANSFORM, REF(src))
 
 /datum/game_mode/proc/check_finished()
 	if(SSevacuation.dest_status == NUKE_EXPLOSION_FINISHED)

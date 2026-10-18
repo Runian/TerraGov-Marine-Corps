@@ -1,8 +1,9 @@
 /mob/living/silicon/ai/Life(seconds_per_tick, times_fired)
-
-	if(notransform) //If we're dead or set to notransform don't bother processing life
+	// Don't bother to process life if they're blocked from doing so.
+	if(HAS_TRAIT(src, TRAIT_NO_TRANSFORM))
 		return
 
+	// Because AIs are not expected to be revived / live again, no more processing.
 	if(stat == DEAD)
 		SSmobs.stop_processing(src)
 		return

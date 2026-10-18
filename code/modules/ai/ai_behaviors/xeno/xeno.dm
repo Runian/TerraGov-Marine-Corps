@@ -22,7 +22,7 @@
 	set_escorted_atom(source, atom_to_escort)
 
 /datum/ai_behavior/xeno/process()
-	if(mob_parent.notransform)
+	if(HAS_TRAIT(mob_parent, TRAIT_NO_TRANSFORM))
 		return ..()
 	if(mob_parent.do_actions) //No activating more abilities if they're already in the progress of doing one
 		return ..()

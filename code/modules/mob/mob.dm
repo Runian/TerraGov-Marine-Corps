@@ -580,7 +580,7 @@
 		return FALSE
 	if(anchored)
 		return FALSE
-	if(notransform)
+	if(HAS_TRAIT(src, TRAIT_NO_TRANSFORM))
 		return FALSE
 	if(restrained())
 		return FALSE

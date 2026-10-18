@@ -232,6 +232,9 @@
 #define TRAIT_INNATE_HEALING "innate_healing"
 ///is currently jumping
 #define TRAIT_IS_JUMPING "is_jumping"
+/// "Magic" trait that blocks the mob from moving or interacting with anything. Used for transient stuff like mob transformations or incorporality in special cases.
+/// Will block movement, `Life()` (!!!), and other stuff based on the mob.
+#define TRAIT_NO_TRANSFORM "block_transformations"
 
 ///Traits for managing AM pass_flags
 #define TRAIT_PASS_LOW_STRUCTURE "pass_low_structure"

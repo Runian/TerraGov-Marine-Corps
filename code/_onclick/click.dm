@@ -47,7 +47,6 @@
  * * mob/RangedAttack(atom, params) - used only ranged, only used for tk and laser eyes but could be changed
  */
 /mob/proc/ClickOn(atom/A, location, params)
-
 	if(world.time <= next_click)
 		return
 	next_click = world.time + 1
@@ -55,7 +54,7 @@
 	if(check_click_intercept(params, A))
 		return
 
-	if(notransform)
+	if(HAS_TRAIT(src, TRAIT_NO_TRANSFORM))
 		return
 
 	if(SEND_SIGNAL(src, COMSIG_MOB_CLICKON, A, params) & COMSIG_MOB_CLICK_CANCELED)

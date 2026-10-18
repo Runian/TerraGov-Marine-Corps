@@ -3,7 +3,8 @@
 	set invisibility = 0
 	set background = 1
 
-	if(notransform || stat == DEAD) //If we're dead or set to notransform don't bother processing life
+	//If we're dead or set to notransform don't bother processing life
+	if(HAS_TRAIT(src, TRAIT_NO_TRANSFORM) || stat == DEAD)
 		return
 
 	. = ..()
