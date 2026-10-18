@@ -177,7 +177,7 @@ Redefine as needed.
 	return TRUE
 
 
-/obj/item/tk_grab/attack(mob/living/L, mob/living/user, def_zone)
+/obj/item/tk_grab/attack(mob/living/target, mob/living/user)
 	return
 
 

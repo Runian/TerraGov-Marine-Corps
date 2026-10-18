@@ -25,11 +25,14 @@
 	times_used = max(0,round(times_used)) //sanity
 
 
-/obj/item/flash/attack(mob/living/M, mob/user)
-	if(!user || !M)	return	//sanity
-	if(!ishuman(M)) return
+/obj/item/flash/attack(mob/living/target, mob/living/user)
+	if(!user || !target)
+		return// sanity.
+	if(!ishuman(target))
+		return
+	var/mob/living/carbon/human/human_target = target
 
-	log_combat(user, M, "attempted to flash", src)
+	log_combat(user, human_target, "attempted to flash", src)
 
 	if(user.skills.getRating(SKILL_POLICE) < SKILL_POLICE_FLASH)
 		to_chat(user, span_warning("You don't seem to know how to use [src]..."))
@@ -144,7 +147,7 @@
 	desc = "When a problem arises, SCIENCE is the solution."
 	icon_state = "sflash"
 
-/obj/item/flash/synthetic/attack(mob/living/M as mob, mob/user as mob)
+/obj/item/flash/synthetic/attack(mob/living/target, mob/living/user)
 	..()
 	if(!broken)
 		broken = 1

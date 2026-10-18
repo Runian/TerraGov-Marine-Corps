@@ -31,7 +31,7 @@
 	icon_state = "full_camo"
 
 
-/obj/item/facepaint/attack(mob/M, mob/user)
+/obj/item/facepaint/attack(mob/living/target, mob/living/user)
 	. = ..()
 	if(!ishuman(M))
 		to_chat(user, span_warning("This doesn't have a human face..."))

@@ -186,17 +186,17 @@
 	return
 
 
-/obj/item/proc/attack(mob/living/M, mob/living/user)
-	if(SEND_SIGNAL(src, COMSIG_ITEM_ATTACK, M, user) & COMPONENT_ITEM_NO_ATTACK)
+/obj/item/proc/attack(mob/living/target, mob/living/user)
+	if(SEND_SIGNAL(src, COMSIG_ITEM_ATTACK, target, user) & COMPONENT_ITEM_NO_ATTACK)
 		return FALSE
-	if(SEND_SIGNAL(user, COMSIG_MOB_ITEM_ATTACK, M, src) & COMPONENT_ITEM_NO_ATTACK)
+	if(SEND_SIGNAL(user, COMSIG_MOB_ITEM_ATTACK, target, src) & COMPONENT_ITEM_NO_ATTACK)
 		return FALSE
 
 	// TODO terrible placement move this up the stack or something
-	if(M.status_flags & INCORPOREAL || user.status_flags & INCORPOREAL)
+	if(target.status_flags & INCORPOREAL || user.status_flags & INCORPOREAL)
 		return FALSE
 
-	if(M.can_be_operated_on() && do_surgery(M, user, src)) //Checks if mob is lying down on table for surgery
+	if(target.can_be_operated_on() && do_surgery(target, user, src)) //Checks if mob is lying down on table for surgery
 		return TRUE
 
 	if(item_flags & NOBLUDGEON)
@@ -205,7 +205,7 @@
 	if(!force)
 		return FALSE
 
-	. = M.attacked_by(src, user)
+	. = target.attacked_by(src, user)
 	if(. && hitsound)
 		playsound(loc, hitsound, 25, TRUE, MEDIUM_SOUND_RANGE)
 

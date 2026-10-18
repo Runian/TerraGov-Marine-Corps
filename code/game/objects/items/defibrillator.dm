@@ -135,8 +135,8 @@
 	stack_trace("Powercell deleted while powering the defib, this isn't supposed to happen normally.")
 	set_dcell(null)
 
-/obj/item/defibrillator/attack(mob/living/carbon/human/patient, mob/living/carbon/human/user)
-	defibrillate(patient,user)
+/obj/item/defibrillator/attack(mob/living/target, mob/living/user)
+	defibrillate(target, user)
 
 ///Proc for checking that the defib is ready to operate
 /obj/item/defibrillator/proc/defib_ready(mob/living/carbon/human/patient, mob/living/carbon/human/user)
