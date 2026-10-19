@@ -15,7 +15,9 @@
 	equip_slot_flags = ITEM_SLOT_BELT
 	item_flags = NOBLUDGEON
 	w_class = WEIGHT_CLASS_SMALL
-	var/skilllock = 1
+	// Does using this require SKILL_MEDICAL?
+	var/skill_lock = TRUE
+	/// What mode is it: HYPOSPRAY_INJECT_MODE_DRAW or HYPOSPRAY_INJECT_MODE_INJECT
 	var/inject_mode = HYPOSPRAY_INJECT_MODE_INJECT
 	var/core_name = "hypospray"
 	///If we add a custom label, our name becomes "[core_name] ([label])"
@@ -23,121 +25,105 @@
 	/// Small description appearing as an overlay
 	var/description_overlay = ""
 
-/obj/item/reagent_containers/hypospray/proc/empty(mob/user)
-	if(tgui_alert(user, "Are you sure you want to empty [src]?", "Flush [src]:", list("Yes", "No")) != "Yes")
-		return
-	if(isturf(user.loc))
-		user.balloon_alert(user, "Flushes hypospray.")
-		reagents.reaction(user.loc)
-		reagents.clear_reagents()
+/obj/item/reagent_containers/hypospray/interact_with_atom(atom/interacting_with, mob/living/user, list/modifiers)
+	if(!in_range(interacting_with, user) || !user.Adjacent(interacting_with))
+		return NONE
 
-/obj/item/reagent_containers/hypospray/afterattack(atom/A, mob/living/user)
-	if(!istype(user))
-		return FALSE
-	if(!in_range(A, user) || !user.Adjacent(A))
-		return FALSE
-
-	if(istype(A, /obj/item/storage/pill_bottle) && is_open_container()) //this should only run if its a pillbottle
-		var/obj/item/storage/pill_bottle/bottle = A
-		if(reagents.total_volume >= volume)
-			balloon_alert(user, "Hypospray is full.")
-			return  //early returning if its full
-
+	if(istype(interacting_with, /obj/item/storage/pill_bottle) && is_open_container())
+		var/obj/item/storage/pill_bottle/bottle = interacting_with
 		if(!length(bottle.contents))
-			return //early returning if its empty
+			return ITEM_INTERACT_BLOCKING
+		if(reagents.total_volume >= volume)
+			balloon_alert(user, "hypospray full!")
+			return ITEM_INTERACT_BLOCKING
 		var/obj/item/pill = bottle.contents[1]
-
 		if((pill.reagents.total_volume + reagents.total_volume) > volume)
-			balloon_alert(user, "Can't hold that much.")
-			return // so it doesnt let people have hypos more filled than their volume
+			balloon_alert(user, "can't hold that much!")
+			return ITEM_INTERACT_BLOCKING // So it doesn't let people have hyposprays more filled than their volume.
 		pill.reagents.trans_to(src, pill.reagents.total_volume)
-
 		to_chat(user, span_notice("You dissolve [pill] from [bottle] in [src]."))
-		bottle.storage_datum.remove_from_storage(pill,null,user)
+		bottle.storage_datum.remove_from_storage(pill, null, user)
 		qdel(pill)
-		return
+		return ITEM_INTERACT_SUCCESS
 
-	//For drawing reagents, will check if it's possible to draw, then draws.
+	// For drawing reagents, will check if it's possible to draw, then draws.
 	if(inject_mode == HYPOSPRAY_INJECT_MODE_DRAW)
-		can_draw_reagent(A, user, FALSE)
-		return
+		can_draw_reagent(interacting_with, user, FALSE)
+		return ITEM_INTERACT_SUCCESS
 
 	if(!reagents.total_volume)
-		balloon_alert(user, "Hypospray is Empty.")
+		balloon_alert(user, "hypospray empty!")
+		return ITEM_INTERACT_BLOCKING
+
+	if(iscarbon(interacting_with))
+		var/mob/living/carbon/interacting_carbon = interacting_with
+		if((interacting_carbon.species.species_flags & NO_CHEM_METABOLIZATION) || (interacting_carbon.species.species_flags & IS_SYNTHETIC))
+			interacting_carbon.balloon_alert(user, "Can't inject (robot)")
+			return ITEM_INTERACT_BLOCKING
+
+	if(!interacting_with.is_injectable() && !ismob(interacting_with))
+		interacting_with.balloon_alert(user, "can't fill!")
 		return
-	if(iscarbon(A))
-		var/mob/living/carbon/C = A
-		if((C.species.species_flags & NO_CHEM_METABOLIZATION) || (C.species.species_flags & IS_SYNTHETIC))
-			C.balloon_alert(user, "Can't inject (robot)")
-			return
-	if(!A.is_injectable() && !ismob(A))
-		A.balloon_alert(user, "Can't fill.")
-		return
-	if(skilllock && user.skills.getRating(SKILL_MEDICAL) < SKILL_MEDICAL_NOVICE)
+
+	if(skill_lock && user.skills.getRating(SKILL_MEDICAL) < SKILL_MEDICAL_NOVICE)
 		user.visible_message(span_notice("[user] fumbles around figuring out how to use the [src]."),
 		span_notice("You fumble around figuring out how to use the [src]."))
-		if(!do_after(user, SKILL_TASK_EASY, NONE, A, BUSY_ICON_UNSKILLED) || (!in_range(A, user) || !user.Adjacent(A)))
+		if(!do_after(user, SKILL_TASK_EASY, NONE, interacting_with, BUSY_ICON_UNSKILLED) || (!in_range(interacting_with, user) || !user.Adjacent(interacting_with)))
 			return
-	if(ismob(A))
-		var/mob/M = A
-		if(reagents.has_reagent(/datum/reagent/medicalnanites) && M != user)
+
+	if(ismob(interacting_with))
+		var/mob/interacting_mob = interacting_with
+		if(reagents.has_reagent(/datum/reagent/medicalnanites) && interacting_mob != user)
 			user.balloon_alert(user, "nanites must be self-administered!")
 			return
-		if(!M.can_inject(user, TRUE, user.zone_selected, TRUE))
+		if(!interacting_mob.can_inject(user, TRUE, user.zone_selected, TRUE))
 			return
-		if(M.faction != user.faction && !M.incapacitated())
-			user.visible_message(span_notice("[user] attempts to inject [M] with [src]."),
-			span_notice("You attempt to inject [M] with [src]."))
-			if(!do_after(user, SKILL_TASK_VERY_EASY, NONE, A, BUSY_ICON_HOSTILE) || (!in_range(A, user) || !user.Adjacent(A)))
+		if(interacting_mob.faction != user.faction && !interacting_mob.incapacitated())
+			user.visible_message(span_notice("[user] attempts to inject [interacting_mob] with [src]."),
+			span_notice("You attempt to inject [interacting_mob] with [src]."))
+			if(!do_after(user, SKILL_TASK_VERY_EASY, NONE, interacting_mob, BUSY_ICON_HOSTILE) || (!in_range(interacting_mob, user) || !user.Adjacent(interacting_mob)))
 				return
 
 	var/list/injected = list()
-	for(var/datum/reagent/R in reagents.reagent_list)
-		injected += R.name
-	log_combat(user, A, "injected", src, "Reagents: [english_list(injected)]")
+	for(var/datum/reagent/injected_reagent in reagents.reagent_list)
+		injected += injected_reagent.name
+	log_combat(user, interacting_with, "injected", src, "Reagents: [english_list(injected)]")
 
-	if(ismob(A))
-		var/mob/M = A
-		balloon_alert(user, "Injects [M]")
-		to_chat(M, span_warning("You feel a tiny prick!")) // inject self doubleposting
-		record_reagent_consumption(min(amount_per_transfer_from_this, reagents.total_volume), injected, user, M)
+	if(ismob(interacting_with))
+		var/mob/interacting_mob = interacting_with
+		balloon_alert(user, "injects [interacting_mob]!")
+		to_chat(interacting_mob, span_warning("You feel a tiny prick!")) // Inject self doubleposting.
+		record_reagent_consumption(min(amount_per_transfer_from_this, reagents.total_volume), injected, user, interacting_mob)
 
-	// /mob/living/carbon/human/attack_hand causes
-	// changeNext_move(7) which creates a delay
-	// This line overrides the delay, and will absolutely break everything
-	user.changeNext_move(3) // please don't break the game
+	user.changeNext_move(CLICK_CD_UNARMED)
 
 	playsound(loc, 'sound/items/hypospray.ogg', 50, 1)
-	reagents.reaction(A, INJECT, min(amount_per_transfer_from_this, reagents.total_volume) / reagents.total_volume)
-	var/trans = reagents.trans_to(A, amount_per_transfer_from_this)
-	to_chat(user, span_notice("[trans] units injected. [reagents.total_volume] units remaining in [src]. ")) // better to not balloon
+	reagents.reaction(interacting_with, INJECT, min(amount_per_transfer_from_this, reagents.total_volume) / reagents.total_volume)
+	var/trans = reagents.trans_to(interacting_with, amount_per_transfer_from_this)
+	to_chat(user, span_notice("[trans] units injected. [reagents.total_volume] units remaining in [src]. ")) // Too long to balloon
 
-	return TRUE
-
-/obj/item/reagent_containers/hypospray/afterattack_alternate(atom/A, mob/living/user)
-	if(!istype(user))
-		return FALSE
-	if(!in_range(A, user) || !user.Adjacent(A)) //So we arent drawing reagent from a container behind a window
-		return FALSE
-	can_draw_reagent(A, user, TRUE) //Always draws reagents on right click
+/obj/item/reagent_containers/hypospray/interact_with_atom_secondary(atom/interacting_with, mob/living/user, list/modifiers)
+	if(!in_range(interacting_with, user) || !user.Adjacent(interacting_with))
+		return NONE
+	can_draw_reagent(interacting_with, user, TRUE)
 
 /obj/item/reagent_containers/hypospray/is_refuelable()
 	return FALSE
 
-///If it's possible to draw from something. Will draw_blood() when targetting a carbon, or draw_reagent() when targetting a non-carbon
+/// If it's possible to draw from something. Will draw_blood() when targetting a carbon, or draw_reagent() when targetting a non-carbon
 /obj/item/reagent_containers/hypospray/proc/can_draw_reagent(atom/A, mob/living/user)
 	if(!A.reagents)
 		return FALSE
 	if(reagents.holder_full())
-		balloon_alert(user, "Hypospray is full.")
+		balloon_alert(user, "hypospray full!")
 		inject_mode = HYPOSPRAY_INJECT_MODE_INJECT
 		update_icon() //So we now display as Inject
 		return FALSE
 	if(!A.reagents.total_volume)
-		balloon_alert(user, "Hypospray is empty.")
+		balloon_alert(user, "hypospray empty!")
 		return
 	if(!A.is_drawable())
-		balloon_alert(user, "Can't remove reagents.")
+		balloon_alert(user, "can't remove reagents!")
 		return
 
 	if(iscarbon(A))
@@ -279,6 +265,16 @@
 
 		if("EmptyHypospray")
 			empty(usr)
+
+/// Clears out all reagents in hypospray if user agrees to a prompt.
+/obj/item/reagent_containers/hypospray/proc/empty(mob/user)
+	if(tgui_alert(user, "Are you sure you want to empty [src]?", "Flush [src]:", list("Yes", "No")) != "Yes")
+		return
+	if(!isturf(user.loc))
+		return
+	user.balloon_alert(user, "flushes hypospray!")
+	reagents.reaction(user.loc)
+	reagents.clear_reagents()
 
 /obj/item/reagent_containers/hypospray/advanced
 	name = "Advanced hypospray"

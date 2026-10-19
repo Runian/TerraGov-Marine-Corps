@@ -70,7 +70,6 @@
 		return TRUE
 	if(QDELETED(target) || QDELETED(src))
 		return TRUE
-	afterattack(target, user, TRUE, modifiers) // TRUE: Clicking something Adjacent.
 	return TRUE
 
 /// Called when the item is in the active hand is LEFT CLICKED.
@@ -478,65 +477,3 @@
 		to_chat(user, span_notice("[src] is bolted to the ground."))
 		return
 	attached_clamp.do_load(src)
-
-///////////////
-///RIGHT CLICK CODE FROM HERE
-///
-/// Most of this is basically whats above for left click but broken down, add more as needed
-///////////////
-
-// has_proximity is TRUE if this afterattack was called on something adjacent, in your square, or on your person.
-// Click parameters is the params string from byond Click() code, see that documentation.
-/obj/item/proc/afterattack_alternate(atom/target, mob/user, has_proximity, click_parameters)
-	SEND_SIGNAL(src, COMSIG_ITEM_AFTERATTACK_ALTERNATE, target, user, has_proximity, click_parameters)
-	SEND_SIGNAL(user, COMSIG_MOB_ITEM_AFTERATTACK_ALTERNATE, target, user, has_proximity, click_parameters)
-	return
-
-/**
- * /mob/living attacked_by_alternate //TODO!! MAKE THIS UNIQUE FROM NORMAL ATTACKED_BY AS A FEATURE
- *
- * Called when a mob is attacked by an item
- * while the user clicked on them with left click
- * Arguments:
- * I: item this mob is being attacked by
- * user: the attacker
- * def_zone: targetted area that will be attacked
- */
-/mob/living/proc/attacked_by_alternate(obj/item/I, mob/living/user, def_zone)
-	var/message_verb = "attacks"
-	if(LAZYLEN(I.attack_verb))
-		message_verb = pick(I.attack_verb)
-	var/message_hit_area
-	if(def_zone)
-		message_hit_area = " in the [def_zone]"
-	var/attack_message = "[src] is [message_verb][message_hit_area] with [I]!"
-	var/attack_message_local = "You're [message_verb][message_hit_area] with [I]!"
-	if(user in viewers(src, null))
-		attack_message = "[user] [message_verb] [src][message_hit_area] with [I]!"
-		attack_message_local = "[user] [message_verb] you[message_hit_area] with [I]!"
-
-	user.do_attack_animation(src, used_item = I)
-
-	var/power = I.force + round(I.force * MELEE_SKILL_DAM_BUFF * user.skills.getRating(SKILL_MELEE_WEAPONS))
-
-	switch(I.damtype)
-		if(BRUTE)
-			apply_damage(power, BRUTE, user.zone_selected, MELEE, I.sharp, I.edge, FALSE, I.penetration, user)
-		if(BURN)
-			if(apply_damage(power, BURN, user.zone_selected, FIRE, I.sharp, I.edge, FALSE, I.penetration, user))
-				attack_message_local = "[attack_message_local] It burns!"
-
-	visible_message(span_danger("[attack_message]"),
-		span_userdanger("[attack_message_local]"), null, COMBAT_MESSAGE_RANGE)
-
-	UPDATEHEALTH(src)
-
-	record_melee_damage(user, power)
-	log_combat(user, src, "attacked", I, "(INTENT: [uppertext(user.a_intent)]) (DAMTYE: [uppertext(I.damtype)]) (RAW DMG: [power])")
-	if(power && !user.mind?.bypass_ff && !mind?.bypass_ff && user.faction == faction)
-		var/turf/T = get_turf(src)
-		user.ff_check(power, src)
-		log_ffattack("[key_name(user)] attacked [key_name(src)] with \the [I] in [AREACOORD(T)] (RAW DMG: [power]).")
-		msg_admin_ff("[ADMIN_TPMONTY(user)] attacked [ADMIN_TPMONTY(src)] with \the [I] in [ADMIN_VERBOSEJMP(T)] (RAW DMG: [power]).")
-
-	return TRUE

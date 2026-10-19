@@ -4,7 +4,7 @@
 	icon_state = "autoinjector"
 	worn_icon_state = "hypo"
 	w_class = WEIGHT_CLASS_TINY
-	skilllock = 0
+	skill_lock = 0
 	reagent_flags = DRAWABLE
 	amount_per_transfer_from_this = 10
 	volume = 30
@@ -30,7 +30,7 @@
 
 	. += span_notice("Use to inject into yourself. Unique Action to configure injection amount.")
 
-/obj/item/reagent_containers/hypospray/is_refuelable()
+/obj/item/reagent_containers/hypospray/autoinjector/is_refuelable()
 	return FALSE
 
 /obj/item/reagent_containers/hypospray/autoinjector/fillable
