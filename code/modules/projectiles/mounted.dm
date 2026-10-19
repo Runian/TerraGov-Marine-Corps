@@ -53,12 +53,12 @@
 	var/obj/item/weapon/gun/internal_gun = get_internal_item()
 	internal_gun?.do_unique_action(user)
 
-/obj/machinery/deployable/mounted/attackby_alternate(obj/item/I, mob/user, params)
+/obj/machinery/deployable/mounted/attackby_secondary(obj/item/I, mob/user, params)
 	. = ..()
 	if(!ishuman(user))
 		return
 	var/obj/item/weapon/gun/internal_gun = get_internal_item()
-	internal_gun?.attackby_alternate(I, user, params)
+	internal_gun?.attackby_secondary(I, user, params)
 
 /obj/machinery/deployable/mounted/attackby(obj/item/I, mob/user, params) //This handles reloading the gun, if its in acid cant touch it.
 	. = ..()

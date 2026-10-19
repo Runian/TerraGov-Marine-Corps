@@ -229,6 +229,20 @@
 		if(O.atom_flags & INITIALIZED)
 			SEND_SIGNAL(O, COMSIG_OBJ_HIDE, intact_tile)
 
+/turf/item_interaction(mob/living/user, obj/item/tool, list/modifiers)
+	if(can_lay_cable() && istype(tool, /obj/item/stack/cable_coil))
+		var/obj/item/stack/cable_coil/coil = tool
+		coil.place_turf(src, user)
+		return ITEM_INTERACT_SUCCESS
+	if(can_have_cabling() && istype(tool, /obj/item/stack/pipe_cleaner_coil))
+		var/obj/item/stack/pipe_cleaner_coil/coil = tool
+		for(var/obj/structure/pipe_cleaner/existing_coil in src)
+			if(!existing_coil.d1 || !existing_coil.d2)
+				existing_coil.attackby(tool, user)
+				return
+		coil.place_turf(src, user)
+		return ITEM_INTERACT_SUCCESS
+	return NONE
 
 // Creates a new turf
 // new_baseturfs can be either a single type or list of types, formated the same as baseturfs. see turf.dm

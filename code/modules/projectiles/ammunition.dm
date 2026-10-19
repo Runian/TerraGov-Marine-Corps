@@ -111,7 +111,7 @@
 	var/amount_to_transfer = mag.current_rounds
 	transfer_ammo(mag, user, amount_to_transfer)
 
-/obj/item/ammo_magazine/attackby_alternate(obj/item/I, mob/user, params)
+/obj/item/ammo_magazine/attackby_secondary(obj/item/I, mob/user, params)
 	. = ..()
 	if(!isgun(I))
 		return

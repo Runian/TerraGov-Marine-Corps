@@ -12,76 +12,74 @@
 	max_amount = 60
 	attack_verb = list("hits", "bludgeons", "whacks")
 
+/obj/item/stack/rods/welder_act(mob/living/user, obj/item/tool)
+	if(amount < 4)
+		to_chat(user, span_warning("You need at least four rods to do this."))
+		return ITEM_INTERACT_BLOCKING
 
-/obj/item/stack/rods/attackby(obj/item/W as obj, mob/user as mob)
+	if(!tool.use(0))
+		return ITEM_INTERACT_BLOCKING
+
+	var/obj/item/stack/sheet/metal/new_item = new(user.loc)
+	new_item.add_to_stacks(user)
+	visible_message(span_warning("[src] is shaped into metal by [user] with the weldingtool."), null, span_warning("You hear welding."))
+	use(4)
+	return ITEM_INTERACT_SUCCESS
+
+/obj/item/stack/rods/interact_with_atom(atom/interacting_with, mob/living/user, list/modifiers)
+	if(istype(interacting_with, /turf/open/liquid))
+		place_catwalk(interacting_with, user)
+		return ITEM_INTERACT_SUCCESS
+	if(isfloorturf(interacting_with))
+		reinforce_floor(interacting_with, user)
+		return ITEM_INTERACT_SUCCESS
+	return NONE
+
+/obj/item/stack/rods/item_interaction(mob/living/user, obj/item/tool, list/modifiers)
+	var/obj/item/stack/barbed_wire/barbed_wire = tool
+	if(!istype(tool))
+		return NONE
+	if(amount < 8)
+		to_chat(user, span_warning("You need at least [8 - amount] more [src] to make razorwire obstacles!"))
+		return ITEM_INTERACT_BLOCKING
+	if(barbed_wire.amount < 2)
+		to_chat(user, span_warning("You need [2 - barbed_wire.amount] more [barbed_wire] to make a razor wire obstacle!"))
+		return ITEM_INTERACT_BLOCKING
+	var/obj/item/stack/razorwire/crafted_razorwire = new(user.loc, 2)
+	crafted_razorwire.add_to_stacks(user)
+	to_chat(user, span_notice("You combine the rods and barbed wire into [crafted_razorwire]!"))
+	use(8)
+	barbed_wire.use(2)
+	return ITEM_INTERACT_SUCCESS
+
+/obj/item/stack/rods/attack_self(mob/user)
 	. = ..()
 	if(.)
-		return
+		return TRUE
+	var/turf/current_turf = get_turf(user.loc)
+	var/obj/structure/grille/premade_grille = locate() in current_turf
+	if(premade_grille)
+		if(premade_grille.obj_integrity <= premade_grille.integrity_failure)
+			premade_grille.repair_damage(10, user)
+			premade_grille.density = TRUE
+			premade_grille.icon_state = "grille"
+			use(1)
+			return TRUE
+		return FALSE
 
-	if(istype(W, /obj/item/stack/barbed_wire)) // making razorwire obstacles
-		var/obj/item/stack/barbed_wire/B = W
-		if(amount < 8)
-			to_chat(user, span_warning("You need at least [8 - amount] more [src] to make razorwire obstacles!"))
-			return
-		if(B.amount < 2)
-			to_chat(user, span_warning("You need [2 - B.amount] more [B] to make a razor wire obstacle!"))
-			return
-		use(8)
-		B.use(2)
-		var/obj/structure/razorwire/M = new /obj/item/stack/razorwire(user.loc, 2)
-		to_chat(user, span_notice("You combine the rods and barbed wire into [M]!"))
-		return
-	if (iswelder(W))
-		var/obj/item/tool/weldingtool/WT = W
+	if(user.do_actions)
+		return FALSE
 
-		if(amount < 4)
-			to_chat(user, span_warning("You need at least four rods to do this."))
-			return
+	if(amount < 4)
+		to_chat(user, span_notice("You need at least four rods to do this."))
+		return TRUE
 
-		if(WT.remove_fuel(0,user))
-			var/obj/item/stack/sheet/metal/new_item = new(usr.loc)
-			new_item.add_to_stacks(usr)
-			visible_message(span_warning("[src] is shaped into metal by [user] with the weldingtool."), null, span_warning("You hear welding."))
-			var/obj/item/stack/rods/R = src
-			var/replace = (user.get_inactive_held_item()==R)
-			R.use(4)
-			if (!R && replace)
-				user.put_in_hands(new_item)
-		return
+	if(!do_after(usr, 2 SECONDS, NONE, src, BUSY_ICON_BUILD))
+		return TRUE
 
-/obj/item/stack/rods/attack_self(mob/user as mob)
-
-	if(!istype(user.loc,/turf)) return 0
-
-	if (locate(/obj/structure/grille, usr.loc))
-		for(var/obj/structure/grille/G in usr.loc)
-			if (G.obj_integrity <= G.integrity_failure)
-				G.repair_damage(10, user)
-				G.density = TRUE
-				G.icon_state = "grille"
-				use(1)
-			else
-				return 1
-
-	else if(!CHECK_BITFIELD(obj_flags, IN_USE))
-		if(amount < 4)
-			to_chat(user, span_notice("You need at least four rods to do this."))
-			return
-		to_chat(usr, span_notice("Assembling grille..."))
-		ENABLE_BITFIELD(obj_flags, IN_USE)
-		if (!do_after(usr, 20, NONE, src, BUSY_ICON_BUILD))
-			DISABLE_BITFIELD(obj_flags, IN_USE)
-			return
-		new /obj/structure/grille/ ( usr.loc )
-		to_chat(usr, span_notice("You assemble a grille"))
-		DISABLE_BITFIELD(obj_flags, IN_USE)
-		use(4)
-
-/obj/item/stack/rods/attack_turf(turf/T, mob/living/user)
-	if(istype(T, /turf/open/liquid))
-		place_catwalk(T, user)
-	else if(isfloorturf(T))
-		reinforce_floor(T, user)
+	new /obj/structure/grille(current_turf)
+	to_chat(user, span_notice("You assemble a grille."))
+	use(4)
 
 ///Builds a catwalk
 /obj/item/stack/rods/proc/place_catwalk(turf/target_turf, mob/living/user)

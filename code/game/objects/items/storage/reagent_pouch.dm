@@ -138,7 +138,7 @@
 
 	return ..()
 
-/obj/item/storage/pouch/pressurized_reagent_pouch/attackby_alternate(obj/item/held_item, mob/user, params)
+/obj/item/storage/pouch/pressurized_reagent_pouch/attackby_secondary(obj/item/held_item, mob/user, params)
 	. = ..()
 	if(istype(held_item, /obj/item/reagent_containers/hypospray))
 		fill_autoinjector(held_item, user)

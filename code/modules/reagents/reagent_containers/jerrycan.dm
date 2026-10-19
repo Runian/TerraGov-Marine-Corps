@@ -6,43 +6,43 @@
 	w_class = WEIGHT_CLASS_BULKY
 	volume = 200
 	list_reagents = list(/datum/reagent/fuel = 200)
-	///how much fuel we use up per spill
+	/// How much fuel we use up per spill?
 	var/fuel_usage = 10
 
 /obj/item/reagent_containers/jerrycan/examine(mob/user as mob)
 	. = ..()
 	if(!reagents)
 		return
-	if(get_dist(user,src) > 2)
+	if(get_dist(user, src) > 2)
 		. += span_warning("You're too far away to see [src]'s reagent amount!")
 		return
 	. += "There is [reagents.reagent_list ? reagents.total_volume : 0] units of fuel remaining."
 
-/obj/item/reagent_containers/jerrycan/attack_turf(turf/A, mob/user)
-	. = ..()
-	if(A.density)
-		return
+/obj/item/reagent_containers/jerrycan/interact_with_atom(atom/interacting_with, mob/living/user, list/modifiers)
+	if(!isturf(interacting_with) && !istype(interacting_with, /obj/alien/weeds))
+		return NONE
+	var/turf/found_turf = get_turf(interacting_with)
+	if(found_turf.density)
+		return ITEM_INTERACT_BLOCKING
 	if(!reagents.total_volume)
-		to_chat(user, span_warning("Theres no fuel left in [src]!"))
-		return
-	new /obj/effect/decal/cleanable/liquid_fuel(A, fuel_usage/2)
+		balloon_alert(user, "no fuel!")
+		return ITEM_INTERACT_BLOCKING
+	new /obj/effect/decal/cleanable/liquid_fuel(found_turf, fuel_usage / 2)
 	reagents.remove_reagent(/datum/reagent/fuel, fuel_usage)
-	user.visible_message(span_notice("[user] splashes some fuel on \the [A]"), span_notice("You splash some fuel on [A]"))
-	log_attack("[key_name(user)] has splashed fuel on  [A] in [AREACOORD(user)]")
-	A.add_fingerprint(user, "attack_turf", "doused with fuel from [src]")
+	user.visible_message(span_notice("[user] splashes some fuel on \the [found_turf]."), span_notice("You splash some fuel on [found_turf]."))
+	log_attack("[key_name(user)] has splashed fuel on [found_turf] in [AREACOORD(user)]")
+	found_turf.add_fingerprint(user, "pour_fuel", "doused with fuel from [src]")
+	return ITEM_INTERACT_SUCCESS
 
-/obj/item/reagent_containers/jerrycan/attack(mob/living/M, mob/living/user)
+/obj/item/reagent_containers/jerrycan/attack(mob/living/target_mob, mob/living/user, list/modifiers)
 	. = ..()
+	if(!.)
+		return FALSE
 	if(!reagents.total_volume)
-		to_chat(user, span_warning("Theres no fuel left in [src]!"))
-		return
-	M.adjust_fire_stacks(10)
+		balloon_alert(user, "no fuel!")
+		return TRUE
+	target_mob.adjust_fire_stacks(10)
 	reagents.remove_reagent(/datum/reagent/fuel, fuel_usage)
-	user.visible_message(span_notice("[user] splashes some fuel on [M]"), span_notice("You splash some fuel on [M]"), ignored_mob = M)
-	to_chat(M, "<span class='warning'>[user] drenches you in fuel from [src]!<span>")
-	log_attack("[key_name(user)] has doused [M] in fuel in [AREACOORD(user)]")
-
-/obj/item/reagent_containers/jerrycan/attack_obj(obj/target_object, mob/living/user)
-	if(istype(target_object, /obj/alien/weeds))
-		return attack_turf(get_turf(target_object), user)
-	return ..()
+	user.visible_message(span_notice("[user] splashes some fuel on [target_mob]."), span_notice("You splash some fuel on [target_mob]."), ignored_mob = target_mob)
+	to_chat(target_mob, span_warning("[user] drenches you in fuel from [src]!"))
+	log_attack("[key_name(user)] has doused [target_mob] in fuel in [AREACOORD(user)]")

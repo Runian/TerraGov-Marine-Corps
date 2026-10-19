@@ -482,9 +482,6 @@
 
 // /obj/item signals
 #define COMSIG_ITEM_APPLY_CUSTOM_OVERLAY "item_apply_custom_overlay" //from base of obj/item/apply_custom(): (/image/standing)
-#define COMSIG_ITEM_ATTACK "item_attack"						//from base of obj/item/attack(): (/mob/living/target, /mob/living/user)
-#define COMSIG_ITEM_ATTACK_ALTERNATE "item_attack_alt"			//from base of obj/item/attack_alternate(): (/mob/living/target, /mob/living/user)
-	#define COMPONENT_NO_INTERACT (1<<0)
 #define COMSIG_ITEM_EQUIPPED "item_equip"						//from base of obj/item/equipped(): (/mob/equipper, slot)
 #define COMSIG_ITEM_EQUIPPED_TO_SLOT "item_equip_to_slot"			//from base of obj/item/equipped(): (/mob/equipper, slot)
 #define COMSIG_ITEM_EQUIPPED_NOT_IN_SLOT "item_equip_not_in_slot"	//from base of obj/item/equipped(): (/mob/equipper, slot)
@@ -497,8 +494,6 @@
 #define COMSIG_ITEM_AFTERATTACK_ALTERNATE "item_afterattack_alternate"	//from base of obj/item/afterattack_alternate(): (atom/target, mob/user, has_proximity, click_parameters)
 #define COMSIG_ITEM_ATTACK_OBJ "item_attack_obj"				//from base of obj/item/attack_obj(): (/obj, /mob)
 	#define COMPONENT_NO_ATTACK_OBJ (1<<0)
-#define COMSIG_ITEM_ATTACK_TURF "item_attack_turf"				//from base of obj/item/attack_turf(): (/turf, /mob)
-	#define COMPONENT_NO_ATTACK_TURF (1<<0)
 #define COMSIG_ITEM_UNZOOM "item_unzoom"
 #define COMSIG_ITEM_ZOOM "item_zoom"                            //from base of /obj/item/zoom(), used for telling when a scope zooms and for checking if another zoom is already on mob.
 	#define COMSIG_ITEM_ALREADY_ZOOMED (1<<0)                         //bitshift that tells to a item when zoom checking that there already soemthing zooming user.
@@ -644,8 +639,7 @@
 
 #define COMSIG_MOB_SHIELD_DETACH "mob_shield_detached"
 #define COMSIG_MOB_ITEM_ATTACK "mob_item_attack"				//from base of /obj/item/attack(): (mob/target, /obj/item/attacking_item)
-#define COMSIG_MOB_ITEM_ATTACK_ALTERNATE "mob_item_attack_alt"	//from base of /obj/item/attack_alternate(): (mob/target, /obj/item/attacking_item)
-	#define COMPONENT_ITEM_NO_ATTACK (1<<0)						//return this if you dont want attacka and altattacks to run
+#define COMSIG_MOB_ITEM_ATTACK_ALTERNATE "mob_item_attack_alt"	//from base of /obj/item/attack_secondary(): (mob/target, /obj/item/attacking_item)
 
 ///Called when an object is grilled ontop of a griddle
 #define COMSIG_ITEM_GRILLED "item_griddled"

@@ -352,33 +352,33 @@ CIGARETTE PACKETS ARE IN FANCY.DM
 		die()
 	return ..()
 
-/obj/item/clothing/mask/cigarette/attack_obj(obj/target_object, mob/living/user)
-	if(lit)
-		return ..()
-	if(!istype(target_object, /obj/machinery/light))
-		return ..()
-	var/obj/machinery/light/fixture = target_object
-	if(fixture.status != LIGHT_BROKEN || !fixture.has_power())
-		return ..()
-	light(span_notice("[user] lights [user.p_their()] [src] from the broken light."))
-	return TRUE
 
-/obj/item/clothing/mask/cigarette/attack(mob/living/living_target, mob/living/user)
+/obj/item/clothing/mask/cigarette/interact_with_atom(atom/interacting_with, mob/living/user, list/modifiers)
 	if(lit)
-		return ..()
-	if(!living_target.on_fire)
-		return ..()
-	if(user == living_target)
-		light(span_notice("[user] lights [user.p_their()] [src] from their own burning body, that's crazy!"))
-	else
-		light(span_notice("[user] lights [user.p_their()] [src] from the burning body of [living_target], that's stone cold."))
-	return TRUE
+		return NONE
 
-/obj/item/clothing/mask/cigarette/attack_turf(turf/target_turf, mob/living/user)
-	if(!lit && locate(/obj/fire/flamer) in target_turf.contents)
+	if(istype(interacting_with, /obj/machinery/light))
+		var/obj/machinery/light/light_fixture = interacting_with
+		if(light_fixture.status != LIGHT_BROKEN || !light_fixture.has_power())
+			return ITEM_INTERACT_BLOCKING
+		light(span_notice("[user] lights [user.p_their()] [src] from the broken light."))
+		return ITEM_INTERACT_SUCCESS
+
+	if(isliving(interacting_with))
+		var/mob/living/living_target = interacting_with
+		if(!living_target.on_fire)
+			return ITEM_INTERACT_BLOCKING
+		if(user == living_target)
+			light(span_notice("[user] lights [user.p_their()] [src] from their own burning body, that's crazy!"))
+		else
+			light(span_notice("[user] lights [user.p_their()] [src] from the burning body of [living_target], that's stone cold."))
+		return ITEM_INTERACT_SUCCESS
+
+	if(isturf(interacting_with) && locate(/obj/fire/flamer) in interacting_with.contents)
 		light(span_notice("[user] lights [user.p_their()] [src] with the burning ground."))
-		return TRUE
-	return ..()
+		return ITEM_INTERACT_SUCCESS
+
+	return NONE
 
 /obj/item/clothing/mask/cigarette/proc/die()
 	var/turf/T = get_turf(src)

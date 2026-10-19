@@ -378,7 +378,7 @@
 	else if(S.storage_datum.can_be_inserted(src, user))
 		S.storage_datum.handle_item_insertion(src, FALSE, user)
 
-/obj/item/attackby_alternate(obj/item/attacking_item, mob/user, params)
+/obj/item/attackby_secondary(obj/item/attacking_item, mob/user, params)
 	if(istype(attacking_item, /obj/item/facepaint))
 		alternate_color_item(attacking_item, user)
 		return TRUE

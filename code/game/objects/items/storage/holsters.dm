@@ -392,7 +392,7 @@
 	holsterable_allowed = list(/obj/item/weapon/gun/grenade_launcher/single_shot/flare/marine)
 	storage_type = /datum/storage/holster/flarepouch
 
-/obj/item/storage/holster/flarepouch/attackby_alternate(obj/item/I, mob/user, params)
+/obj/item/storage/holster/flarepouch/attackby_secondary(obj/item/I, mob/user, params)
 	if(!istype(I, /obj/item/weapon/gun/grenade_launcher/single_shot/flare))
 		return ..()
 	var/obj/item/weapon/gun/grenade_launcher/single_shot/flare/flare_gun = I

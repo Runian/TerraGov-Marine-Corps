@@ -53,27 +53,37 @@
 /obj/item/light_bulb/bulb/blue
 	icon_state = "bbulb1"
 
-/obj/item/light_bulb/bulb/attack_turf(turf/T, mob/living/user)
-	var/turf/open/floor/light/light_tile = T
-	if(!istype(light_tile))
-		return
+/obj/item/light_bulb/bulb/interact_with_atom(atom/interacting_with, mob/living/user, list/modifiers)
+	var/turf/open/floor/light/floorlight_turf = interacting_with
+	if(!istype(floorlight_turf))
+		return NONE
 	if(status != LIGHT_OK)
 		to_chat(user, span_notice("The replacement bulb is broken."))
-		return
-	var/obj/item/stack/tile/light/existing_bulb = light_tile.floor_tile
+		return ITEM_INTERACT_BLOCKING
+	var/obj/item/stack/tile/light/existing_bulb = floorlight_turf.floor_tile
 	if(existing_bulb.state == LIGHT_TILE_OK)
 		to_chat(user, span_notice("The lightbulb seems fine, no need to replace it."))
-		return
-
-	user.drop_held_item(src)
+		return ITEM_INTERACT_BLOCKING
+	if(!user.drop_held_item(src))
+		to_chat(user, span_warning("The [src] is stuck to your hand!"))
+		return ITEM_INTERACT_BLOCKING
 	qdel(src)
 	existing_bulb.state = LIGHT_TILE_OK
-	light_tile.update_icon()
+	existing_bulb.update_icon()
 	to_chat(user, span_notice("You replace the light bulb."))
+	return ITEM_INTERACT_SUCCESS
 
+/obj/item/light_bulb/bulb/item_interaction(mob/living/user, obj/item/tool, list/modifiers)
+	var/obj/item/reagent_containers/syringe/syringe_tool = tool
+	if(istype(syringe_tool))
+		to_chat(user, "You inject the solution into the [src].")
+		if(syringe_tool.reagents.has_reagent(/datum/reagent/toxin/phoron, 5))
+			rigged = TRUE
+		syringe_tool.reagents.clear_reagents()
+		return ITEM_INTERACT_SUCCESS
+	return NONE
 
-// update the icon state and description of the light
-
+// Updates the icon state and description of the light
 /obj/item/light_bulb/proc/update()
 	switch(status)
 		if(LIGHT_OK)
@@ -89,7 +99,6 @@
 			desc = "A broken [name]."
 			worn_icon_state = "ltube-broken"
 
-
 /obj/item/light_bulb/Initialize(mapload)
 	. = ..()
 	switch(name)
@@ -99,36 +108,17 @@
 			brightness = rand(4,6)
 	update()
 
-
-// attack bulb/tube with object
-// if a syringe, can inject phoron to make it explode
-/obj/item/light_bulb/attackby(obj/item/I, mob/user, params)
-	. = ..()
-	if(.)
-		return
-
-	if(istype(I, /obj/item/reagent_containers/syringe))
-		var/obj/item/reagent_containers/syringe/S = I
-
-		to_chat(user, "You inject the solution into the [src].")
-
-		if(S.reagents.has_reagent(/datum/reagent/toxin/phoron, 5))
-			rigged = TRUE
-
-		S.reagents.clear_reagents()
-
 // called after an attack with a light item
 // shatter light, unless it was an attempt to put it in a light socket
 // now only shatter if the intent was harm
-
-/obj/item/light_bulb/afterattack(atom/target, mob/user, proximity)
-	if(!proximity)
+/obj/item/light_bulb/afterattack(atom/target, mob/user, has_proximity, click_parameters)
+	. = ..()
+	if(!has_proximity)
 		return
 	if(istype(target, /obj/machinery/light))
 		return
 	if(user.a_intent != INTENT_HARM)
 		return
-
 	shatter()
 
 /obj/item/light_bulb/proc/shatter()

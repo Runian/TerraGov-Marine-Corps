@@ -218,7 +218,7 @@
 	switch(loaded_reagent)
 		if(/datum/reagent/medicine/bicaridine)
 			if(user.a_intent == INTENT_HELP)
-				. = COMPONENT_ITEM_NO_ATTACK
+				. = COMPONENT_CANCEL_ATTACK_CHAIN
 			INVOKE_ASYNC(src, PROC_REF(attack_bicaridine), source, target, user, weapon)
 
 		if(/datum/reagent/medicine/kelotane)

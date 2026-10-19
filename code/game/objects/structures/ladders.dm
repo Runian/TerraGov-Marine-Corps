@@ -388,7 +388,7 @@
 	throw_object(item, user, TRUE)
 	return TRUE
 
-/obj/structure/ladder/attackby_alternate(obj/item/attacking_item, mob/user, params)
+/obj/structure/ladder/attackby_secondary(obj/item/attacking_item, mob/user, params)
 	. = ..()
 	if(.)
 		return

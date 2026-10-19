@@ -46,90 +46,92 @@
  * * item/afterattack(atom, user, adjacent, params) - used both ranged and adjacent when not handled by attackby
  * * mob/RangedAttack(atom, params) - used only ranged, only used for tk and laser eyes but could be changed
  */
-/mob/proc/ClickOn(atom/A, location, params)
+/mob/proc/ClickOn(atom/clicked_atom, location, params)
 	if(world.time <= next_click)
 		return
 	next_click = world.time + 1
 
-	if(check_click_intercept(params, A))
+	if(check_click_intercept(params, clicked_atom) || notransform)
 		return
 
-	if(notransform)
-		return
-
-	if(SEND_SIGNAL(src, COMSIG_MOB_CLICKON, A, params) & COMSIG_MOB_CLICK_CANCELED)
+	if(SEND_SIGNAL(src, COMSIG_MOB_CLICKON, clicked_atom, params) & COMSIG_MOB_CLICK_CANCELED)
 		return
 
 	var/list/modifiers = params2list(params)
-	if(isnull(location) && A.plane == CLICKCATCHER_PLANE) //Checks if the intended target is in deep darkness and adjusts A based on params.
-		A = params2turf(modifiers["screen-loc"], get_turf(client.eye), client)
+	if(isnull(location) && clicked_atom.plane == CLICKCATCHER_PLANE) // Checks if the intended target is in deep darkness and adjusts the clicked_atom based on params.
+		clicked_atom = params2turf(modifiers["screen-loc"], get_turf(client.eye), client)
 		modifiers["icon-x"] = num2text(ABS_PIXEL_TO_REL(text2num(modifiers["icon-x"])))
 		modifiers["icon-y"] = num2text(ABS_PIXEL_TO_REL(text2num(modifiers["icon-y"])))
 		params = list2params(modifiers)
 
+	// Specific mouse buttons that we don't support (at the moment).
 	if(modifiers[BUTTON4] || modifiers[BUTTON5])
 		return
 
+	// Everything shift-click.
 	if(LAZYACCESS(modifiers, SHIFT_CLICK))
 		if(LAZYACCESS(modifiers, MIDDLE_CLICK))
-			ShiftMiddleClickOn(A)
+			ShiftMiddleClickOn(clicked_atom)
 			return
 		if(LAZYACCESS(modifiers, CTRL_CLICK))
-			CtrlShiftClickOn(A)
+			CtrlShiftClickOn(clicked_atom)
 			return
 		if(LAZYACCESS(modifiers, RIGHT_CLICK))
-			ShiftRightClickOn(A)
+			ShiftRightClickOn(clicked_atom)
 			return
-		if(ShiftClickOn(A))
+		if(ShiftClickOn(clicked_atom))
 			return
 
+	/// Everything ctrl-click.
 	if(LAZYACCESS(modifiers, CTRL_CLICK))
 		if(LAZYACCESS(modifiers, MIDDLE_CLICK))
-			CtrlMiddleClickOn(A)
+			CtrlMiddleClickOn(clicked_atom)
 			return
-		CtrlClickOn(A)
+		CtrlClickOn(clicked_atom)
 		return
 
+	// Everything alt-click.
 	if(LAZYACCESS(modifiers, ALT_CLICK))
 		if(LAZYACCESS(modifiers, RIGHT_CLICK))
-			AltRightClickOn(A)
+			AltRightClickOn(clicked_atom)
 			return
-		if(AltClickOn(A))
+		if(AltClickOn(clicked_atom))
 			return
 
-	if(LAZYACCESS(modifiers, MIDDLE_CLICK) && MiddleClickOn(A))
+	// Middle and right-click standalone.
+	if(LAZYACCESS(modifiers, MIDDLE_CLICK) && MiddleClickOn(clicked_atom))
 		return
-	if(LAZYACCESS(modifiers, RIGHT_CLICK) && RightClickOn(A))
+	if(LAZYACCESS(modifiers, RIGHT_CLICK) && RightClickOn(clicked_atom))
 		return
 
 	if(incapacitated(TRUE))
 		return
 
-	face_atom(A)
+	face_atom(clicked_atom)
 
-	if(next_move > world.time)
+	if(world.time <= next_click) // TODO: Is this really needed?
 		return
 
-	if(!LAZYACCESS(modifiers, "catcher") && A.IsObscured())
+	/// Allows clicking in darkness.
+	if(!LAZYACCESS(modifiers, "catcher") && clicked_atom.IsObscured())
 		return
 
 	if(restrained())
 		changeNext_move(CLICK_CD_HANDCUFFED)
-		RestrainedClickOn(A)
+		RestrainedClickOn(clicked_atom)
 		return
 
 	if(in_throw_mode)
-		if(throw_item(A))
+		if(throw_item(clicked_atom))
 			changeNext_move(CLICK_CD_THROWING)
 		return
 
-	var/obj/item/W = get_active_held_item()
-
-	if(W == A)
+	var/obj/item/held_item = get_active_held_item()
+	if(held_item == clicked_atom)
 		if(LAZYACCESS(modifiers, RIGHT_CLICK))
-			W.attack_self_secondary(src)
+			held_item.attack_self_secondary(src)
 		else
-			W.attack_self(src)
+			held_item.attack_self(src)
 
 		update_inv_l_hand()
 		update_inv_r_hand()
@@ -137,37 +139,30 @@
 
 	// These are always reachable.
 	// User itself, current loc, and user inventory.
-	if(A in DirectAccess())
-		if(W)
-			W.melee_attack_chain(src, A, modifiers)
+	if(clicked_atom in DirectAccess())
+		if(held_item)
+			held_item.melee_attack_chain(src, clicked_atom, modifiers)
 		else
-			UnarmedAttack(A, FALSE, modifiers)
+			UnarmedAttack(clicked_atom, TRUE, modifiers) // TODO: Proximity was set to FALSE. Why? I don't know.
 		return
 
 	// Can't reach anything else in lockers or other weirdness.
 	if(!loc.AllowClick())
 		return
 
-	//Standard reach turf to turf or reaching inside storage
-	if(CanReach(A, W))
-		if(W)
-			W.melee_attack_chain(src, A, modifiers)
+	// Standard reach turf to turf or reaching inside storage.
+	if(CanReach(clicked_atom, held_item))
+		if(held_item)
+			held_item.melee_attack_chain(src, clicked_atom, modifiers)
 		else
-			UnarmedAttack(A, TRUE, modifiers)
+			UnarmedAttack(clicked_atom, TRUE, modifiers)
 		return
 
-	if(W)
-		var/proximity = A.Adjacent(src)
-		if(!proximity || !A.attackby(W, src, params))
-			W.afterattack(A, src, proximity, params)
-			RangedAttack(A, params)
-		return
-
-	if(A.Adjacent(src))
-		A.attack_hand(src)
+	/// Ranged since we can't meet standard reach.
+	if(held_item)
+		clicked_atom.base_ranged_item_interaction(src, held_item, modifiers)
 	else
-		RangedAttack(A, params)
-
+		RangedAttack(clicked_atom, modifiers)
 
 /**
  * A backwards depth-limited breadth-first-search to see if the target is

@@ -603,7 +603,7 @@
 /obj/vehicle/sealed/armored/grab_interact(obj/item/grab/grab, mob/user, base_damage, is_sharp)
 	return try_easy_load(grab.grabbed_thing, user)
 
-/obj/vehicle/sealed/armored/attackby_alternate(obj/item/I, mob/user, params)
+/obj/vehicle/sealed/armored/attackby_secondary(obj/item/I, mob/user, params)
 	. = ..()
 	if(user.skills.getRating(SKILL_LARGE_VEHICLE) < required_entry_skill)
 		balloon_alert(user, "not enough skill")

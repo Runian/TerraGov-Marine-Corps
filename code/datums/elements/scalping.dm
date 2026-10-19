@@ -21,7 +21,7 @@
 	M.visible_message(span_danger("[user] brutally scalps [M]!"), span_danger("You brutally scalp [M] with \the [source]!"))
 	var/obj/item/scalp/scalp = new(get_turf(M))
 	scalp.name = M.name + "'s " + initial(scalp.name)
-	return COMPONENT_ITEM_NO_ATTACK
+	return COMPONENT_CANCEL_ATTACK_CHAIN
 
 /obj/item/scalp
 	name = "scalp"

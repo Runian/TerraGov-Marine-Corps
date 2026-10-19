@@ -410,7 +410,7 @@
 		var/obj/item/to_stock = I
 		stock(to_stock, user)
 
-/obj/machinery/vending/attackby_alternate(obj/item/item_to_refill, mob/user, params)
+/obj/machinery/vending/attackby_secondary(obj/item/item_to_refill, mob/user, params)
 	. = ..()
 	/// The found record matching the item_to_refill in the vending_records lists
 	var/datum/vending_product/record = FALSE

@@ -39,7 +39,7 @@
 	. = ..()
 	scanner.analyze_vitals(patient_candidate, user)
 
-/obj/item/healthanalyzer/attack_alternate(mob/living/carbon/patient_candidate, mob/living/user)
+/obj/item/healthanalyzer/attack_secondary(mob/living/carbon/patient_candidate, mob/living/user)
 	. = ..()
 	scanner.analyze_vitals(patient_candidate, user, TRUE)
 

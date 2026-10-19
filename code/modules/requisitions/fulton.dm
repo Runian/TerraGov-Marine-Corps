@@ -222,7 +222,7 @@
 	return ..()
 
 
-/obj/item/fulton_extraction_pack/adminbus/preattack(mob/user, atom/target)
+/obj/item/fulton_extraction_pack/adminbus/pre_attack(mob/user, atom/target)
 	if(!isturf(target.loc) || !ismovable(target))
 		return FALSE
 	if(active)

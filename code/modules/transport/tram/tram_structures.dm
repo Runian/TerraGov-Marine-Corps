@@ -112,7 +112,7 @@
 		update_appearance()
 	return TRUE
 
-/obj/structure/tram/attackby_alternate(obj/item/attacking_item, mob/user, params)
+/obj/structure/tram/attackby_secondary(obj/item/attacking_item, mob/user, params)
 	switch(state)
 		if(TRAM_SCREWED_TO_FRAME)
 			if(attacking_item.tool_behaviour == TOOL_SCREWDRIVER)

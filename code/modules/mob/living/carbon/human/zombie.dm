@@ -49,7 +49,7 @@
 	. = ..()
 	ADD_TRAIT(src, TRAIT_NODROP, ABSTRACT_ITEM_TRAIT)
 
-/obj/item/weapon/zombie_claw/preattack(atom/target, mob/user, params)
+/obj/item/weapon/zombie_claw/pre_attack(atom/target, mob/user, params)
 	if(ishuman(target))
 		var/mob/living/carbon/human/human_target = target
 		if(human_target.stat == DEAD)

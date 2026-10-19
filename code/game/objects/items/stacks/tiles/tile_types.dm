@@ -17,15 +17,16 @@
 	pixel_x = rand(1, 14)
 	pixel_y = rand(1, 14)
 
-/obj/item/stack/tile/attack_turf(turf/T, mob/living/user)
+/obj/item/stack/tile/interact_with_atom(atom/interacting_with, mob/living/user, list/modifiers)
 	if(!turf_type)
-		return
-	if(!istype(T, /turf/open/floor/plating))
-		return
+		return NONE
+	var/turf/open/floor/plating/interacting_turf = interacting_with
+	if(!istype(interacting_turf))
+		return NONE
 	if(!use(1))
-		return
-	playsound(T, 'sound/weapons/genhit.ogg', 25, 1, MEDIUM_SOUND_RANGE)
-	T.PlaceOnTop(turf_type)
+		return NONE
+	playsound(interacting_turf, 'sound/weapons/genhit.ogg', 25, 1, MEDIUM_SOUND_RANGE)
+	interacting_turf.PlaceOnTop(turf_type)
 
 /obj/item/stack/tile/plasteel
 	force = 6

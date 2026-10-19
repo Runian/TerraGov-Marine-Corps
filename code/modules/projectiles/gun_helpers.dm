@@ -33,7 +33,7 @@
 		return
 	reload(I, user)
 
-/obj/item/weapon/gun/attackby_alternate(obj/item/I, mob/user, params)
+/obj/item/weapon/gun/attackby_secondary(obj/item/I, mob/user, params)
 	. = ..()
 	if(!active_attachable || user.get_inactive_held_item() != src)
 		return

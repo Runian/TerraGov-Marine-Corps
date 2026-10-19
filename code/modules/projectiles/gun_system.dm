@@ -1165,7 +1165,7 @@
 
 	ENABLE_BITFIELD(gun_features_flags, GUN_CAN_POINTBLANK)
 
-/obj/item/weapon/gun/attack_alternate(mob/living/M, mob/living/user)
+/obj/item/weapon/gun/attack_secondary(mob/living/M, mob/living/user)
 	if(active_attachable)
 		active_attachable.attack(M, user)
 		return
