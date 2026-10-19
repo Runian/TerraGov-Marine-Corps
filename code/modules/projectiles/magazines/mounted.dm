@@ -193,7 +193,7 @@
 	///Whether this is direct fire or not
 	var/guided = FALSE
 
-/obj/item/ammo_magazine/heavy_isg/he/attack_hand_alternate(mob/living/user)
+/obj/item/ammo_magazine/heavy_isg/he/attack_hand_secondary(mob/living/user)
 	if(guided)
 		default_ammo = /datum/ammo/rocket/heavy_isg/unguided
 		balloon_alert(user, "You swap the shell to unguided form")

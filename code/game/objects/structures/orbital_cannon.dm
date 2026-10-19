@@ -283,7 +283,7 @@ GLOBAL_DATUM(rail_gun, /obj/structure/ship_rail_gun)
 		. += image("cannon_tray_[fuel_amt]")
 
 //Not calling parent because this isn't the typical pick up/put down
-/obj/structure/orbital_tray/attack_powerloader(mob/living/user, obj/item/powerloader_clamp/attached_clamp)
+/obj/structure/orbital_tray/powerloader_act(mob/living/user, obj/item/powerloader_clamp/attached_clamp)
 	if(attached_clamp.loaded && istype(attached_clamp.loaded, /obj/structure/ob_ammo))
 		var/obj/structure/ob_ammo/OA = attached_clamp.loaded
 

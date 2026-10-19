@@ -51,7 +51,7 @@
 	if(HAS_TRAIT(src, BENCH_BEING_USED))
 		. += mutable_appearance(icon, "[base_icon_state]_[plates]_anim", ABOVE_MOB_LAYER, src, GAME_PLANE, alpha)
 
-/obj/structure/benchpress/attack_hand_alternate(mob/living/user)
+/obj/structure/benchpress/attack_hand_secondary(mob/living/user)
 	. = ..()
 	if(.)
 		return

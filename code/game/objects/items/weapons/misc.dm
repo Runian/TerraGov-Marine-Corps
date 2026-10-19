@@ -150,7 +150,7 @@
 	user.balloon_alert(user, "cell removed")
 	return
 
-/obj/item/weapon/powerfist/attack_hand_alternate(mob/living/user)
+/obj/item/weapon/powerfist/attack_hand_secondary(mob/living/user)
 	if(!cell)
 		user.balloon_alert(user, "no cell!")
 		return

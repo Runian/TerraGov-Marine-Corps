@@ -133,7 +133,7 @@
 
 	return ..()
 
-/obj/structure/bed/roller/attack_hand_alternate(mob/living/user)
+/obj/structure/bed/roller/attack_hand_secondary(mob/living/user)
 	. = ..()
 	if(!ishuman(user)) // Keep xenos from toggling the brake
 		return
@@ -379,7 +379,7 @@ GLOBAL_LIST_EMPTY(activated_medevac_stretchers)
 /obj/structure/bed/medevac_stretcher/ai_should_stay_buckled(mob/living/carbon/npc)
 	return TRUE
 
-/obj/structure/bed/medevac_stretcher/attack_hand_alternate(mob/living/user)
+/obj/structure/bed/medevac_stretcher/attack_hand_secondary(mob/living/user)
 	activate_medevac_teleport(user)
 
 /obj/structure/bed/medevac_stretcher/proc/activate_medevac_teleport(mob/user)

@@ -52,7 +52,7 @@
 	. = ..()
 	RegisterSignals(reagents, list(COMSIG_REAGENTS_NEW_REAGENT, COMSIG_REAGENTS_ADD_REAGENT, COMSIG_REAGENTS_DEL_REAGENT, COMSIG_REAGENTS_REM_REAGENT), PROC_REF(on_reagent_add))
 
-/obj/item/reagent_containers/attack_hand_alternate(mob/living/user)
+/obj/item/reagent_containers/attack_hand_secondary(mob/living/user)
 	. = ..()
 	if(.)
 		return TRUE

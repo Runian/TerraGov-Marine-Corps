@@ -45,7 +45,7 @@
 	transfer_fuel(tank, user)
 
 /// Handles alternate interaction and drains a station tank back into the silo.
-/obj/machinery/refuel_station/attack_hand_alternate(mob/living/user)
+/obj/machinery/refuel_station/attack_hand_secondary(mob/living/user)
 	. = ..()
 	if(.)
 		return

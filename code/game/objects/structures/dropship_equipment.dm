@@ -31,7 +31,12 @@
 	return ..()
 
 //Not calling parent because this isn't the typical pick up/put down
-/obj/effect/attach_point/attack_powerloader(mob/living/user, obj/item/powerloader_clamp/attached_clamp)
+/obj/effect/attach_point/powerloader_act(mob/living/user, obj/item/powerloader_clamp/attached_clamp)
+	. = ..()
+	if(.)
+		return TRUE
+	. = TRUE
+
 	if(!attached_clamp.loaded || !istype(attached_clamp.loaded, /obj/structure/dropship_equipment))
 		return
 
@@ -213,7 +218,7 @@
 	ammo_type_used = null
 	return ..()
 
-/obj/structure/dropship_equipment/attack_powerloader(mob/living/user, obj/item/powerloader_clamp/attached_clamp)
+/obj/structure/dropship_equipment/powerloader_act(mob/living/user, obj/item/powerloader_clamp/attached_clamp)
 	if(attached_clamp.loaded)
 		try_load_ammo(user, attached_clamp, attached_clamp.loaded)
 		return

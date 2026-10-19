@@ -229,8 +229,8 @@
 	static_weapon = null
 	return ..()
 
-/obj/structure/caspart/minigun/attack_powerloader(mob/living/user, obj/item/powerloader_clamp/attached_clamp)
-	return static_weapon.attack_powerloader(user, attached_clamp)
+/obj/structure/caspart/minigun/powerloader_act(mob/living/user, obj/item/powerloader_clamp/attached_clamp)
+	return static_weapon.powerloader_act(user, attached_clamp)
 
 /obj/structure/caspart/minigun/attackby(obj/item/I, mob/user, params)
 	return static_weapon.attackby(I, user, params)

@@ -81,3 +81,11 @@
 
 ///Xenomorph accuracy
 #define XENO_DEFAULT_ACCURACY 70
+
+// Return these at the end of any attack chain proc, e.g. [/obj/item/proc/pre_attack_secondary].
+/// Ends the rest of attack chain.
+#define SECONDARY_ATTACK_CANCEL_ATTACK_CHAIN 2
+/// Skips calling the primary attack step and continues with the rest of the attack chain.
+#define SECONDARY_ATTACK_CONTINUE_CHAIN 1
+/// Calls the primary attack step and continues with the rest of the attack chain.
+#define SECONDARY_ATTACK_CALL_NORMAL 3

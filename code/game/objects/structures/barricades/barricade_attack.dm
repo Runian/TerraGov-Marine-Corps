@@ -1,4 +1,4 @@
-/obj/structure/barricade/attack_hand_alternate(mob/living/user)
+/obj/structure/barricade/attack_hand_secondary(mob/living/user)
 	if(anchored)
 		balloon_alert(usr, "fastened to the floor")
 		return FALSE

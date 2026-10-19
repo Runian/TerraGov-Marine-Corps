@@ -58,7 +58,7 @@
 	balloon_alert(user, "removed battery")
 	battery = null
 
-/obj/item/tesla_turret/attack_hand_alternate(mob/living/user)
+/obj/item/tesla_turret/attack_hand_secondary(mob/living/user)
 	. = ..()
 	if(!in_range(src, user))
 		return
@@ -160,7 +160,7 @@
 	update_appearance(UPDATE_ICON)
 	return TRUE
 
-/obj/machinery/deployable/tesla_turret/attack_hand_alternate(mob/living/user)
+/obj/machinery/deployable/tesla_turret/attack_hand_secondary(mob/living/user)
 	. = ..()
 	if(!in_range(src, user))
 		return

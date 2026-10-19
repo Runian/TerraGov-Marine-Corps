@@ -325,7 +325,7 @@
 	use(user)
 	return TRUE
 
-/obj/structure/ladder/attack_hand_alternate(mob/living/user)
+/obj/structure/ladder/attack_hand_secondary(mob/living/user)
 	. = ..()
 	if(.)
 		return

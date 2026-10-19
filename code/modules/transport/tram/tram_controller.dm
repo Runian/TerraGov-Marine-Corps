@@ -841,7 +841,7 @@
 
 	toggle_door()
 
-/obj/machinery/transport/tram_controller/attack_hand_alternate(mob/living/user)
+/obj/machinery/transport/tram_controller/attack_hand_secondary(mob/living/user)
 	. = ..()
 	if(!has_cover)
 		return TRUE

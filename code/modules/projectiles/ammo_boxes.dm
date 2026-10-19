@@ -66,7 +66,7 @@
 	to_chat(user, span_notice("You grab <b>[rounds]</b> round\s from [src]."))
 	update_appearance()
 
-/obj/item/big_ammo_box/attack_hand_alternate(mob/living/user)
+/obj/item/big_ammo_box/attack_hand_secondary(mob/living/user)
 	. = ..()
 	if(.)
 		return

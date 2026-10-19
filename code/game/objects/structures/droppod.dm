@@ -78,7 +78,7 @@ GLOBAL_DATUM(droppod_reservation, /datum/turf_reservation/transit/droppod)
 	z_move_flags |= ZMOVE_ALLOW_ANCHORED
 	return ..()
 
-/obj/structure/droppod/attack_powerloader(mob/living/user, obj/item/powerloader_clamp/attached_clamp)
+/obj/structure/droppod/powerloader_act(mob/living/user, obj/item/powerloader_clamp/attached_clamp)
 	for(var/atom/movable/ejectee AS in buckled_mobs) // dump them out, just in case no mobs get deleted
 		ejectee.forceMove(loc)
 	return ..()
@@ -467,7 +467,8 @@ GLOBAL_DATUM(droppod_reservation, /datum/turf_reservation/transit/droppod)
 	layer = OPEN_DOOR_LAYER //so anything inside layers over it
 	return ..()
 
-/obj/structure/droppod/nonmob/supply_pod/attack_powerloader(mob/living/user, obj/item/powerloader_clamp/attached_clamp)
+/obj/structure/droppod/nonmob/supply_pod/powerloader_act(mob/living/user, obj/item/powerloader_clamp/attached_clamp)
+	. = TRUE
 	if(attached_clamp.loaded)
 		if(istype(attached_clamp.loaded, /obj/structure/droppod))
 			return //no recursive pods please
@@ -631,7 +632,7 @@ GLOBAL_DATUM(droppod_reservation, /datum/turf_reservation/transit/droppod)
 	GLOB.droppod_bays -= src
 	return ..()
 
-/obj/structure/drop_pod_launcher/attack_powerloader(mob/living/user, obj/item/powerloader_clamp/attached_clamp)
+/obj/structure/drop_pod_launcher/powerloader_act(mob/living/user, obj/item/powerloader_clamp/attached_clamp)
 	if(!istype(attached_clamp.loaded, /obj/structure/droppod))
 		return ..()
 	user.visible_message(span_notice("[user] drops [attached_clamp.loaded] onto [src] and it clicks into place!"),
@@ -640,6 +641,7 @@ GLOBAL_DATUM(droppod_reservation, /datum/turf_reservation/transit/droppod)
 	attached_clamp.loaded = null
 	playsound(src, 'sound/machines/hydraulics_1.ogg', 40, 1)
 	attached_clamp.update_icon()
+	return TRUE
 
 ///Loads a new pod onto the bay if one is not already there
 /obj/structure/drop_pod_launcher/proc/refresh_pod(new_target_z, enabled = TRUE)

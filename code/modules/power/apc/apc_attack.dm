@@ -223,7 +223,7 @@
 	interact(user)
 
 //Alternate attack with hand - lock/unlock the interface
-/obj/machinery/power/apc/attack_hand_alternate(mob/living/user)
+/obj/machinery/power/apc/attack_hand_secondary(mob/living/user)
 	. = ..()
 	if(!can_use(user))
 		return

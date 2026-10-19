@@ -17,7 +17,7 @@
 	SStransport.hello(src, name, id_tag)
 
 //set tram destination
-/obj/item/assembly/control/transport/remote/attack_hand_alternate(mob/living/user)
+/obj/item/assembly/control/transport/remote/attack_hand_secondary(mob/living/user)
 	. = ..()
 	var/list/available_platforms = list()
 	for(var/obj/effect/landmark/transport/nav_beacon/tram/platform/platform as anything in SStransport.nav_beacons[specific_transport_id])

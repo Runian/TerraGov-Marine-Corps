@@ -62,7 +62,7 @@
 
 	draw(usr)
 
-/obj/item/toy/deck/attack_hand_alternate(mob/living/user)
+/obj/item/toy/deck/attack_hand_secondary(mob/living/user)
 	draw(user)
 
 /// Takes a card from the deck, and (if possible) puts it in the user's hand
@@ -200,7 +200,7 @@
 
 	discard_card(usr)
 
-/obj/item/toy/handcard/attack_hand_alternate(mob/living/user)
+/obj/item/toy/handcard/attack_hand_secondary(mob/living/user)
 	discard_card(user)
 
 /// Takes a selected card, and puts it down, face-up, in front

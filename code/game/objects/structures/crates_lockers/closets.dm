@@ -238,13 +238,13 @@
 		if(!togglelock(user, TRUE))
 			toggle(user)
 
-/obj/structure/closet/attack_hand_alternate(mob/living/user)
+/obj/structure/closet/attack_hand_secondary(mob/living/user)
 	. = ..()
 	if(user in src)
 		return
 	togglelock(user)
 
-/obj/structure/closet/attack_powerloader(mob/living/user, obj/item/powerloader_clamp/attached_clamp)
+/obj/structure/closet/powerloader_act(mob/living/user, obj/item/powerloader_clamp/attached_clamp)
 	. = ..()
 	if(.)
 		return

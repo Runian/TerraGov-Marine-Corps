@@ -20,9 +20,6 @@
  * Finally we call [obj/item/proc/afterattack] after damage is dealt, to handle special item interacts after an attack occurs.
  * Use afterattack for stuff like "My stick stuns when it hits people".
  *
- * Powerloader (/obj/item/powerloader_clamp) -> [obj/item/proc/attack_powerloader].
- * This is dealt with in /after_attack of that obj. Annoying, but it is what it is.
- *
  * Arguments
  * * mob/living/user - The mob using src on something
  * * atom/target - The atom being clicked on with src
@@ -174,7 +171,7 @@
 	if(.)
 		return TRUE
 	user.changeNext_move(attacking_item.attack_speed)
-	return attacking_item.attack(src, user)
+	return attacking_item.attack(src, user, modifiers)
 
 /turf/attackby(obj/item/attacking_item, mob/user, list/modifiers)
 	. = ..()
@@ -212,12 +209,9 @@
  */
 /atom/proc/attackby_secondary(obj/item/attacking_item, mob/user, list/modifiers)
 	add_fingerprint(user, "attackby_secondary", attacking_item)
-	var/signal_result = SEND_SIGNAL(src, COMSIG_ATOM_ATTACKBY_SECONDARY, attacking_item, user, modifiers)
-	if(signal_result & COMPONENT_SECONDARY_CANCEL_ATTACK_CHAIN)
-		return SECONDARY_ATTACK_CANCEL_ATTACK_CHAIN
-	if(signal_result & COMPONENT_SECONDARY_CONTINUE_ATTACK_CHAIN)
-		return SECONDARY_ATTACK_CONTINUE_CHAIN
-	return SECONDARY_ATTACK_CALL_NORMAL
+	if(SEND_SIGNAL(src, COMSIG_ATOM_ATTACKBY_SECONDARY, attacking_item, user, modifiers) & COMPONENT_NO_AFTERATTACK)
+		return TRUE
+	return FALSE
 
 /mob/living/attackby_secondary(obj/item/attacking_item, mob/living/user, params)
 	. = ..()
@@ -301,7 +295,7 @@
 
 /**
  * The equivalent of the standard version of [/obj/item/proc/attack] but for object targets.
- * Called on an item that is being used to attack an obj via RIGHT CLICK.
+ * Called on an item that is being used to attack an obj.
  *
  * Arguments:
  * * obj/target_object - The object getting attacked.
@@ -310,7 +304,6 @@
  *
  * Returns TRUE if the attack has been fully handled, failed to connect, or to prevent any afterattack.
  */
-// TODO: This is defunct. Replace all interactions to base_interaction and alike.
 /obj/item/proc/attack_obj(obj/target_object, mob/living/user, modifiers)
 	var/signal_return =  SEND_SIGNAL(src, COMSIG_ITEM_ATTACK_OBJ, target_object, user, modifiers)
 	add_fingerprint(user, "attack_obj")
@@ -325,6 +318,17 @@
 		return TRUE
 	return FALSE
 
+/**
+ * The equivalent of the standard version of [/obj/item/proc/attack] but for turf targets.
+ * Called on an item that is being used to attack a turf.
+ *
+ * Arguments:
+ * * turf/target_turf - The turf getting attacked.
+ * * mob/living/user - The living mob that is attacking.
+ * * list/modifiers - The click modifiers, e.g. alt, shift.
+ *
+ * Returns TRUE if the attack has been fully handled, failed to connect, or to prevent any afterattack.
+ */
 /obj/item/proc/attack_turf(turf/target_turf, mob/living/user, modifiers)
 	var/signal_return = NONE
 	//var/signal_return = SEND_SIGNAL(src, COMSIG_ITEM_ATTACK_TURF, target_turf, user, modifiers)
@@ -335,28 +339,8 @@
 		return FALSE
 	return FALSE
 
-/atom/proc/attack_powerloader(mob/living/user, obj/item/powerloader_clamp/attached_clamp)
-	var/signal_return = SEND_SIGNAL(src, COMSIG_ATOM_ATTACK_POWERLOADER, user, attached_clamp)
-	add_fingerprint(user, "attack_powerloader")
-	if(signal_return & COMPONENT_CANCEL_ATTACK_CHAIN)
-		return TRUE
-	if(signal_return & COMPONENT_CONTINUE_ATTACK_CHAIN)
-		return FALSE
-	if(!attached_clamp)
-		stack_trace("attack_powerloader called on [src] without an attached_clamp.")
-		return TRUE
-	if(!user)
-		stack_trace("[attached_clamp] called attack_powerloader on [src] without a user.")
-		return TRUE
-	if(!attached_clamp.linked_powerloader)
-		stack_trace("[attached_clamp] called attack_powerloader on [src] without a linked_powerloader.")
-		return TRUE
-	if(!Adjacent(user))
-		return TRUE
-	return FALSE
-
 /**
- * Handles the actual attack effects on an atom by an item.
+ * Deals with the default/regular attack effects by an item.
  *
  * Arguments:
  * * obj/item/attacking_item - The item hitting this atom.
@@ -365,7 +349,7 @@
  *
  * Returns TRUE if the attack successfully connected / has been processed.
  *
- * See: [/obj/item/proc/attack] and [/obj/item/proc/attack] if the attack checks succeeds.
+ * See: [/obj/item/proc/attack], [/obj/item/proc/attack_obj], etc.
  */
 /atom/proc/attacked_by(obj/item/attacking_item, mob/living/user, list/modifiers)
 	return FALSE
@@ -440,7 +424,6 @@
 	SEND_SIGNAL(user, COMSIG_MOB_ITEM_AFTERATTACK, target, user, has_proximity, click_parameters)
 	return
 
-
 /**
  * This proc is called when an atom gets attacked (clicked on) by a powerloader clamp
  *
@@ -449,15 +432,13 @@
  * * attached_clamp: The clamp used by the mob for attacking
  */
 
-
-
-/turf/attack_powerloader(mob/living/user, obj/item/powerloader_clamp/attached_clamp)
+/turf/powerloader_act(mob/living/user, obj/item/powerloader_clamp/attached_clamp)
 	. = ..()
 	if(.)
-		return
-
-	if(!attached_clamp.loaded || density) //no picking up turfs
-		return
+		return TRUE
+	if(!attached_clamp.loaded || density) // No picking up turfs.
+		return FALSE
+	. = TRUE
 
 	for(var/i in contents)
 		var/atom/movable/blocky_stuff = i
@@ -476,6 +457,7 @@
 				continue
 			to_chat(user, span_warning("You can't drop [attached_clamp.loaded] here, [blocky_stuff] blocks the way."))
 			return
+
 	if(attached_clamp.loaded.bound_width > 32)
 		var/turf/next_turf = get_step(src, EAST)
 		if(next_turf.density)
@@ -495,10 +477,11 @@
 	playsound(src, 'sound/machines/hydraulics_1.ogg', 40, 1)
 	attached_clamp.update_icon()
 
-/obj/attack_powerloader(mob/living/user, obj/item/powerloader_clamp/attached_clamp)
+/obj/powerloader_act(mob/living/user, obj/item/powerloader_clamp/attached_clamp)
 	. = ..()
 	if(.)
-		return
+		return TRUE
+	. = TRUE
 	if(attached_clamp.loaded)
 		return
 	if(!CHECK_BITFIELD(interaction_flags, INTERACT_POWERLOADER_PICKUP_ALLOWED) && !CHECK_BITFIELD(interaction_flags, INTERACT_POWERLOADER_PICKUP_ALLOWED_BYPASS_ANCHOR))

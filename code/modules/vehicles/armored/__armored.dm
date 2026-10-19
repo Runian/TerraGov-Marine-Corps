@@ -511,7 +511,7 @@
 	primary_weapon.ammo_magazine -= choice
 	user.put_in_hands(choice)
 
-/obj/vehicle/sealed/armored/attack_hand_alternate(mob/living/user)
+/obj/vehicle/sealed/armored/attack_hand_secondary(mob/living/user)
 	. = ..()
 	if(interior?.secondary_breech) // handled by gun breech
 		return

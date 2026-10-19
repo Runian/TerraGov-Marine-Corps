@@ -76,7 +76,7 @@
 #define EJECT_BLOOD_PACK "Eject Blood Pack"
 #define TOGGLE_BLOOD_FLOW "Toggle Blood Flow"
 #define ANALYZE_VITALS "Analyze Vitals"
-/obj/machinery/optable/attack_hand_alternate(mob/living/user)
+/obj/machinery/optable/attack_hand_secondary(mob/living/user)
 	. = ..()
 	if(.)
 		return

@@ -11,13 +11,21 @@
 	return
 
 
+/**
+ * Called when a human attacks us with an empty hand via LEFT CLICK.
+ *
+ * Arguments:
+ * * mob/living/carbon/human/user - The human that touched us.
+ *
+ * Returns TRUE if the attack has fully resolved.
+ */
 /atom/proc/attack_hand(mob/living/user)
 	. = FALSE
 	if(QDELETED(src))
 		stack_trace("attack_hand on a qdeleted atom")
 		return TRUE
 	add_fingerprint(user, "attack_hand")
-	if(SEND_SIGNAL(src, COMSIG_ATOM_ATTACK_HAND, user) & COMPONENT_NO_ATTACK_HAND)
+	if(SEND_SIGNAL(src, COMSIG_ATOM_ATTACK_HAND, user) & COMPONENT_CANCEL_ATTACK_CHAIN)
 		return TRUE
 
 /atom/movable/attack_hand(mob/living/user)
@@ -51,19 +59,23 @@
 		return TRUE
 
 /**
- * This proc is called when a human user right clicks on an atom with an empty hand
+ * Called when a human attacks us with an empty hand via RIGHT CLICK.
  *
  * Arguments:
- * * user: The mob clicking on the atom
+ * * mob/living/carbon/human/user - The human that touched us.
+ *
+ * Returns TRUE if the attack has fully resolved.
  */
-/atom/proc/attack_hand_alternate(mob/living/user)
+
+/atom/proc/attack_hand_secondary(mob/living/carbon/human/user)
 	. = FALSE
 	if(QDELETED(src))
-		stack_trace("attack_hand_alternate on a qdeleted atom")
+		stack_trace("attack_hand_secondary on a qdeleted atom")
 		return TRUE
-	add_fingerprint(user, "attack_hand_alternate")
-	if(SEND_SIGNAL(src, COMSIG_ATOM_ATTACK_HAND_ALTERNATE, user) & COMPONENT_NO_ATTACK_HAND)
+	add_fingerprint(user, "attack_hand_secondary")
+	if(SEND_SIGNAL(src, COMSIG_ATOM_ATTACK_HAND_SECONDARY, user) & COMPONENT_CANCEL_ATTACK_CHAIN)
 		return TRUE
+
 
 /*
 	New Players:

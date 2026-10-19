@@ -249,8 +249,21 @@ directive is properly returned.
 
 /atom/proc/emp_act(severity)
 	SEND_SIGNAL(src, COMSIG_ATOM_EMP_ACT, severity)
-	return
+	return FALSE
 
+/**
+ * Occurs when a powerloader clamp interacts with this atom.
+ *
+ * Arguments:
+ * * mob/living/user - The mob using the powerloader clamp.
+ * * obj/item/powerloader_clamp/attached_clamp - The powerloader clamp itself.
+ *
+ * Returns TRUE if the interaction was resolved.
+ */
+/atom/proc/powerloader_act(mob/living/user, obj/item/powerloader_clamp/attached_clamp)
+	if(SEND_SIGNAL(src, COMSIG_ATOM_POWERLOADER_ACT, user, attached_clamp) & COMPONENT_NO_POWERLOADER_ACT)
+		return TRUE
+	return FALSE
 
 /atom/proc/effect_smoke(obj/effect/particle_effect/smoke/S)
 	if(S.lifetime < 1)

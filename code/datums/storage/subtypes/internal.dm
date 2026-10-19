@@ -7,7 +7,7 @@
 	RegisterSignal(parent, COMSIG_ATOM_ATTACKBY, PROC_REF(on_attackby)) //Left click
 	RegisterSignal(parent, COMSIG_ATOM_ATTACK_HAND, PROC_REF(on_attack_hand)) //Left click empty hand
 	RegisterSignal(parent, COMSIG_ITEM_ATTACK_SELF, PROC_REF(on_attack_self)) //Item clicking on itself
-	RegisterSignal(parent, COMSIG_ATOM_ATTACK_HAND_ALTERNATE, PROC_REF(on_attack_hand_alternate)) //Right click empty hand
+	RegisterSignal(parent, COMSIG_ATOM_ATTACK_HAND_SECONDARY, PROC_REF(on_attack_hand_alternate)) //Right click empty hand
 	RegisterSignal(parent, COMSIG_CLICK_ALT_RIGHT, PROC_REF(on_alt_right_click)) //ALT + right click
 	RegisterSignal(parent, COMSIG_CLICK_CTRL, PROC_REF(on_ctrl_click)) //CTRL + Left click
 	RegisterSignal(parent, COMSIG_ATOM_ATTACK_GHOST, PROC_REF(on_attack_ghost)) //Ghosts can see inside your storages
@@ -30,7 +30,7 @@
 		COMSIG_ATOM_ATTACKBY,
 		COMSIG_ATOM_ATTACK_HAND,
 		COMSIG_ITEM_ATTACK_SELF,
-		COMSIG_ATOM_ATTACK_HAND_ALTERNATE,
+		COMSIG_ATOM_ATTACK_HAND_SECONDARY,
 		COMSIG_CLICK_ALT_RIGHT,
 		COMSIG_CLICK_CTRL,
 		COMSIG_ATOM_ATTACK_GHOST,
@@ -433,7 +433,7 @@
 	//Clicking signals
 	RegisterSignal(parent, COMSIG_ATOM_ATTACKBY, PROC_REF(on_attackby)) //Left click
 	RegisterSignal(parent, COMSIG_ITEM_ATTACK_SELF, PROC_REF(on_attack_self)) //Item clicking on itself
-	RegisterSignal(parent, COMSIG_ATOM_ATTACK_HAND_ALTERNATE, PROC_REF(on_attack_hand_alternate)) //Right click empty hand
+	RegisterSignal(parent, COMSIG_ATOM_ATTACK_HAND_SECONDARY, PROC_REF(on_attack_hand_alternate)) //Right click empty hand
 	RegisterSignal(parent, COMSIG_ATOM_ATTACK_GHOST, PROC_REF(on_attack_ghost)) //Ghosts can see inside your storages
 
 	//Something is happening to our storage
@@ -452,7 +452,7 @@
 	UnregisterSignal(parent, list(
 		COMSIG_ATOM_ATTACKBY,
 		COMSIG_ITEM_ATTACK_SELF,
-		COMSIG_ATOM_ATTACK_HAND_ALTERNATE,
+		COMSIG_ATOM_ATTACK_HAND_SECONDARY,
 		COMSIG_ATOM_ATTACK_GHOST,
 
 		COMSIG_ATOM_EMP_ACT,

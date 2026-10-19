@@ -225,7 +225,7 @@
 	RegisterSignal(parent, COMSIG_ATOM_ATTACKBY, PROC_REF(on_attackby)) //Left click
 	RegisterSignal(parent, COMSIG_ATOM_ATTACK_HAND, PROC_REF(on_attack_hand)) //Left click empty hand
 	RegisterSignal(parent, COMSIG_ITEM_ATTACK_SELF, PROC_REF(on_attack_self)) //Item clicking on itself
-	RegisterSignal(parent, COMSIG_ATOM_ATTACK_HAND_ALTERNATE, PROC_REF(on_attack_hand_alternate)) //Right click empty hand
+	RegisterSignal(parent, COMSIG_ATOM_ATTACK_HAND_SECONDARY, PROC_REF(on_attack_hand_alternate)) //Right click empty hand
 	RegisterSignal(parent, COMSIG_CLICK_ALT, PROC_REF(on_alt_click)) //ALT + click
 	RegisterSignal(parent, COMSIG_CLICK_ALT_RIGHT, PROC_REF(on_alt_right_click)) //ALT + right click
 	RegisterSignal(parent, COMSIG_CLICK_CTRL, PROC_REF(on_ctrl_click)) //CTRL + Left click
@@ -249,7 +249,7 @@
 		COMSIG_ATOM_ATTACKBY,
 		COMSIG_ATOM_ATTACK_HAND,
 		COMSIG_ITEM_ATTACK_SELF,
-		COMSIG_ATOM_ATTACK_HAND_ALTERNATE,
+		COMSIG_ATOM_ATTACK_HAND_SECONDARY,
 		COMSIG_CLICK_ALT,
 		COMSIG_CLICK_ALT_RIGHT,
 		COMSIG_CLICK_CTRL,
@@ -331,14 +331,14 @@ GLOBAL_LIST_EMPTY(cached_storage_typecaches)
 		if(holstered_item in parent.contents)
 			item_to_attack = holstered_item
 			INVOKE_ASYNC(item_to_attack, TYPE_PROC_REF(/atom/movable, attack_hand), user)
-			return COMPONENT_NO_ATTACK_HAND
+			return COMPONENT_CANCEL_ATTACK_CHAIN
 		if(draw_mode && ishuman(user) && length(parent.contents))
 			item_to_attack = parent.contents[length(parent.contents)]
 			INVOKE_ASYNC(item_to_attack, TYPE_PROC_REF(/atom/movable, attack_hand), user)
-			return COMPONENT_NO_ATTACK_HAND
+			return COMPONENT_CANCEL_ATTACK_CHAIN
 		else if(can_open(user))
 			INVOKE_ASYNC(src, PROC_REF(open), user)
-			return COMPONENT_NO_ATTACK_HAND
+			return COMPONENT_CANCEL_ATTACK_CHAIN
 	for(var/mob/M AS in content_watchers)
 		close(M)
 		return

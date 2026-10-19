@@ -598,7 +598,7 @@ GLOBAL_LIST_INIT(blacklisted_cargo_types, typecacheof(list(
 	. = ..()
 	. += span_notice("Right-Click with empty hand to open requisitions interface.")
 
-/obj/item/storage/backpack/marine/radiopack/attack_hand_alternate(mob/living/user)
+/obj/item/storage/backpack/marine/radiopack/attack_hand_secondary(mob/living/user)
 	if(!allowed(user))
 		return ..()
 	if(!supply_interface)

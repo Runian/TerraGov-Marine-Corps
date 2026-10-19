@@ -66,7 +66,7 @@
 	explosion(target, 2, 2, 6, 7, 5, 5, explosion_cause=activator)
 	qdel(src)
 
-/obj/item/clothing/suit/storage/marine/boomvest/attack_hand_alternate(mob/living/user)
+/obj/item/clothing/suit/storage/marine/boomvest/attack_hand_secondary(mob/living/user)
 	. = ..()
 	var/new_bomb_message = stripped_input(user, "Select Warcry", "Warcry", null, 50)
 	var/filter_result = CAN_BYPASS_FILTER(user) ? null : is_ic_filtered_for_bombvests(new_bomb_message)

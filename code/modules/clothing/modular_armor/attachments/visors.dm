@@ -22,13 +22,13 @@
 
 /obj/item/armor_module/armor/visor/on_attach(obj/item/attaching_to, mob/user)
 	. = ..()
-	RegisterSignal(parent, COMSIG_ATOM_ATTACK_HAND_ALTERNATE, PROC_REF(toggle_emissive))
+	RegisterSignal(parent, COMSIG_ATOM_ATTACK_HAND_SECONDARY, PROC_REF(toggle_emissive))
 	if(visor_emissive_on)
 		parent.AddElement(/datum/element/special_clothing_overlay/modular_helmet_visor, HEAD_LAYER, icon_state, icon)
 	update_icon()
 
 /obj/item/armor_module/armor/visor/on_detach(obj/item/detaching_from, mob/user)
-	UnregisterSignal(parent, COMSIG_ATOM_ATTACK_HAND_ALTERNATE)
+	UnregisterSignal(parent, COMSIG_ATOM_ATTACK_HAND_SECONDARY)
 	parent.RemoveElement(/datum/element/special_clothing_overlay/modular_helmet_visor, HEAD_LAYER, icon_state, icon)
 	update_icon()
 	return ..()
@@ -46,7 +46,7 @@
 	to_chat(user, span_notice("You turn [ visor_emissive_on ? "on" : "off" ] \the [src]'s internal lighting."))
 	update_icon()
 	parent.update_icon()
-	return COMPONENT_NO_ATTACK_HAND
+	return COMPONENT_CANCEL_ATTACK_CHAIN
 
 /obj/item/armor_module/armor/visor/extra_examine(datum/source, mob/user)
 	. = ..()

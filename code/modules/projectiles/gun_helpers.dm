@@ -13,7 +13,7 @@
 		return
 	unload(user)
 
-/obj/item/weapon/gun/attack_hand_alternate(mob/user)
+/obj/item/weapon/gun/attack_hand_secondary(mob/user)
 	. = ..()
 	if(!active_attachable)
 		balloon_alert(user, "no attachment to unload")

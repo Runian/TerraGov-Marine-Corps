@@ -626,12 +626,12 @@
 	if(!sponson.attackby(I, user, params))
 		return ..()
 
-/obj/machinery/deployable/mounted/moveable/atgun/attack_hand_alternate(mob/living/user)
+/obj/machinery/deployable/mounted/moveable/atgun/attack_hand_secondary(mob/living/user)
 	if(user.interactee == src)
 		balloon_alert(user, "Busy manning!")
 		return
 
-	return sponson.attack_hand_alternate(user)
+	return sponson.attack_hand_secondary(user)
 
 /obj/machinery/deployable/mounted/moveable/atgun/MouseDrop(atom/over, src_location, over_location, src_control, over_control, params)
 	if(!ishuman(usr) || usr.lying_angle || usr.incapacitated())

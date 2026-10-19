@@ -339,7 +339,7 @@
 		mortar.linked_item_binoculars = linked_struct_binoculars.Copy()
 	UnregisterSignal(src, COMSIG_ITEM_UNDEPLOY)
 
-/obj/machinery/deployable/mortar/attack_hand_alternate(mob/living/user)
+/obj/machinery/deployable/mortar/attack_hand_secondary(mob/living/user)
 	if(!Adjacent(user) || user.lying_angle || user.incapacitated() || !ishuman(user))
 		return
 

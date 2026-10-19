@@ -6,7 +6,7 @@
 	w_class = WEIGHT_CLASS_NORMAL
 	fill_delay = 1.5 SECONDS
 
-/obj/item/ammo_magazine/packet/attack_hand_alternate(mob/living/user)
+/obj/item/ammo_magazine/packet/attack_hand_secondary(mob/living/user)
 	. = ..()
 	if(current_rounds <= 0)
 		balloon_alert(user, "Empty")

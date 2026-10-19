@@ -189,7 +189,7 @@
 	else if(!operating)
 		QDEL_NULL(current)
 
-/obj/item/multitool/field_debug/attack_hand_alternate(mob/living/user)
+/obj/item/multitool/field_debug/attack_hand_secondary(mob/living/user)
 	. = ..()
 	current.edge_is_a_field = !current.edge_is_a_field
 

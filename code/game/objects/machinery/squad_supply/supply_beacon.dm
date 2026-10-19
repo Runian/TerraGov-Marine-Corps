@@ -19,7 +19,7 @@
 	. = ..()
 	. += span_notice("Right-Click with empty hand when anchored to open requisitions interface.")
 
-/obj/item/supply_beacon/attack_hand_alternate(mob/living/user)
+/obj/item/supply_beacon/attack_hand_secondary(mob/living/user)
 	if(!allowed(user) || !anchored)
 		return ..()
 	if(!supply_interface)

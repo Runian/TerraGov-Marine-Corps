@@ -56,7 +56,7 @@
 	for(var/datum/atom_hud/player_hud in GLOB.huds)
 		player_hud.add_to_hud(src)
 	update_visuals()
-	RegisterSignals(src, list(COMSIG_ATOM_BULLET_ACT, COMSIG_ATOM_EX_ACT, COMSIG_ATOM_ATTACK_HAND, COMSIG_ATOM_ATTACK_HAND_ALTERNATE, COMSIG_ATOM_ATTACKBY), PROC_REF(update_visuals))
+	RegisterSignals(src, list(COMSIG_ATOM_BULLET_ACT, COMSIG_ATOM_EX_ACT, COMSIG_ATOM_ATTACK_HAND, COMSIG_ATOM_ATTACK_HAND_SECONDARY, COMSIG_ATOM_ATTACKBY), PROC_REF(update_visuals))
 
 /obj/structure/xeno/earth_pillar/Destroy()
 	vis_contents -= flash_visual

@@ -55,10 +55,11 @@
 	. = ..()
 	AddComponent(/datum/component/climbable)
 
-/obj/structure/ship_ammo/attack_powerloader(mob/living/user, obj/item/powerloader_clamp/attached_clamp)
+/obj/structure/ship_ammo/powerloader_act(mob/living/user, obj/item/powerloader_clamp/attached_clamp)
 	. = ..()
 	if(.)
 		return
+	. = TRUE
 
 	if(!attached_clamp.loaded || !istype(attached_clamp.loaded, type))
 		return

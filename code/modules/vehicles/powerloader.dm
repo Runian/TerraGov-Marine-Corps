@@ -34,7 +34,7 @@
 	setDir(direction)
 	return TRUE
 
-/obj/vehicle/ridden/powerloader/attack_powerloader(mob/living/user, obj/item/powerloader_clamp/attached_clamp)
+/obj/vehicle/ridden/powerloader/powerloader_act(mob/living/user, obj/item/powerloader_clamp/attached_clamp)
 	. = ..()
 	if(.)
 		return
@@ -156,21 +156,20 @@
 	forceMove(linked_powerloader)
 	linked_powerloader.unbuckle_mob(user)
 
-/obj/item/powerloader_clamp/attack(mob/living/victim, mob/living/user, def_zone)
-	if(victim in linked_powerloader.buckled_mobs)
-		linked_powerloader.unbuckle_mob(victim) //if the pilot clicks themself with the clamp, it unbuckles them.
-		return TRUE
-	if(isxeno(victim) && victim.stat == DEAD && !victim.anchored && user.a_intent == INTENT_HELP)
-		do_load(victim)
-	return ..()
-
-/obj/item/powerloader_clamp/afterattack(atom/target, mob/user, proximity)
-	. = ..()
-
-	if(!proximity)
-		return
-
-	return target.attack_powerloader(user, src)
+/obj/item/powerloader_clamp/interact_with_atom(atom/interacting_with, mob/living/user, list/modifiers)
+	if(!linked_powerloader)
+		stack_trace("[src] somehow didn't have a link_powerloader.")
+		return ITEM_INTERACT_BLOCKING
+	// If the pilot clicks themself with the clamp, it unbuckles them.
+	if(interacting_with in linked_powerloader.buckled_mobs)
+		linked_powerloader.unbuckle_mob(interacting_with)
+		return ITEM_INTERACT_SUCCESS
+	if(isxeno(interacting_with))
+		var/mob/living/carbon/xenomorph/interacting_xenomorph = interacting_with
+		if(interacting_xenomorph.stat == DEAD && !interacting_xenomorph.anchored && user.a_intent == INTENT_HELP))
+			do_load(interacting_with)
+			return ITEM_INTERACT_SUCCESS
+	return interacting_with.powerloader_act(user, src)
 
 /obj/item/powerloader_clamp/update_icon_state()
 	. = ..()

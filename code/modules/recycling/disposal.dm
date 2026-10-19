@@ -180,7 +180,7 @@
 	flush()
 	update()
 
-/obj/machinery/disposal/attack_hand_alternate(mob/living/user)
+/obj/machinery/disposal/attack_hand_secondary(mob/living/user)
 	. = ..()
 	if(!can_interact(user))
 		return

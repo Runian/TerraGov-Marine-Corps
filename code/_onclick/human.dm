@@ -58,7 +58,7 @@
 		return
 
 	if(LAZYACCESS(modifiers, "right"))
-		A.attack_hand_alternate(src)
+		A.attack_hand_secondary(src)
 		SEND_SIGNAL(src, COMSIG_HUMAN_MELEE_UNARMED_ATTACK_ALTERNATE, A)
 		return
 

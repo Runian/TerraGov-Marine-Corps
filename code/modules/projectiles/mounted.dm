@@ -46,7 +46,7 @@
 	internal_gun?.unload(user)
 	update_icon()
 
-/obj/machinery/deployable/mounted/attack_hand_alternate(mob/living/user)
+/obj/machinery/deployable/mounted/attack_hand_secondary(mob/living/user)
 	. = ..()
 	if(!ishuman(user))
 		return

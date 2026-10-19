@@ -476,7 +476,7 @@
 	playsound(user, 'sound/weapons/guns/interact/rifle_reload.ogg', 20, 1, 5)
 	icon_state = "handheldcharger_black"
 
-/obj/item/tool/handheld_charger/attack_hand_alternate(mob/living/user)
+/obj/item/tool/handheld_charger/attack_hand_secondary(mob/living/user)
 	if(!cell)
 		return ..()
 	cell.update_icon()

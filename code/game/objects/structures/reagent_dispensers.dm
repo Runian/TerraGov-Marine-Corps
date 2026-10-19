@@ -27,7 +27,7 @@
 		return FALSE //Handled in reagent code, which refills the item
 	return ..()
 
-/obj/structure/reagent_dispensers/attack_hand_alternate(mob/living/user)
+/obj/structure/reagent_dispensers/attack_hand_secondary(mob/living/user)
 	. = ..()
 	if(!possible_transfer_amounts)
 		return
