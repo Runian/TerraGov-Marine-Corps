@@ -1,19 +1,27 @@
 /**
- * THIS IS THE ROOT OF ALL EVIL (I mean the root of all item-on-atom interactions)
- *
- * Implementation details
+ * ### Implementation Details
  *
  * [obj/item/proc/base_item_interaction] handles all non-combat interactions of an item with an atom.
- * This calls [atom/proc/tool_act], among others.
+ * It calls [atom/proc/tool_act], among others.
  *
  * [obj/item/proc/pre_attack] is called before an attack is made, before we even check for block.
- * Use pre attack to cancel attacks early based on conditions ("You cant attack with this unless you're a pacifist!")
- * After pre-attack we go into [atom/proc/attackby] which is where individual atoms handle what happens when being hit
- * Objects use [obj/item/proc/attack_atom], mobs use [obj/item/proc/attack].
- * You GENERALLY should never override attack, like ever. (On-attack effects go in afterattack)
+ * Use pre_attack to cancel attacks early based on conditions ("You can't attack with this unless you're a pacifist!")
+ *
+ * After pre-attack, we go into [atom/proc/attackby] which is where individual atoms handle what happens when being hit.
+ * Mobs (/mob/living) -> [obj/item/proc/attack].
+ * Turfs (/turf) -> [obj/item/proc/attack_turf].
+ * Objects (/obj) -> [obj/item/proc/attack_obj].
+ *
+ * You GENERALLY should never override [obj/item/proc/attack]; use NOBLUDGEON to ensure parent can be called with no issue if overridden.
+ * All on-attack effects should dealt with in [obj/item/proc/afterattack] which should handle any on-attack effects or special item.
+ * e.g. stuff like "my stick stuns when it hits people".
+ *
  * Regardless, we go BACK to the atom to call [atom/proc/attacked_by], which is where the damage is actually applied.
  * Finally we call [obj/item/proc/afterattack] after damage is dealt, to handle special item interacts after an attack occurs.
  * Use afterattack for stuff like "My stick stuns when it hits people".
+ *
+ * Powerloader (/obj/item/powerloader_clamp) -> [obj/item/proc/attack_powerloader].
+ * This is dealt with in /after_attack of that obj. Annoying, but it is what it is.
  *
  * Arguments
  * * mob/living/user - The mob using src on something
@@ -70,6 +78,11 @@
 		return TRUE
 	if(QDELETED(target) || QDELETED(src))
 		return TRUE
+
+	SEND_SIGNAL(src, COMSIG_ITEM_AFTERATTACK, target, user, modifiers)
+	SEND_SIGNAL(target, COMSIG_ATOM_AFTER_ATTACKEDBY, src, user, modifiers)
+	afterattack(target, user, modifiers)
+
 	return TRUE
 
 /// Called when the item is in the active hand is LEFT CLICKED.
@@ -149,17 +162,33 @@
 /atom/proc/attackby(obj/item/attacking_item, mob/user, list/modifiers)
 	SIGNAL_HANDLER_DOES_SLEEP // TODO: Someone should really get rid of this.
 	add_fingerprint(user, "attackby", attacking_item)
-	if(SEND_SIGNAL(src, COMSIG_ATOM_ATTACKBY, attacking_item, user, modifiers) & COMPONENT_NO_AFTERATTACK)
+	var/signal_return = SEND_SIGNAL(src, COMSIG_ATOM_ATTACKBY, attacking_item, user, modifiers)
+	if(signal_return & COMPONENT_CANCEL_ATTACK_CHAIN)
 		return TRUE
+	if(signal_return & COMPONENT_CONTINUE_ATTACK_CHAIN)
+		return FALSE
 	return FALSE
 
-// TODO: Some of this stuff should be moved to its own existing file.
 /mob/living/attackby(obj/item/attacking_item, mob/user, list/modifiers)
 	. = ..()
 	if(.)
 		return TRUE
 	user.changeNext_move(attacking_item.attack_speed)
 	return attacking_item.attack(src, user)
+
+/turf/attackby(obj/item/attacking_item, mob/user, list/modifiers)
+	. = ..()
+	if(.)
+		return TRUE
+	return attacking_item.attack_turf(src, user, modifiers)
+
+/obj/attackby(obj/item/attacking_item, mob/user, list/modifiers)
+	. = ..()
+	if(.)
+		return TRUE
+	if(!(obj_flags & CAN_BE_HIT))
+		return FALSE
+	return attacking_item.attack_obj(src, user, modifiers)
 
 /obj/item/grab/attackby(obj/item/attacking_item, mob/user, list/modifiers)
 	. = ..()
@@ -168,14 +197,6 @@
 	if(grab_interact(attacking_item, user))
 		user.changeNext_move(GRAB_SLAM_DELAY)
 		return TRUE
-
-/obj/attackby(obj/item/attacking_item, mob/user, list/modifiers)
-	. = ..()
-	if(.)
-		return TRUE
-	if(!(obj_flags & CAN_BE_HIT))
-		return FALSE
-	return attacking_item.attack_atom(src, user, modifiers)
 
 /**
  * Called on an atom is getting attacked by an item via RIGHT CLICK.
@@ -215,20 +236,16 @@
  *
  * Returns TRUE if the attack has fully resolved / if the attack chain should end here.
  */
-/obj/item/proc/attack(mob/living/target_mob, mob/living/user, list/modifiers)
+/obj/item/proc/attack(mob/living/target_mob, mob/user, list/modifiers)
 	var/signal_return = SEND_SIGNAL(src, COMSIG_ITEM_ATTACK, target_mob, user, modifiers) || SEND_SIGNAL(user, COMSIG_MOB_ITEM_ATTACK, target_mob, src, modifiers)
 	if(signal_return & COMPONENT_CANCEL_ATTACK_CHAIN)
 		return TRUE
 	if(signal_return & COMPONENT_CONTINUE_ATTACK_CHAIN)
 		return FALSE
-
 	if(item_flags & NOBLUDGEON)
 		return FALSE
-	// TODO: Why not just add NOBLUDGEON to whatever might trigger this?
 	if(!force)
 		return FALSE
-	// TODO: Terrible placement. Move this up the stack or something.
-	// TODO: What is this suppose to do again?
 	if(target_mob.status_flags & INCORPOREAL || user.status_flags & INCORPOREAL)
 		return FALSE
 	if(target_mob.can_be_operated_on() && do_surgery(target_mob, user, src)) // Checks if mob is lying down on table for surgery.
@@ -237,10 +254,6 @@
 		return TRUE
 	if(hitsound)
 		playsound(loc, hitsound, 25, TRUE, MEDIUM_SOUND_RANGE)
-
-	SEND_SIGNAL(src, COMSIG_ITEM_AFTERATTACK, target_mob, user, modifiers)
-	SEND_SIGNAL(target_mob, COMSIG_ATOM_AFTER_ATTACKEDBY, src, user, modifiers)
-	afterattack(target_mob, user, modifiers)
 
 /**
  * Called on an item that is being used to attack a living mob via RIGHT CLICK.
@@ -274,19 +287,17 @@
 
 /obj/item/proc/attack_atom(atom/target_atom, mob/living/user, list/modifiers)
 	var/signal_return = SEND_SIGNAL(src, COMSIG_ITEM_ATTACK_ATOM, target_atom, user, modifiers) | SEND_SIGNAL(user, COMSIG_LIVING_ATTACK_ATOM, target_atom, src, modifiers)
+	add_fingerprint(user, "attack_atom")
 	if(signal_return & COMPONENT_CANCEL_ATTACK_CHAIN)
 		return TRUE
 	if(signal_return & COMPONENT_CONTINUE_ATTACK_CHAIN)
 		return FALSE
 	if(item_flags & NOBLUDGEON)
-		return FALSE
+		return TRUE
 	user.changeNext_move(attack_speed)
 	if(!target_atom.attacked_by(src, user, modifiers))
 		return TRUE
-	SEND_SIGNAL(src, COMSIG_ITEM_AFTERATTACK, target_atom, user, modifiers)
-	SEND_SIGNAL(target_atom, COMSIG_ATOM_AFTER_ATTACKEDBY, src, user, modifiers)
-	afterattack(target_atom, user, modifiers)
-	return FALSE // unhandled
+	return FALSE
 
 /**
  * The equivalent of the standard version of [/obj/item/proc/attack] but for object targets.
@@ -297,17 +308,52 @@
  * * mob/living/user - The living mob that is attacking.
  * * list/modifiers - The click modifiers, e.g. alt, shift.
  *
- * Returns TRUE if the attack has been fully handled / failed to connect.
+ * Returns TRUE if the attack has been fully handled, failed to connect, or to prevent any afterattack.
  */
 // TODO: This is defunct. Replace all interactions to base_interaction and alike.
-/obj/item/proc/attack_obj(obj/target_object, mob/living/user)
-	if(SEND_SIGNAL(src, COMSIG_ITEM_ATTACK_OBJ, target_object, user) & COMPONENT_NO_ATTACK_OBJ)
-		return
+/obj/item/proc/attack_obj(obj/target_object, mob/living/user, modifiers)
+	var/signal_return =  SEND_SIGNAL(src, COMSIG_ITEM_ATTACK_OBJ, target_object, user, modifiers)
+	add_fingerprint(user, "attack_obj")
+	if(signal_return & COMPONENT_CANCEL_ATTACK_CHAIN)
+		return TRUE
+	if(signal_return & COMPONENT_CONTINUE_ATTACK_CHAIN)
+		return FALSE
 	if(item_flags & NOBLUDGEON)
-		return
+		return TRUE
 	user.changeNext_move(attack_speed)
-	user.do_attack_animation(target_object, used_item = src)
-	return target_object.attacked_by(src, user)
+	if(!target_object.attacked_by(src, user, modifiers))
+		return TRUE
+	return FALSE
+
+/obj/item/proc/attack_turf(turf/target_turf, mob/living/user, modifiers)
+	var/signal_return = NONE
+	//var/signal_return = SEND_SIGNAL(src, COMSIG_ITEM_ATTACK_TURF, target_turf, user, modifiers)
+	add_fingerprint(user, "attack_turf")
+	if(signal_return & COMPONENT_CANCEL_ATTACK_CHAIN)
+		return TRUE
+	if(signal_return & COMPONENT_CONTINUE_ATTACK_CHAIN)
+		return FALSE
+	return FALSE
+
+/atom/proc/attack_powerloader(mob/living/user, obj/item/powerloader_clamp/attached_clamp)
+	var/signal_return = SEND_SIGNAL(src, COMSIG_ATOM_ATTACK_POWERLOADER, user, attached_clamp)
+	add_fingerprint(user, "attack_powerloader")
+	if(signal_return & COMPONENT_CANCEL_ATTACK_CHAIN)
+		return TRUE
+	if(signal_return & COMPONENT_CONTINUE_ATTACK_CHAIN)
+		return FALSE
+	if(!attached_clamp)
+		stack_trace("attack_powerloader called on [src] without an attached_clamp.")
+		return TRUE
+	if(!user)
+		stack_trace("[attached_clamp] called attack_powerloader on [src] without a user.")
+		return TRUE
+	if(!attached_clamp.linked_powerloader)
+		stack_trace("[attached_clamp] called attack_powerloader on [src] without a linked_powerloader.")
+		return TRUE
+	if(!Adjacent(user))
+		return TRUE
+	return FALSE
 
 /**
  * Handles the actual attack effects on an atom by an item.
@@ -404,21 +450,6 @@
  */
 
 
-/atom/proc/attack_powerloader(mob/living/user, obj/item/powerloader_clamp/attached_clamp)
-	SEND_SIGNAL(src, COMSIG_ATOM_ATTACK_POWERLOADER, user, attached_clamp)
-	add_fingerprint(user, "attack_powerloader")
-	if(!attached_clamp)
-		stack_trace("attack_powerloader called on [src] without an attached_clamp.")
-		return TRUE
-	if(!user)
-		stack_trace("[attached_clamp] called attack_powerloader on [src] without a user.")
-		return TRUE
-	if(!attached_clamp.linked_powerloader)
-		stack_trace("[attached_clamp] called attack_powerloader on [src] without a linked_powerloader.")
-		return TRUE
-	if(!Adjacent(user))
-		return TRUE
-	return FALSE
 
 /turf/attack_powerloader(mob/living/user, obj/item/powerloader_clamp/attached_clamp)
 	. = ..()

@@ -28,6 +28,41 @@
 		if(!is_open_container())
 			. += span_info("An airtight lid seals it completely.")
 
+/obj/item/reagent_containers/glass/interact_with_atom(atom/interacting_with, mob/living/user, list/modifiers)
+	. = ..()
+	if(.)
+		return TRUE
+
+	if(interacting_with.is_refillable())
+		return try_refill(interacting_with, user, amount_per_transfer_from_this)
+	if(interacting_with.is_drainable())
+		return try_drain(interacting_with, user, amount_per_transfer_from_this)
+
+	if(istype(interacting_with, /obj/item/tool/pen) || istype(interacting_with, /obj/item/flashlight/pen))
+		var/tmp_label = stripped_input(user, "Enter a label for [name]", "Label", label_text)
+		if(length(tmp_label) > MAX_NAME_LEN)
+			to_chat(user, span_warning("The label can be at most [MAX_NAME_LEN] characters long."))
+			return ITEM_INTERACT_BLOCKING
+
+		user.visible_message(
+			span_notice("[user] labels [src] as \"[tmp_label]\"."), \
+			span_notice("You label [src] as \"[tmp_label]\".")
+		)
+		label_text = tmp_label
+		update_name_label()
+		return ITEM_INTERACT_SUCCESS
+
+/obj/item/reagent_containers/glass/afterattack(atom/target, mob/user, has_proximity, click_parameters)
+	. = ..()
+	if(user.a_intent == INTENT_HARM)
+		try_splash(target, user)
+
+/obj/item/reagent_containers/glass/proc/update_name_label()
+	if(label_text == "")
+		name = base_name
+		return
+	name = "[base_name] ([label_text])"
+
 /obj/item/reagent_containers/glass/verb/attach_lid()
 	set name = "Attach/Detach lid"
 	set category = "IC.Object"
@@ -40,66 +75,6 @@
 		DISABLE_BITFIELD(reagents.reagent_flags, TRANSPARENT)
 		ENABLE_BITFIELD(reagents.reagent_flags, OPENCONTAINER)
 	update_icon()
-
-/obj/item/reagent_containers/glass/afterattack(obj/target, mob/user , proximity)
-	if(!proximity)
-		return
-
-	user.changeNext_move(CLICK_CD_RAPID)
-
-	if(target.is_refillable()) //Something like a glass. Player probably wants to transfer TO it.
-		if(!is_drainable())
-			to_chat(user, span_warning("take [src]'s lid off first!"))
-			return
-		if(!reagents.total_volume)
-			to_chat(user, span_warning("[src] is empty!"))
-			return
-		if(target.reagents.holder_full())
-			to_chat(user, span_warning("[target] is full."))
-			return
-
-		var/trans = reagents.trans_to(target, amount_per_transfer_from_this)
-		to_chat(user, span_notice("You transfer [trans] unit\s of the solution to [target]."))
-
-	else if(target.is_drainable()) //A dispenser. Transfer FROM it TO us.
-		if(!is_refillable())
-			to_chat(user, span_warning("take [src]'s lid off first!"))
-			return
-		if(!target.reagents.total_volume)
-			to_chat(user, span_warning("[target] is empty and can't be refilled!"))
-			return
-		if(reagents.holder_full())
-			to_chat(user, span_warning("[src] is full."))
-			return
-
-		var/trans = target.reagents.trans_to(src, amount_per_transfer_from_this)
-		to_chat(user, span_notice("You fill [src] with [trans] unit\s of the contents of [target]."))
-
-	if(user.a_intent == INTENT_HARM)
-		try_splash(user, target)
-
-/obj/item/reagent_containers/glass/attackby(obj/item/I, mob/user, params)
-	. = ..()
-	if(.)
-		return
-
-	if(istype(I, /obj/item/tool/pen) || istype(I, /obj/item/flashlight/pen))
-		var/tmp_label = stripped_input(user, "Enter a label for [name]", "Label", label_text)
-		if(length(tmp_label) > MAX_NAME_LEN)
-			to_chat(user, span_warning("The label can be at most [MAX_NAME_LEN] characters long."))
-			return
-
-		user.visible_message(span_notice("[user] labels [src] as \"[tmp_label]\"."), \
-							span_notice("You label [src] as \"[tmp_label]\"."))
-
-		label_text = tmp_label
-		update_name_label()
-
-/obj/item/reagent_containers/glass/proc/update_name_label()
-	if(label_text == "")
-		name = base_name
-	else
-		name = "[base_name] ([label_text])"
 
 /obj/item/reagent_containers/glass/beaker
 	name = "beaker"

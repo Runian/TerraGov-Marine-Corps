@@ -109,9 +109,8 @@
 
 	face_atom(clicked_atom)
 
-	// TODO: Was this really needed?
-	//if(world.time <= next_click)
-	//	return
+	if(world.time <= next_move)
+		return
 
 	/// Allows clicking in darkness.
 	if(!LAZYACCESS(modifiers, "catcher") && clicked_atom.IsObscured())

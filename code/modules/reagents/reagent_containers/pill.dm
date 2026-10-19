@@ -23,93 +23,86 @@
 
 /obj/item/reagent_containers/pill/attack_self(mob/user)
 	. = ..()
-	attack(user, user)
-
-/obj/item/reagent_containers/pill/attack(mob/M, mob/user, def_zone)
-	if(M == user)
-
-		if(ishuman(M))
-			var/mob/living/carbon/human/H = M
-			if(H.species.species_flags & ROBOTIC_LIMBS)
-				to_chat(H, span_warning("You can't eat pills."))
-				return
-
-		to_chat(M, span_green("You swallow [src]."))
-		M.dropItemToGround(src) //icon update
-		if(reagents.total_volume)
-			record_reagent_consumption(reagents.total_volume, reagents.reagent_list, user)
-			reagents.reaction(M, INGEST)
-			reagents.trans_to(M, reagents.total_volume)
-
-		qdel(src)
+	if(.)
 		return TRUE
+	user.changeNext_move(attack_speed)
+	return try_consume(user, user, null)
 
-	else if(ishuman(M) )
+/obj/item/reagent_containers/pill/interact_with_atom(atom/interacting_with, mob/living/user, list/modifiers)
+	if(!check_allowed_items(interacting_with, target_self = TRUE))
+		return NONE
 
-		var/mob/living/carbon/human/H = M
-		if(H.species.species_flags & ROBOTIC_LIMBS)
-			to_chat(user, span_warning("They have a monitor for a head, where do you think you're going to put that?"))
-			return
+	if(ismob(interacting_with))
+		return try_consume(interacting_with, user, null)
+	if(interacting_with.is_refillable())
+		return try_refill(interacting_with, user, null)
 
-		user.visible_message(span_green("[user] attempts to force [M] to swallow [src]."))
+	return NONE
 
+/obj/item/reagent_containers/pill/try_consume(atom/target, mob/living/user, transfer_amount = null)
+	if(!can_consume(target)) // Will give varied chat message if it fails.
+		return ITEM_INTERACT_BLOCKING
+
+	user.changeNext_move(CLICK_CD_MELEE)
+	if(target == user)
+		to_chat(user, span_green("You swallow [src]."))
+	else
+		target.visible_message(
+			span_danger("[user] attempts to force [target] to swallow [src]."),
+			span_userdanger("[user] attempts to force you to swallow [src]."),
+		)
 		var/ingestion_time = max(1 SECONDS, 3 SECONDS - 1 SECONDS * user.skills.getRating(SKILL_MEDICAL))
+		if(!do_after(user, ingestion_time, NONE, target, BUSY_ICON_FRIENDLY, BUSY_ICON_MEDICAL))
+			return ITEM_INTERACT_BLOCKING
+		if(!reagents || !reagents.total_volume)
+			return ITEM_INTERACT_BLOCKING
 
-		if(!do_after(user, ingestion_time, NONE, M, BUSY_ICON_FRIENDLY, BUSY_ICON_MEDICAL))
-			return
+		target.visible_message(
+			span_danger("[user] forces [target] to swallow [src]."),
+			span_userdanger("[user] forces you to swallow [src]."),
+		)
+		if(is_blind(target))
+			to_chat(target, span_notice("You feel someone feed you something."))
+		log_combat(user, target, "fed", src, "Reagents: [get_reagent_list_text()]")
 
-		user.dropItemToGround(src) //icon update
-		visible_message(span_green("[user] forces [M] to swallow the pill."))
-
-		var/rgt_list_text = get_reagent_list_text()
-
-		log_combat(user, M, "fed", src, "Reagents: [rgt_list_text]")
-
-		if(reagents.total_volume)
-			record_reagent_consumption(reagents.total_volume, reagents.reagent_list, user, M)
-			reagents.reaction(M, INGEST)
-			reagents.trans_to(M, reagents.total_volume)
-			qdel(src)
-		else
-			qdel(src)
-
-			return TRUE
-
-		return FALSE
-
-/obj/item/reagent_containers/pill/afterattack(obj/target, mob/user, proximity)
-	if(!proximity)
-		return
-
-	if(target.is_refillable())
-		if(target.reagents.holder_full())
-			to_chat(user, span_warning("[target] is full."))
-			return
-
-		var/obj/item/reagent_containers/R = null
-		var/liquidate = null
-		if(istype(target,/obj/item/reagent_containers))
-			R = target
-			if(R.liquifier)
-				liquidate = TRUE
-
-		if(target.is_drainable() && !target.reagents.total_volume)
-			if(!R || !liquidate)
-				to_chat(user, span_warning("[target] is empty! There's nothing to dissolve [src] in."))
-				return
-			to_chat(user, span_notice("[target]'s liquifier instantly reprocesses [src] upon insertion."))
-
-		if(!R || !liquidate)
-			to_chat(user, span_notice("You dissolve the pill in [target]."))
-
-		var/rgt_list_text = get_reagent_list_text()
-
-		log_combat(user, target, "spiked", src, "Reagents: [rgt_list_text]")
-
+	record_reagent_consumption(min(transfer_amount, reagents.total_volume), reagents.reagent_list, user, target)
+	if(reagents.total_volume)
+		reagents.reaction(target, INGEST)
 		reagents.trans_to(target, reagents.total_volume)
-		visible_message("<span class='warning'>[user] puts something in \the [target].", null, null, 2)
+	qdel(src)
 
-		QDEL_IN(src, 5)
+	return ITEM_INTERACT_SUCCESS
+
+/obj/item/reagent_containers/pill/try_refill(atom/target, mob/living/user, transfer_amount = amount_per_transfer_from_this)
+	if(!reagents.total_volume)
+		to_chat(user, span_warning("[src] is empty!"))
+		return ITEM_INTERACT_BLOCKING
+	if(target.reagents.holder_full())
+		to_chat(user, span_warning("[target] is full."))
+		return ITEM_INTERACT_BLOCKING
+
+	var/can_freely_liquidate = FALSE
+	if(istype(target, /obj/item/reagent_containers))
+		var/obj/item/reagent_containers/reagent_liquiater = target
+		if(reagent_liquiater.liquifier)
+			can_freely_liquidate = TRUE
+
+	if(target.is_drainable() && !target.reagents.total_volume)
+		if(!can_freely_liquidate)
+			to_chat(user, span_warning("[target] is empty! There's nothing to dissolve [src] in."))
+			return
+		to_chat(user, span_notice("[target]'s liquifier instantly reprocesses [src] upon insertion."))
+	to_chat(user, span_notice("You dissolve the pill in [target]."))
+
+	var/rgt_list_text = get_reagent_list_text()
+	log_combat(user, target, "spiked", src, "Reagents: [rgt_list_text]")
+	reagents.trans_to(target, reagents.total_volume)
+	visible_message(
+		span_warning("[user] puts something in \the [target]."),
+		vision_distance = 2
+	)
+	qdel(src)
+	return ITEM_INTERACT_SUCCESS
 
 /obj/item/reagent_containers/pill/is_refuelable()
 	return FALSE

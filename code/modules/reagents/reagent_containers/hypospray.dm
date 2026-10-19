@@ -95,7 +95,7 @@
 		to_chat(interacting_mob, span_warning("You feel a tiny prick!")) // Inject self doubleposting.
 		record_reagent_consumption(min(amount_per_transfer_from_this, reagents.total_volume), injected, user, interacting_mob)
 
-	user.changeNext_move(CLICK_CD_UNARMED)
+	user.changeNext_move(3) // Faster than CLICK_CD_UNARMED.
 
 	playsound(loc, 'sound/items/hypospray.ogg', 50, 1)
 	reagents.reaction(interacting_with, INJECT, min(amount_per_transfer_from_this, reagents.total_volume) / reagents.total_volume)

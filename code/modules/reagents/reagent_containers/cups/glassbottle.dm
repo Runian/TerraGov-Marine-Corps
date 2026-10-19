@@ -39,7 +39,7 @@
 	var/bottle_knockdown_duration = BOTTLE_KNOCKDOWN_DEFAULT_DURATION
 
 /obj/item/reagent_containers/cup/glass/bottle/smash(mob/living/target, mob/thrower, ranged = FALSE, break_top)
-	try_splash(thrower, target)
+	try_splash(target, thrower)
 	var/obj/item/broken_bottle/B = new(drop_location())
 	if(!ranged && thrower)
 		thrower.put_in_hands(B)
@@ -84,7 +84,7 @@
 
 /obj/item/reagent_containers/cup/glass/bottle/small
 	name = "small glass bottle"
-	desc = "This blank bottle is unyieldingly anonymous, offering no clues to its contents."
+	desc = "This blank bottle is unyieldinsgly anonymous, offering no clues to its contents."
 	icon_state = "glassbottlesmall"
 	volume = 50
 

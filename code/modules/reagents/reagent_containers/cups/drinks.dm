@@ -285,7 +285,7 @@
 	)
 
 /obj/item/reagent_containers/cup/glass/bottle/juice/smallcarton/smash(atom/target, mob/thrower, ranged = FALSE)
-	try_splash(thrower, target)
+	try_splash(target, thrower)
 	var/obj/item/broken_bottle/bottle_shard = new (loc)
 	bottle_shard.mimic_broken(src, target)
 	qdel(src)
