@@ -46,7 +46,7 @@
 	RegisterSignal(parent, COMSIG_ATOM_EXAMINE, PROC_REF(examine))
 	RegisterSignal(parent, COMSIG_ITEM_UNIQUE_ACTION, PROC_REF(activate_blade))
 	RegisterSignal(parent, COMSIG_ITEM_ATTACK, PROC_REF(attack))
-	RegisterSignal(parent, COMSIG_ITEM_ATTACK_ALTERNATE, PROC_REF(attack))
+	RegisterSignal(parent, COMSIG_ITEM_ATTACK_SECONDARY, PROC_REF(attack))
 	RegisterSignal(parent, COMSIG_ATOM_ATTACKBY, PROC_REF(attackby))
 	RegisterSignal(reagent_select_action, COMSIG_ACTION_TRIGGER, PROC_REF(select_reagent))
 	RegisterSignal(parent, COMSIG_ATOM_UPDATE_OVERLAYS, PROC_REF(update_loaded_color))
@@ -67,7 +67,7 @@
 		COMSIG_ATOM_EXAMINE,
 		COMSIG_ITEM_UNIQUE_ACTION,
 		COMSIG_ITEM_ATTACK,
-		COMSIG_ITEM_ATTACK_ALTERNATE,
+		COMSIG_ITEM_ATTACK_SECONDARY,
 		COMSIG_ATOM_ATTACKBY,
 	))
 

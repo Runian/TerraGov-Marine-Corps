@@ -638,8 +638,6 @@
 #define COMSIG_MOB_KEYBINDINGS_UPDATED "mob_bindings_changed"   //from base of datum/preferences/ui_act(): (/datum/keybinding)
 
 #define COMSIG_MOB_SHIELD_DETACH "mob_shield_detached"
-#define COMSIG_MOB_ITEM_ATTACK "mob_item_attack"				//from base of /obj/item/attack(): (mob/target, /obj/item/attacking_item)
-#define COMSIG_MOB_ITEM_ATTACK_ALTERNATE "mob_item_attack_alt"	//from base of /obj/item/attack_secondary(): (mob/target, /obj/item/attacking_item)
 
 ///Called when an object is grilled ontop of a griddle
 #define COMSIG_ITEM_GRILLED "item_griddled"

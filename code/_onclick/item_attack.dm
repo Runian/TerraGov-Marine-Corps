@@ -217,7 +217,7 @@
  * Returns TRUE if the attack has fully resolved / if the attack chain should end here.
  */
 /obj/item/proc/attack(mob/living/target_mob, mob/living/user, list/modifiers)
-	var/signal_return = SEND_SIGNAL(src, COMSIG_ITEM_ATTACK, target_mob, user, modifiers) || SEND_SIGNAL(user, COMSIG_MOB_ITEM_ATTACK, target_mob, user, modifiers)
+	var/signal_return = SEND_SIGNAL(src, COMSIG_ITEM_ATTACK, target_mob, user, modifiers) || SEND_SIGNAL(user, COMSIG_MOB_ITEM_ATTACK, target_mob, src, modifiers)
 	if(signal_return & COMPONENT_CANCEL_ATTACK_CHAIN)
 		return TRUE
 	if(signal_return & COMPONENT_CONTINUE_ATTACK_CHAIN)
@@ -274,7 +274,7 @@
  */
 
 /obj/item/proc/attack_atom(atom/target_atom, mob/living/user, list/modifiers)
-	var/signal_return = SEND_SIGNAL(src, COMSIG_ITEM_ATTACK_ATOM, target_atom, user, modifiers) | SEND_SIGNAL(user, COMSIG_LIVING_ATTACK_ATOM, target_atom, modifiers)
+	var/signal_return = SEND_SIGNAL(src, COMSIG_ITEM_ATTACK_ATOM, target_atom, user, modifiers) | SEND_SIGNAL(user, COMSIG_LIVING_ATTACK_ATOM, target_atom, src, modifiers)
 	if(signal_return & COMPONENT_CANCEL_ATTACK_CHAIN)
 		return TRUE
 	if(signal_return & COMPONENT_CONTINUE_ATTACK_CHAIN)
@@ -284,8 +284,8 @@
 	user.changeNext_move(attack_speed)
 	if(!target_atom.attacked_by(src, user, modifiers))
 		return TRUE
-	SEND_SIGNAL(src, COMSIG_ITEM_AFTERATTACK, target_atom, user, modifiers, attack_modifiers)
-	SEND_SIGNAL(target_atom, COMSIG_ATOM_AFTER_ATTACKEDBY, src, user, modifiers, attack_modifiers)
+	SEND_SIGNAL(src, COMSIG_ITEM_AFTERATTACK, target_atom, user, modifiers)
+	SEND_SIGNAL(target_atom, COMSIG_ATOM_AFTER_ATTACKEDBY, src, user, modifiers)
 	afterattack(target_atom, user, modifiers)
 	return FALSE // unhandled
 
@@ -320,9 +320,9 @@
  *
  * Returns TRUE if the attack successfully connected / has been processed.
  *
- * See: [/obj/item/proc/attack]
+ * See: [/obj/item/proc/attack] and [/obj/item/proc/attack] if the attack checks succeeds.
  */
-/atom/movable/proc/attacked_by(obj/item/attacking_item, mob/living/user, list/modifiers)
+/atom/proc/attacked_by(obj/item/attacking_item, mob/living/user, list/modifiers)
 	return FALSE
 
 /mob/living/attacked_by(obj/item/attacking_item, mob/living/user, def_zone)
@@ -342,6 +342,7 @@
 		attack_message = "[user] [message_verb] [src][message_hit_area] with [attacking_item]!"
 		attack_message_local = "[user] [message_verb] you[message_hit_area] with [attacking_item]!"
 
+	user.changeNext_move(attacking_item.attack_speed)
 	user.do_attack_animation(src, used_item = attacking_item)
 
 	var/power = attacking_item.force + round(attacking_item.force * MELEE_SKILL_DAM_BUFF * user.skills.getRating(SKILL_MELEE_WEAPONS))
@@ -377,6 +378,9 @@
 	if(.)
 		return TRUE
 
+	user.changeNext_move(attacking_item.attack_speed)
+	user.do_attack_animation(src, used_item = attacking_item)
+
 	user.visible_message(span_warning("[user] hits [src] with [attacking_item]!"),
 		span_warning("You hit [src] with [attacking_item]!"), visible_message_flags = COMBAT_MESSAGE)
 	log_combat(user, src, "attacked", attacking_item)
@@ -384,31 +388,38 @@
 	take_damage(power, attacking_item.damtype, MELEE, blame_mob = user)
 	return TRUE
 
-/obj/attack_powerloader(mob/living/user, obj/item/powerloader_clamp/attached_clamp)
-	. = ..()
-	if(.)
-		return
-
-	if(attached_clamp.loaded)
-		return
-
-	if(!CHECK_BITFIELD(interaction_flags, INTERACT_POWERLOADER_PICKUP_ALLOWED) && !CHECK_BITFIELD(interaction_flags, INTERACT_POWERLOADER_PICKUP_ALLOWED_BYPASS_ANCHOR))
-		to_chat(user, span_notice("[attached_clamp.linked_powerloader] cannot pick up [src]!"))
-		return
-
-	if(anchored && !CHECK_BITFIELD(interaction_flags, INTERACT_POWERLOADER_PICKUP_ALLOWED_BYPASS_ANCHOR))
-		to_chat(user, span_notice("[src] is bolted to the ground."))
-		return
-
-	attached_clamp.do_load(src)
-
-
 // has_proximity is TRUE if this afterattack was called on something adjacent, in your square, or on your person.
 // Click parameters is the params string from byond Click() code, see that documentation.
 /obj/item/proc/afterattack(atom/target, mob/user, has_proximity, click_parameters)
 	SEND_SIGNAL(src, COMSIG_ITEM_AFTERATTACK, target, user, has_proximity, click_parameters)
 	SEND_SIGNAL(user, COMSIG_MOB_ITEM_AFTERATTACK, target, user, has_proximity, click_parameters)
 	return
+
+
+/**
+ * This proc is called when an atom gets attacked (clicked on) by a powerloader clamp
+ *
+ * Arguments:
+ * * user: The mob doing the attacking
+ * * attached_clamp: The clamp used by the mob for attacking
+ */
+
+
+/atom/proc/attack_powerloader(mob/living/user, obj/item/powerloader_clamp/attached_clamp)
+	SEND_SIGNAL(src, COMSIG_ATOM_ATTACK_POWERLOADER, user, attached_clamp)
+	add_fingerprint(user, "attack_powerloader")
+	if(!attached_clamp)
+		stack_trace("attack_powerloader called on [src] without an attached_clamp.")
+		return TRUE
+	if(!user)
+		stack_trace("[attached_clamp] called attack_powerloader on [src] without a user.")
+		return TRUE
+	if(!attached_clamp.linked_powerloader)
+		stack_trace("[attached_clamp] called attack_powerloader on [src] without a linked_powerloader.")
+		return TRUE
+	if(!Adjacent(user))
+		return TRUE
+	return FALSE
 
 /turf/attack_powerloader(mob/living/user, obj/item/powerloader_clamp/attached_clamp)
 	. = ..()
@@ -454,8 +465,19 @@
 	playsound(src, 'sound/machines/hydraulics_1.ogg', 40, 1)
 	attached_clamp.update_icon()
 
-
-
+/obj/attack_powerloader(mob/living/user, obj/item/powerloader_clamp/attached_clamp)
+	. = ..()
+	if(.)
+		return
+	if(attached_clamp.loaded)
+		return
+	if(!CHECK_BITFIELD(interaction_flags, INTERACT_POWERLOADER_PICKUP_ALLOWED) && !CHECK_BITFIELD(interaction_flags, INTERACT_POWERLOADER_PICKUP_ALLOWED_BYPASS_ANCHOR))
+		to_chat(user, span_notice("[attached_clamp.linked_powerloader] cannot pick up [src]!"))
+		return
+	if(anchored && !CHECK_BITFIELD(interaction_flags, INTERACT_POWERLOADER_PICKUP_ALLOWED_BYPASS_ANCHOR))
+		to_chat(user, span_notice("[src] is bolted to the ground."))
+		return
+	attached_clamp.do_load(src)
 
 ///////////////
 ///RIGHT CLICK CODE FROM HERE

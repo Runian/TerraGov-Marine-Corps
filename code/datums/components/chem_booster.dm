@@ -375,7 +375,7 @@
 
 	connected_weapon = weapon_to_connect
 	ADD_TRAIT(connected_weapon, TRAIT_NODROP, VALI_TRAIT)
-	RegisterSignals(connected_weapon, list(COMSIG_ITEM_ATTACK, COMSIG_ITEM_ATTACK_ALTERNATE), PROC_REF(drain_resource))
+	RegisterSignals(connected_weapon, list(COMSIG_ITEM_ATTACK, COMSIG_ITEM_ATTACK_SECONDARY), PROC_REF(drain_resource))
 	RegisterSignals(connected_weapon, list(COMSIG_ITEM_EQUIPPED_NOT_IN_SLOT, COMSIG_ITEM_DROPPED), PROC_REF(vali_connect))
 	return TRUE
 

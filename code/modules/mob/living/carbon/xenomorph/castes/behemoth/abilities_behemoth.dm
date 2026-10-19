@@ -151,7 +151,7 @@
 	RegisterSignal(current_holder, COMSIG_MOVABLE_MOVED, PROC_REF(holder_moved))
 	forceMove(current_holder.loc)
 	dummy_item = new(current_holder.loc)
-	RegisterSignal(dummy_item, COMSIG_ITEM_ATTACK_TURF, PROC_REF(dummy_attack))
+	RegisterSignal(dummy_item, COMSIG_ITEM_ATTACK_ATOM, PROC_REF(dummy_attack))
 	RegisterSignal(dummy_item, COMSIG_ITEM_REMOVED_INVENTORY, PROC_REF(force_drop))
 	current_holder.put_in_active_hand(dummy_item)
 
@@ -190,11 +190,11 @@
 	forceMove(current_holder.loc)
 
 /// When the dummy item is used to attack a turf, this object will be dropped on it.
-/obj/structure/xeno/earth_pillar/proc/dummy_attack(datum/source, turf/attacked_turf, atom/user)
+/obj/structure/xeno/earth_pillar/proc/dummy_attack(datum/source, atom/attacked_atom, atom/user)
 	SIGNAL_HANDLER
-	if(current_holder.a_intent != INTENT_GRAB)
+	if(!isturf(attacked_atom) || current_holder.a_intent != INTENT_GRAB)
 		return
-	when_dropped(current_holder, attacked_turf)
+	when_dropped(current_holder, attacked_atom)
 
 /// Updates appearances, and the HUD elements.
 /obj/structure/xeno/earth_pillar/proc/update_visuals(datum/source)

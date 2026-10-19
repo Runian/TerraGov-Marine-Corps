@@ -77,12 +77,12 @@
 /// When an item is used to attack an atom by a mob via LEFT CLICK.
 /// Sent from [obj/item/proc/pre_attack()] to the item: (atom/target, mob/user, list/modifiers)
 #define COMSIG_ITEM_PRE_ATTACK "item_pre_attack"
-/// When an user attacks an atom with an item via LEFT CLICK.
-/// Sent from [obj/item/proc/pre_attack()] to the item: (atom/item/weapon, mob/user, list/modifiers)
-#define COMSIG_USER_PRE_ITEM_ATTACK "user_pre_item_attack"
 /// When an item is used to attack an atom by a mob via RIGHT CLICK.
 /// Sent from [obj/item/proc/pre_attack_secondary()] to the item: (atom/target, mob/user, list/modifiers)
 #define COMSIG_ITEM_PRE_ATTACK_SECONDARY "item_pre_attack_secondary"
+/// When an user attacks an atom with an item via LEFT CLICK.
+/// Sent from [obj/item/proc/pre_attack()] to the item: (atom/item/weapon, mob/user, list/modifiers)
+#define COMSIG_USER_PRE_ITEM_ATTACK "user_pre_item_attack"
 /// When an user attacks an atom with an item via RIGHT CLICK.
 /// Sent from [obj/item/proc/pre_attack()] to the item: (atom/item/weapon, mob/user, list/modifiers)
 #define COMSIG_USER_PRE_ITEM_ATTACK_SECONDARY "user_pre_item_attack_secondary"
@@ -95,7 +95,6 @@
 #define COMSIG_ATOM_ATTACKBY_SECONDARY "atom_attackby_secondary"
 	/// Return this in response if you don't want afterattack to be called.
 	#define COMPONENT_NO_AFTERATTACK (1<<0)
-
 /// After this atom is attacked by a mob with an item, but before [/obj/item/proc/afterattack()] is called.
 /// Sent from [/obj/item/proc/attack_atom()] to the atom: (/obj/item/weapon, /mob/user, list/modifiers)
 #define COMSIG_ATOM_AFTER_ATTACKEDBY "atom_after_attackby"
@@ -104,11 +103,24 @@
 /// Sent from [/obj/item/proc/attack()] to the item: (/mob/living/target_mob, /mob/user, list/modifiers)
 #define COMSIG_ITEM_ATTACK "item_attack"
 /// When this item is being used to attack a living mob via RIGHT CLICK.
-/// Sent from [/obj/item/proc/attack()] to the item: (/mob/living/target_mob, /mob/user, list/modifiers)
+/// Sent from [/obj/item/proc/attack_secondary()] to the item: (/mob/living/target_mob, /mob/user, list/modifiers)
 #define COMSIG_ITEM_ATTACK_SECONDARY "item_attack_secondary"
 /// When this item is being used to attack an atom.
 /// Sent from [/obj/item/proc/attack_atom()] to the item: (/atom/target_atom, /mob/user, list/modifiers)
 #define COMSIG_ITEM_ATTACK_ATOM "item_attack_atom"
+
+/// When this mob attacks an living mob with an item via LEFT CLICK.
+/// Sent from [/obj/item/proc/attack()] to the user: (/atom/target_atom, /obj/item/weapon, list/modifiers)
+#define COMSIG_MOB_ITEM_ATTACK "mob_item_attack"
+
+/// When this living mob attacks an atom with an item.
+/// Sent from [/obj/item/proc/attack_atom()] to the user: (/atom/target_atom, /obj/item/weapon, list/modifiers)
+#define COMSIG_LIVING_ATTACK_ATOM "living_attack_atom"
+
+
+
+
+
 
 
 
