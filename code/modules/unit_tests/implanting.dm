@@ -9,7 +9,7 @@
 
 	implanted_guy.put_in_active_hand(implanter_to_inject)
 
-	TEST_ASSERT(implanter_to_inject.attack(implanted_guy, implanted_guy), "[implanted_guy] failed to inject himself with [implanter_to_inject]")
+	TEST_ASSERT(implanter_to_inject.attack_mob(implanted_guy, implanted_guy), "[implanted_guy] failed to inject himself with [implanter_to_inject]")
 	TEST_ASSERT(!implanter_to_inject.imp, "[implanter_to_inject] still has an implant in its implanter, despite being injected into [implanted_guy]")
 
 	qdel(implanted_guy)

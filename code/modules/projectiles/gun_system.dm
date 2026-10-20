@@ -1167,7 +1167,7 @@
 
 /obj/item/weapon/gun/attack_secondary(mob/living/M, mob/living/user)
 	if(active_attachable)
-		active_attachable.attack(M, user)
+		active_attachable.attack_mob(M, user)
 		return
 	return ..()
 

@@ -183,7 +183,7 @@
 	if(.)
 		return TRUE
 	user.changeNext_move(attacking_item.attack_speed)
-	return attacking_item.attack(src, user, modifiers)
+	return attacking_item.attack_mob(src, user, modifiers)
 
 /turf/attackby(obj/item/attacking_item, mob/user, list/modifiers)
 	. = ..()
@@ -291,7 +291,7 @@
  * Returns TRUE if the attack has been handled or to prevent any afterattack.
  */
 /obj/item/proc/attack_obj(obj/target_object, mob/living/user, modifiers)
-	var/signal_return = SEND_SIGNAL(src, COMSIG_ITEM_ATTACK_OBJ, target_atom, user, modifiers) | SEND_SIGNAL(user, COMSIG_LIVING_ATTACK_OBJ, target_atom, src, modifiers)
+	var/signal_return = SEND_SIGNAL(src, COMSIG_ITEM_ATTACK_OBJ, target_object, user, modifiers) | SEND_SIGNAL(user, COMSIG_LIVING_ATTACK_OBJ, target_object, src, modifiers)
 	add_fingerprint(user, "attack_obj")
 	if(signal_return & COMPONENT_CANCEL_ATTACK_CHAIN)
 		return TRUE

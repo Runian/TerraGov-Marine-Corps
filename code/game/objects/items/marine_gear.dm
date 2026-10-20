@@ -352,5 +352,5 @@
 		return
 	if(!do_after(user, 1 SECONDS))
 		return
-	target_turf = isturf(target) ? interacting_with : get_turf(target)
+	target_turf = isturf(interacting_with) ? interacting_with : get_turf(interacting_with)
 	to_chat(user, span_notice("Given your current position, target coordinates are:") + span_bold(" LONGITUDE [target_turf.x]. LATITUDE [target_turf.y]."))

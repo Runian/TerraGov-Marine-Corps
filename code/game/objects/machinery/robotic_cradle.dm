@@ -212,7 +212,7 @@
 
 	if(istype(I, /obj/item/healthanalyzer) && occupant) //Allows us to use the analyzer on the occupant without taking him out.
 		var/obj/item/healthanalyzer/J = I
-		J.attack(occupant, user)
+		J.attack_mob(occupant, user)
 		return
 
 /obj/machinery/robotic_cradle/attack_hand(mob/living/user)

@@ -215,7 +215,7 @@
 		return
 	if(istype(I, /obj/item/healthanalyzer) && occupant) // Allows us to use the analyzer on the occupant without taking him out.
 		var/obj/item/healthanalyzer/health_analyzer = I
-		health_analyzer.attack(occupant, user)
+		health_analyzer.attack_mob(occupant, user)
 		return
 	if(istype(I, /obj/item/stack/sheet/metal))
 		var/obj/item/stack/sheet/metal/metal_stack = I

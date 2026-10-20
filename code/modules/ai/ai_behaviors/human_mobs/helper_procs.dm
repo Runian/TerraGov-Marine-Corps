@@ -64,19 +64,19 @@
 	return FALSE
 
 /obj/item/stack/medical/ai_use(mob/living/target, mob/living/user)
-	attack(target, user)
+	attack_mob(target, user)
 
 /obj/item/reagent_containers/ai_use(mob/living/target, mob/living/user)
 	afterattack(target, user, TRUE) //why are all these medical item inconsistant with their proc usage, holy shit
 
 /obj/item/reagent_containers/pill/ai_use(mob/living/target, mob/living/user)
-	attack(target, user)
+	attack_mob(target, user)
 
 /obj/item/tweezers/ai_use(mob/living/target, mob/living/user)
-	attack(target, user)
+	attack_mob(target, user)
 
 /obj/item/tweezers_advanced/ai_use(mob/living/target, mob/living/user)
-	attack(target, user)
+	attack_mob(target, user)
 
 /obj/item/weapon/ai_use(mob/living/target, mob/living/user)
 	if(item_flags & TWOHANDED)

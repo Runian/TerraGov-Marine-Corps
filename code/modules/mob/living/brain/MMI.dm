@@ -55,7 +55,7 @@
 			to_chat(user, span_warning("Access denied."))
 		return
 	if(brainmob)
-		O.attack(brainmob, user)//Oh noooeeeee
+		O.attack_mob(brainmob, user)//Oh noooeeeee
 		return
 	..()
 

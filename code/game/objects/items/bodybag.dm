@@ -293,7 +293,7 @@
 		return TRUE
 
 	var/obj/item/healthanalyzer/J = I
-	J.attack(bodybag_occupant, user) // yes this is awful -spookydonut // TODO
+	J.attack_mob(bodybag_occupant, user) // yes this is awful -spookydonut // TODO
 	return TRUE
 
 /obj/structure/closet/bodybag/cryobag/open()

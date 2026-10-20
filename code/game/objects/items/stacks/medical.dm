@@ -21,7 +21,7 @@
 
 /obj/item/stack/medical/attack_self(mob/user)
 	. = ..()
-	attack(user, user)
+	attack_mob(user, user)
 
 /obj/item/stack/medical/attack_mob(mob/living/M, mob/living/user)
 	. = ..()

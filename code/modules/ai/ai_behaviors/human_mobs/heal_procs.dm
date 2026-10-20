@@ -155,7 +155,7 @@
 	if(!splint)
 		return FALSE
 	mob_parent.zone_selected = broken_limb.name //why god do we rely on the limb name, which isnt a define?
-	if(splint.attack(target, mob_parent))
+	if(splint.attack_mob(target, mob_parent))
 		. = TRUE
 	mob_parent?.zone_selected = BODY_ZONE_CHEST
 

@@ -505,7 +505,7 @@ GLOBAL_LIST_EMPTY(activated_medevac_stretchers)
 		else if(buckled_bodybag)
 			occupant = locate(/mob/living) in buckled_bodybag.contents
 		var/obj/item/healthanalyzer/J = I
-		J.attack(occupant, user)
+		J.attack_mob(occupant, user)
 
 
 /obj/structure/bed/medevac_stretcher/proc/medvac_alert(mob/M)
