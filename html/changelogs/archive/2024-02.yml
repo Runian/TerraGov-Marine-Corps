@@ -301,7 +301,7 @@
   - bugfix: Loadouts work in Valhalla now
   - bugfix: Xeno alamo console is functional once more
   - refactor: Converts Autoinjectors + Hyposprays into TGUI
-  - code_imp: reagent_containers use attack_self_alternate + attack_hand_secondary
+  - code_imp: reagent_containers use attack_self_alternate + attack_hand_alternate
       to open the reagent change UI (Also applies to hypos)
   - bugfix: Fix not being able to use the beginner loadout in valhalla
   - bugfix: Martini belt no longer has an error sprite when its full
