@@ -17,8 +17,12 @@
 	return ..()
 
 /obj/item/unmanned_vehicle_remote/interact_with_atom(atom/interacting_with, mob/living/user, list/modifiers)
+	. = ..()
+	if(.)
+		return
 	if(!istype(interacting_with, /obj/vehicle/unmanned))
-		return ..()
+		return NONE
+
 	if(vehicle)
 		SEND_SIGNAL(src, COMSIG_REMOTECONTROL_UNLINK)
 		if(vehicle == interacting_with)

@@ -19,8 +19,13 @@
 		pixel_y = rand(-6, 6)
 
 /obj/item/reagent_containers/food/interact_with_atom(atom/interacting_with, mob/living/user, list/modifiers)
+	. = ..()
+	if(.)
+		return
+
 	if(!istype(interacting_with, /obj/structure/table) || !length(center_of_mass))
 		return NONE
+
 	// Places the item on a grid.
 	var/cellnumber = 4
 	var/mouse_x = text2num(modifiers["icon-x"])

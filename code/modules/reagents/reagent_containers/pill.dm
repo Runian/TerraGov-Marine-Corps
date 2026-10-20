@@ -29,19 +29,26 @@
 	return try_consume(user, user, null)
 
 /obj/item/reagent_containers/pill/interact_with_atom(atom/interacting_with, mob/living/user, list/modifiers)
+	. = ..()
+	if(.)
+		return
+
 	if(!check_allowed_items(interacting_with, target_self = TRUE))
 		return NONE
 
 	if(ismob(interacting_with))
-		return try_consume(interacting_with, user, null)
-	if(interacting_with.is_refillable())
-		return try_refill(interacting_with, user, null)
+		if(try_consume(interacting_with, user, null))
+			return ITEM_INTERACT_SUCCESS
+		return ITEM_INTERACT_BLOCKING
 
-	return NONE
+	if(interacting_with.is_refillable())
+		if(try_refill(interacting_with, user, null))
+			return ITEM_INTERACT_SUCCESS
+		return ITEM_INTERACT_BLOCKING
 
 /obj/item/reagent_containers/pill/try_consume(atom/target, mob/living/user, transfer_amount = null)
 	if(!can_consume(target)) // Will give varied chat message if it fails.
-		return ITEM_INTERACT_BLOCKING
+		return FALSE
 
 	user.changeNext_move(CLICK_CD_MELEE)
 	if(target == user)
@@ -53,9 +60,9 @@
 		)
 		var/ingestion_time = max(1 SECONDS, 3 SECONDS - 1 SECONDS * user.skills.getRating(SKILL_MEDICAL))
 		if(!do_after(user, ingestion_time, NONE, target, BUSY_ICON_FRIENDLY, BUSY_ICON_MEDICAL))
-			return ITEM_INTERACT_BLOCKING
+			return FALSE
 		if(!reagents || !reagents.total_volume)
-			return ITEM_INTERACT_BLOCKING
+			return FALSE
 
 		target.visible_message(
 			span_danger("[user] forces [target] to swallow [src]."),
@@ -71,20 +78,20 @@
 		reagents.trans_to(target, reagents.total_volume)
 	qdel(src)
 
-	return ITEM_INTERACT_SUCCESS
+	return TRUE
 
 /obj/item/reagent_containers/pill/try_refill(atom/target, mob/living/user, transfer_amount = amount_per_transfer_from_this)
 	if(!reagents.total_volume)
 		to_chat(user, span_warning("[src] is empty!"))
-		return ITEM_INTERACT_BLOCKING
+		return FALSE
 	if(target.reagents.holder_full())
 		to_chat(user, span_warning("[target] is full."))
-		return ITEM_INTERACT_BLOCKING
+		return FALSE
 
 	var/can_freely_liquidate = FALSE
 	if(istype(target, /obj/item/reagent_containers))
-		var/obj/item/reagent_containers/reagent_liquiater = target
-		if(reagent_liquiater.liquifier)
+		var/obj/item/reagent_containers/possible_liquidator = target
+		if(possible_liquidator.liquifier)
 			can_freely_liquidate = TRUE
 
 	if(target.is_drainable() && !target.reagents.total_volume)
@@ -102,7 +109,7 @@
 		vision_distance = 2
 	)
 	qdel(src)
-	return ITEM_INTERACT_SUCCESS
+	return TRUE
 
 /obj/item/reagent_containers/pill/is_refuelable()
 	return FALSE

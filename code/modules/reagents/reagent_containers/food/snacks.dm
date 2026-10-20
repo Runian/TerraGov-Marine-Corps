@@ -838,11 +838,16 @@
 	return TRUE
 
 /obj/item/reagent_containers/food/snacks/monkeycube/interact_with_atom(atom/interacting_with, mob/living/user, list/modifiers)
+	. = ..()
+	if(.)
+		return
+
 	if(package || !istype(interacting_with, /obj/structure/sink))
 		return NONE
 	if(!user.drop_held_item())
 		to_chat(user, span_warning("The [src] is stuck to your hand!"))
 		return ITEM_INTERACT_BLOCKING
+
 	to_chat(user, "You place \the [name] under a stream of water...")
 	Expand()
 	return ITEM_INTERACT_SUCCESS

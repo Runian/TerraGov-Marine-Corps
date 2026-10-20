@@ -100,6 +100,10 @@
 	icon_state = "bbulb1"
 
 /obj/item/light_bulb/bulb/interact_with_atom(atom/interacting_with, mob/living/user, list/modifiers)
+	. = ..()
+	if(.)
+		return
+
 	var/turf/open/floor/light/floorlight_turf = interacting_with
 	if(!istype(floorlight_turf))
 		return NONE
@@ -113,6 +117,7 @@
 	if(!user.drop_held_item(src))
 		to_chat(user, span_warning("The [src] is stuck to your hand!"))
 		return ITEM_INTERACT_BLOCKING
+
 	qdel(src)
 	existing_bulb.state = LIGHT_TILE_OK
 	existing_bulb.update_icon()

@@ -367,6 +367,10 @@ GLOBAL_LIST_EMPTY(conveyors_by_id)
 	to_chat(user, span_notice("You have linked all nearby conveyor belt assemblies to this switch."))
 
 /obj/item/conveyor_switch_construct/interact_with_atom(atom/interacting_with, mob/living/user, list/modifiers)
+	. = ..()
+	if(.)
+		return
+
 	if(!isfloorturf(interacting_with) || istype(interacting_with, /area/shuttle))
 		return NONE
 	var/found_connected_conveyor = FALSE
@@ -376,9 +380,11 @@ GLOBAL_LIST_EMPTY(conveyors_by_id)
 			break
 	if(!found_connected_conveyor)
 		to_chat(user, "[icon2html(src, user)][span_notice("The conveyor switch did not detect any linked conveyor belts in range.")]")
-		return
+		return ITEM_INTERACT_BLOCKING
+
 	new /obj/machinery/conveyor_switch(interacting_with, id)
 	qdel(src)
+	return ITEM_INTERACT_SUCCESS
 
 /obj/item/stack/conveyor
 	name = "conveyor belt assembly"
@@ -396,18 +402,28 @@ GLOBAL_LIST_EMPTY(conveyors_by_id)
 	id = _id
 
 /obj/item/stack/conveyor/interact_with_atom(atom/interacting_with, mob/living/user, list/modifiers)
+	. = ..()
+	if(.)
+		return
+
 	if(!isfloorturf(interacting_with) || istype(interacting_with, /area/shuttle))
 		return NONE
 	var/conveyor_direction = get_dir(interacting_with, user)
 	if(interacting_with == user.loc)
 		to_chat(user, span_warning("You cannot place a conveyor belt under yourself!"))
 		return ITEM_INTERACT_BLOCKING
+
 	new /obj/machinery/conveyor(interacting_with, conveyor_direction, id)
 	use(1)
 
 /obj/item/stack/conveyor/item_interaction(mob/living/user, obj/item/tool, list/modifiers)
+	. = ..()
+	if(.)
+		return
+
 	if(!istype(tool, /obj/item/conveyor_switch_construct))
 		return NONE
+
 	to_chat(user, span_notice("You link the switch to the conveyor belt assembly."))
 	var/obj/item/conveyor_switch_construct/conveyor_switch = tool
 	id = conveyor_switch.id

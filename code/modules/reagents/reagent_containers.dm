@@ -156,10 +156,10 @@
 /// Causes the target to drink from us.
 /obj/item/reagent_containers/proc/try_consume(atom/target, mob/living/user, transfer_amount = amount_per_transfer_from_this)
 	if(!can_consume(target)) // Will give varied chat message if it fails.
-		return ITEM_INTERACT_BLOCKING
+		return FALSE
 	if(!reagents || !reagents.total_volume)
 		to_chat(user, span_warning("[src] is empty!"))
-		return ITEM_INTERACT_BLOCKING
+		return FALSE
 
 	user.changeNext_move(CLICK_CD_MELEE)
 	if(target == user)
@@ -173,9 +173,9 @@
 			span_userdanger("[user] attempts to feed you something from [src]."),
 		)
 		if(!do_after(user, 3 SECONDS, target))
-			return ITEM_INTERACT_BLOCKING
+			return FALSE
 		if(!reagents || !reagents.total_volume)
-			return ITEM_INTERACT_BLOCKING
+			return FALSE
 		target.visible_message(
 			span_warning("[user] feeds [target] something from [src]."),
 			span_warning("[user] feeds you something from [src]."),
@@ -193,19 +193,19 @@
 	playsound(target, 'sound/items/drink.ogg', rand(10, 50), TRUE)
 	target.update_appearance()
 
-	return ITEM_INTERACT_SUCCESS
+	return TRUE
 
 /// Tries to give/refill target's reagents from our reagents.
 /obj/item/reagent_containers/proc/try_refill(atom/target, mob/living/user, transfer_amount = amount_per_transfer_from_this)
 	if(!is_drainable())
 		to_chat(user, span_notice("[src]'s lid isn't open!"))
-		return ITEM_INTERACT_BLOCKING
+		return FALSE
 	if(!reagents.total_volume)
 		to_chat(user, span_warning("[src] is empty!"))
-		return ITEM_INTERACT_BLOCKING
+		return FALSE
 	if(target.reagents.holder_full())
 		to_chat(user, span_warning("[target] is full."))
-		return ITEM_INTERACT_BLOCKING
+		return FALSE
 
 	var/trans = reagents.trans_to(target, transfer_amount)
 	to_chat(user, span_notice("You transfer [trans] unit\s of the solution to [target]."))
@@ -217,23 +217,23 @@
 /obj/item/reagent_containers/proc/try_drain(atom/target, mob/living/user, transfer_amount = amount_per_transfer_from_this)
 	if(!is_refillable())
 		to_chat(user, span_notice("[src]'s lid isn't open!"))
-		return ITEM_INTERACT_BLOCKING
+		return FALSE
 	if(!target.reagents.total_volume)
 		to_chat(user, span_warning("[target] is empty and can't be refilled!"))
-		return ITEM_INTERACT_BLOCKING
+		return FALSE
 	if(reagents.holder_full())
 		to_chat(user, span_warning("[src] is full."))
-		return ITEM_INTERACT_BLOCKING
+		return FALSE
 
 	var/trans = target.reagents.trans_to(src, transfer_amount)
 	to_chat(user, span_notice("You fill [src] with [trans] unit\s of the contents of [target]."))
 	SEND_SIGNAL(src, COMSIG_REAGENTS_CUP_TRANSFER_FROM, target)
 	target.update_appearance()
-	return ITEM_INTERACT_SUCCESS
+	return TRUE
 
 /// Splashes atom/target with whatever reagents are contained
 /obj/item/reagent_containers/proc/try_splash(atom/target, mob/living/user)
-	if(!is_open_container()) //Can't splash stuff from a sealed container. I dare you to try.
+	if(!is_open_container()) // Can't splash stuff from a sealed container. I dare you to try.
 		to_chat(user, span_warning("An airtight seal prevents you from splashing the solution!"))
 		return FALSE
 
@@ -241,13 +241,8 @@
 		to_chat(user, span_notice("You splash the solution onto [target]."))
 		playsound(target, 'sound/effects/slosh.ogg', 25, 1, MEDIUM_SOUND_RANGE)
 
-		var/mob/living/M = target
-		var/list/injected = list()
-		for(var/datum/reagent/R in src.reagents.reagent_list)
-			injected += R.name
-		var/contained = english_list(injected)
-		log_combat(user, M, "splashed", src, "Reagents: [contained]")
-		record_reagent_consumption(reagents.total_volume, injected, user, M)
+		log_combat(user, target, "splashed", src, "Reagents: [get_reagent_list_text()]")
+		record_reagent_consumption(reagents.total_volume, reagents.reagent_list, user, target)
 
 		visible_message(span_warning("[target] has been splashed with something by [user]!"))
 		reagents.reaction(target, TOUCH)

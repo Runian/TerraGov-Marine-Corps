@@ -42,14 +42,6 @@
 		log_combat(user, M, "thrown", addition="from [start_T_descriptor] with the target [end_T_descriptor]")
 	return M
 
-/obj/item/grab/afterattack(atom/target, mob/user, has_proximity, click_parameters)
-	if(user.pulling == user.buckled)
-		return //can't move the thing you're sitting on.
-	target = get_turf(target)	//we still try to move the grabbed thing to the turf.
-	if(user.Move_Pulled(target))
-		user.changeNext_move(CLICK_CD_MELEE)
-
-
 /obj/item/grab/attack_self(mob/living/user)
 	if(!isliving(grabbed_thing) || user.do_actions)
 		return
@@ -68,6 +60,19 @@
 	if(user.grab_state == GRAB_NECK)
 		RegisterSignal(victim, COMSIG_LIVING_DO_RESIST, TYPE_PROC_REF(/atom/movable, resisted_against))
 
+/obj/item/grab/interact_with_atom(atom/interacting_with, mob/living/user, list/modifiers)
+	. = ..()
+	if(.)
+		return
+
+	if(user.pulling == user.buckled) // Can't move the thing you're sitting on.
+		return NONE
+	interacting_with = get_turf(interacting_with) // We still try to move the grabbed thing to the turf.
+	if(!user.Move_Pulled(interacting_with))
+		return ITEM_INTERACT_BLOCKING
+
+	user.changeNext_move(CLICK_CD_MELEE)
+	return ITEM_INTERACT_SUCCESS
 
 /mob/living/proc/advance_grab_state()
 	if(!isliving(pulling))

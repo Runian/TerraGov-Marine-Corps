@@ -31,12 +31,19 @@
 /obj/item/reagent_containers/glass/interact_with_atom(atom/interacting_with, mob/living/user, list/modifiers)
 	. = ..()
 	if(.)
-		return TRUE
+		return
+
+	user.changeNext_move(CLICK_CD_RAPID)
 
 	if(interacting_with.is_refillable())
-		return try_refill(interacting_with, user, amount_per_transfer_from_this)
+		if(try_refill(interacting_with, user, amount_per_transfer_from_this))
+			return ITEM_INTERACT_SUCCESS
+		return ITEM_INTERACT_BLOCKING
+
 	if(interacting_with.is_drainable())
-		return try_drain(interacting_with, user, amount_per_transfer_from_this)
+		if(try_drain(interacting_with, user, amount_per_transfer_from_this))
+			return ITEM_INTERACT_SUCCESS
+		return ITEM_INTERACT_BLOCKING
 
 	if(istype(interacting_with, /obj/item/tool/pen) || istype(interacting_with, /obj/item/flashlight/pen))
 		var/tmp_label = stripped_input(user, "Enter a label for [name]", "Label", label_text)
@@ -52,10 +59,22 @@
 		update_name_label()
 		return ITEM_INTERACT_SUCCESS
 
-/obj/item/reagent_containers/glass/afterattack(atom/target, mob/user, has_proximity, click_parameters)
+/obj/item/reagent_containers/glass/interact_with_atom_secondary(atom/interacting_with, mob/living/user, list/modifiers)
 	. = ..()
+	if(.)
+		return
+
+	user.changeNext_move(CLICK_CD_RAPID)
+
 	if(user.a_intent == INTENT_HARM)
-		try_splash(target, user)
+		if(try_splash(interacting_with, user))
+			return ITEM_INTERACT_SUCCESS
+		return ITEM_INTERACT_BLOCKING
+
+	if(interacting_with.is_drainable())
+		if(try_drain(interacting_with, user, amount_per_transfer_from_this))
+			return ITEM_INTERACT_SUCCESS
+		return ITEM_INTERACT_BLOCKING
 
 /obj/item/reagent_containers/glass/proc/update_name_label()
 	if(label_text == "")

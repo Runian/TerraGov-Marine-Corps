@@ -19,14 +19,20 @@
 	. += "There is [reagents.reagent_list ? reagents.total_volume : 0] units of fuel remaining."
 
 /obj/item/reagent_containers/jerrycan/interact_with_atom(atom/interacting_with, mob/living/user, list/modifiers)
+	. = ..()
+	if(.)
+		return
+
 	if(!isturf(interacting_with) && !istype(interacting_with, /obj/alien/weeds))
 		return NONE
+
 	var/turf/found_turf = get_turf(interacting_with)
 	if(found_turf.density)
 		return ITEM_INTERACT_BLOCKING
 	if(!reagents.total_volume)
 		balloon_alert(user, "no fuel!")
 		return ITEM_INTERACT_BLOCKING
+
 	new /obj/effect/decal/cleanable/liquid_fuel(found_turf, fuel_usage / 2)
 	reagents.remove_reagent(/datum/reagent/fuel, fuel_usage)
 	user.visible_message(span_notice("[user] splashes some fuel on \the [found_turf]."), span_notice("You splash some fuel on [found_turf]."))

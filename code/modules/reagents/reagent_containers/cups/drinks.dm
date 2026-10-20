@@ -188,7 +188,7 @@
 	return ..()
 
 /obj/item/reagent_containers/cup/glass/waterbottle/item_interaction(mob/living/user, obj/item/tool, list/modifiers)
-	if(cap_on && (target.is_refillable() || target.is_drainable() || (reagents.total_volume && user.a_intent != INTENT_HARM)))
+	if(cap_on && (tool.is_refillable() || tool.is_drainable() || (reagents.total_volume && user.a_intent != INTENT_HARM)))
 		to_chat(user, span_warning("You must remove the cap before you can do that!"))
 		return ITEM_INTERACT_BLOCKING
 	if(istype(tool, /obj/item/reagent_containers/cup/glass/waterbottle))

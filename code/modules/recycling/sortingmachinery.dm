@@ -242,6 +242,10 @@ GLOBAL_LIST_EMPTY(tagger_locations)
 		. = span_notice("There are [amount] units of package wrap left!")
 
 /obj/item/packageWrap/interact_with_atom(atom/interacting_with, mob/living/user, list/modifiers)
+	. = ..()
+	if(.)
+		return
+
 	if(!isobj(interacting_with))
 		return NONE
 	var/obj/interacting_object = interacting_with
@@ -251,6 +255,7 @@ GLOBAL_LIST_EMPTY(tagger_locations)
 		return NONE
 	if(user in interacting_object) // No wrapping closets that you are inside - it's not physically possible.
 		return NONE
+
 	var/static/list/disallowed_typepaths = list(
 		/obj/item/smallDelivery,
 		/obj/structure/bigDelivery,

@@ -280,11 +280,11 @@ CIGARETTE PACKETS ARE IN FANCY.DM
 	if(istype(interacting_with, /obj/item/reagent_containers/glass) && !lit)
 		var/obj/item/reagent_containers/glass_container = interacting_with
 		if(glass_container.reagents.trans_to(src, chem_volume))	// If reagents were transfered, show the message.
-			to_chat(user, span_notice("You dip \the [src] into \the [glass]."))
+			to_chat(user, span_notice("You dip \the [src] into \the [glass_container]."))
 			return ITEM_INTERACT_SUCCESS
 		// If not, either the beaker was empty or the cigarette was full.
-		if(!glass.reagents.total_volume)
-			to_chat(user, span_notice("[glass] is empty."))
+		if(!glass_container.reagents.total_volume)
+			to_chat(user, span_notice("[glass_container] is empty."))
 			return ITEM_INTERACT_BLOCKING
 		to_chat(user, span_notice("[src] is full."))
 		return ITEM_INTERACT_BLOCKING
@@ -309,15 +309,10 @@ CIGARETTE PACKETS ARE IN FANCY.DM
 	if(lit || smoketime <= 0)
 		return NONE
 
-	if(iswelder(tool))
-		var/obj/item/tool/weldingtool/welder = tool
-		if(welder.isOn())// Badasses dont get blinded while lighting their cig with a blowtorch.
-			light(span_notice("[user] casually lights the [name] with [W]."))
-			return ITEM_INTERACT_SUCCESS
-		return NONE
+
 
 	if(istype(tool, /obj/item/assembly/igniter))
-		light(span_notice("[user] fiddles with [W], and manages to light [user.p_their()] [name]."))
+		light(span_notice("[user] fiddles with [tool], and manages to light [user.p_their()] [name]."))
 		return ITEM_INTERACT_SUCCESS
 
 	if(istype(tool, /obj/item/tool/surgery/cautery))
@@ -330,10 +325,10 @@ CIGARETTE PACKETS ARE IN FANCY.DM
 			if(tool_gun.rounds)
 				light(span_notice("[user] deftly lights [user.p_their()] [src] with the [tool_gun]'s low power setting."))
 				return ITEM_INTERACT_SUCCESS
-			to_chat(user, span_warning("You try to light your [src] with the [L] but your power cell has no charge!"))
+			to_chat(user, span_warning("You try to light your [src] with the [tool_gun] but your power cell has no charge!"))
 			return ITEM_INTERACT_BLOCKING
-		if(istype(tool, /obj/item/weapon/gun/flamer))
-			light(span_notice("[user] lights [user.p_their()] [src] with the pilot light of the [tool]."))
+		if(istype(tool_gun, /obj/item/weapon/gun/flamer))
+			light(span_notice("[user] lights [user.p_their()] [src] with the pilot light of the [tool_gun]."))
 			return ITEM_INTERACT_SUCCESS
 		if(istype(LAZYACCESS(tool_gun.attachments_by_slot, ATTACHMENT_SLOT_UNDER), /obj/item/weapon/gun/flamer))
 			light(span_notice("[user] lights [user.p_their()] [src] with the underbarrel [LAZYACCESS(tool_gun.attachments_by_slot, ATTACHMENT_SLOT_UNDER)]."))
@@ -341,6 +336,10 @@ CIGARETTE PACKETS ARE IN FANCY.DM
 
 	// Anything hot enough can light us up and typically means that they're lit, active, etc.
 	if(tool.heat)
+		if(iswelder(tool))
+			// Badasses dont get blinded while lighting their cig with a blowtorch.
+			light(span_notice("[user] casually lights the [name] with [tool]."))
+			return ITEM_INTERACT_SUCCESS
 		if(istype(tool, /obj/item/tool/lighter/zippo))
 			light(span_rose("With a flick of [user.p_their()] wrist, [user] lights their [name] with [tool]."))
 			return ITEM_INTERACT_SUCCESS
@@ -351,7 +350,7 @@ CIGARETTE PACKETS ARE IN FANCY.DM
 			light(span_warning("[user] swings [user.p_their()] [tool], barely missing [user.p_their()] nose. [user.p_they()] light [user.p_their()] [name] in the process."))
 			return ITEM_INTERACT_SUCCESS
 		if(istype(tool, /obj/item/tool/candle) || istype(tool, /obj/item/clothing/mask/cigarette))
-			light(span_notice("[user] lights [user.p_their()] [src] with the [W] after a few attempts."))
+			light(span_notice("[user] lights [user.p_their()] [src] with the [tool] after a few attempts."))
 			return ITEM_INTERACT_SUCCESS
 		light(span_notice("[user] lights [user.p_their()] [name] with [tool]."))
 		return ITEM_INTERACT_SUCCESS

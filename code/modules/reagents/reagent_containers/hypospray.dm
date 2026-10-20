@@ -26,8 +26,9 @@
 	var/description_overlay = ""
 
 /obj/item/reagent_containers/hypospray/interact_with_atom(atom/interacting_with, mob/living/user, list/modifiers)
-	if(!in_range(interacting_with, user) || !user.Adjacent(interacting_with))
-		return NONE
+	. = ..()
+	if(.)
+		return
 
 	if(istype(interacting_with, /obj/item/storage/pill_bottle) && is_open_container())
 		var/obj/item/storage/pill_bottle/bottle = interacting_with
@@ -58,44 +59,38 @@
 	if(iscarbon(interacting_with))
 		var/mob/living/carbon/interacting_carbon = interacting_with
 		if((interacting_carbon.species.species_flags & NO_CHEM_METABOLIZATION) || (interacting_carbon.species.species_flags & IS_SYNTHETIC))
-			interacting_carbon.balloon_alert(user, "Can't inject (robot)")
+			interacting_carbon.balloon_alert(user, "can't inject (robot)!")
 			return ITEM_INTERACT_BLOCKING
 
 	if(!interacting_with.is_injectable() && !ismob(interacting_with))
 		interacting_with.balloon_alert(user, "can't fill!")
-		return
+		return ITEM_INTERACT_BLOCKING
 
 	if(skill_lock && user.skills.getRating(SKILL_MEDICAL) < SKILL_MEDICAL_NOVICE)
 		user.visible_message(span_notice("[user] fumbles around figuring out how to use the [src]."),
 		span_notice("You fumble around figuring out how to use the [src]."))
 		if(!do_after(user, SKILL_TASK_EASY, NONE, interacting_with, BUSY_ICON_UNSKILLED) || (!in_range(interacting_with, user) || !user.Adjacent(interacting_with)))
-			return
+			return ITEM_INTERACT_BLOCKING
 
 	if(ismob(interacting_with))
 		var/mob/interacting_mob = interacting_with
 		if(reagents.has_reagent(/datum/reagent/medicalnanites) && interacting_mob != user)
 			user.balloon_alert(user, "nanites must be self-administered!")
-			return
+			return ITEM_INTERACT_BLOCKING
 		if(!interacting_mob.can_inject(user, TRUE, user.zone_selected, TRUE))
-			return
+			return ITEM_INTERACT_BLOCKING
 		if(interacting_mob.faction != user.faction && !interacting_mob.incapacitated())
 			user.visible_message(span_notice("[user] attempts to inject [interacting_mob] with [src]."),
 			span_notice("You attempt to inject [interacting_mob] with [src]."))
 			if(!do_after(user, SKILL_TASK_VERY_EASY, NONE, interacting_mob, BUSY_ICON_HOSTILE) || (!in_range(interacting_mob, user) || !user.Adjacent(interacting_mob)))
-				return
-
-	var/list/injected = list()
-	for(var/datum/reagent/injected_reagent in reagents.reagent_list)
-		injected += injected_reagent.name
-	log_combat(user, interacting_with, "injected", src, "Reagents: [english_list(injected)]")
-
-	if(ismob(interacting_with))
-		var/mob/interacting_mob = interacting_with
+				return ITEM_INTERACT_BLOCKING
 		balloon_alert(user, "injects [interacting_mob]!")
 		to_chat(interacting_mob, span_warning("You feel a tiny prick!")) // Inject self doubleposting.
-		record_reagent_consumption(min(amount_per_transfer_from_this, reagents.total_volume), injected, user, interacting_mob)
+		record_reagent_consumption(min(amount_per_transfer_from_this, reagents.total_volume), reagents.reagent_list, user, interacting_mob)
 
-	user.changeNext_move(3) // Faster than CLICK_CD_UNARMED.
+	user.changeNext_move(CLICK_CD_RAPID)
+
+	log_combat(user, interacting_with, "injected", src, "Reagents: [get_reagent_list_text()]")
 
 	playsound(loc, 'sound/items/hypospray.ogg', 50, 1)
 	reagents.reaction(interacting_with, INJECT, min(amount_per_transfer_from_this, reagents.total_volume) / reagents.total_volume)
@@ -103,9 +98,13 @@
 	to_chat(user, span_notice("[trans] units injected. [reagents.total_volume] units remaining in [src]. ")) // Too long to balloon
 
 /obj/item/reagent_containers/hypospray/interact_with_atom_secondary(atom/interacting_with, mob/living/user, list/modifiers)
-	if(!in_range(interacting_with, user) || !user.Adjacent(interacting_with))
-		return NONE
-	can_draw_reagent(interacting_with, user, TRUE)
+	. = ..()
+	if(.)
+		return
+
+	if(can_draw_reagent(interacting_with, user))
+		return ITEM_INTERACT_SUCCESS
+	return ITEM_INTERACT_BLOCKING
 
 /obj/item/reagent_containers/hypospray/is_refuelable()
 	return FALSE

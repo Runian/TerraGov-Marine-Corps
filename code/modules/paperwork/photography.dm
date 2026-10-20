@@ -329,6 +329,10 @@
 	adjust_zoom(user)
 
 /obj/item/camera/interact_with_atom(atom/interacting_with, mob/living/user, list/modifiers)
+	. = ..()
+	if(.)
+		return
+
 	if(istype(interacting_with, /obj/item/camera_film))
 		if(pictures_left)
 			to_chat(user, span_notice("[src] still has some film in it!"))
@@ -339,9 +343,15 @@
 		qdel(interacting_with)
 		pictures_left = pictures_max
 		return ITEM_INTERACT_SUCCESS
-	if(try_take_picture(interacting_with, user))
-		return ITEM_INTERACT_SUCCESS
-	return NONE
+
+	if(!can_take_picture_of(interacting_with, user))
+		return NONE
+
+	on = FALSE
+	icon_state = state_off
+	addtimer(CALLBACK(src, PROC_REF(cooldown)), cooldown)
+	INVOKE_ASYNC(src, PROC_REF(captureimage), interacting_with, user, picture_size_x - 1, picture_size_y - 1)
+	return ITEM_INTERACT_SUCCESS
 
 /obj/item/camera/ranged_interact_with_atom(atom/interacting_with, mob/living/user, list/modifiers)
 	return interact_with_atom(interacting_with, user, modifiers)
@@ -359,17 +369,6 @@
 		return FALSE
 	if(!(target_turf in get_hear(WORLD_VIEW, user)))
 		return FALSE
-	return TRUE
-
-/// Tries to take a picture of the target.
-/obj/item/camera/proc/try_take_picture(atom/target, mob/user)
-	if(!can_take_picture_of(target, user))
-		return FALSE
-	on = FALSE
-	addtimer(CALLBACK(src, PROC_REF(cooldown)), cooldown)
-	icon_state = state_off
-
-	INVOKE_ASYNC(src, PROC_REF(captureimage), target, user, picture_size_x - 1, picture_size_y - 1)
 	return TRUE
 
 /obj/item/camera/proc/adjust_zoom(mob/user)

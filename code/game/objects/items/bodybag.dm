@@ -27,13 +27,19 @@
 	deploy_bodybag(user, user.loc)
 
 /obj/item/bodybag/interact_with_atom(atom/interacting_with, mob/living/user, list/modifiers)
+	. = ..()
+	if(.)
+		return
+
 	if(!isturf(interacting_with) || interacting_with.density)
 		return NONE
 	var/turf/target_turf = interacting_with
 	for(var/atom/atom_to_check AS in target_turf)
 		if(atom_to_check.density)
-			return
+			return NONE
+
 	deploy_bodybag(user, target_turf)
+	return ITEM_INTERACT_SUCCESS
 
 /obj/item/bodybag/proc/deploy_bodybag(mob/user, atom/location)
 	if(QDELETED(unfoldedbag_instance))

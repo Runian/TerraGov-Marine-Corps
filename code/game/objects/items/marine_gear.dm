@@ -346,11 +346,16 @@
 	to_chat(user, span_notice("After looking at the [src] you can tell your general coordinates.") + span_bold(" LONGITUDE [target_turf.x]. LATITUDE [target_turf.y]."))
 
 /obj/item/compass/interact_with_atom(atom/interacting_with, mob/living/user, list/modifiers)
+	. = ..()
+	if(.)
+		return
+
 	if(user.do_actions)
-		return
+		return NONE
 	if(istype(interacting_with, /obj/machinery/deployable/mortar))
-		return
+		return NONE
 	if(!do_after(user, 1 SECONDS))
-		return
+		return ITEM_INTERACT_BLOCKING
+
 	target_turf = isturf(interacting_with) ? interacting_with : get_turf(interacting_with)
 	to_chat(user, span_notice("Given your current position, target coordinates are:") + span_bold(" LONGITUDE [target_turf.x]. LATITUDE [target_turf.y]."))

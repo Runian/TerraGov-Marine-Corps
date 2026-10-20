@@ -258,29 +258,39 @@
 /obj/item/roller/attack_self(mob/user)
 	deploy_roller(user, user.loc)
 
-/obj/item/roller/afterattack(atom/target, mob/user, proximity)
-	if(!proximity || !isturf(target) || target.density)
-		return
-	var/turf/target_turf = target
-	for(var/atom/atom_to_check AS in target_turf)
-		if(atom_to_check.density)
-			return
-	deploy_roller(user, target_turf)
-
-/obj/item/roller/attackby(obj/item/I, mob/user, params)
+/obj/item/roller/interact_with_atom(atom/interacting_with, mob/living/user, list/modifiers)
 	. = ..()
 	if(.)
 		return
 
-	if(istype(I, /obj/item/roller_holder) && rollertype == /obj/structure/bed/roller)
-		var/obj/item/roller_holder/RH = I
-		if(RH.held)
-			return
+	if(!isturf(interacting_with) || interacting_with.density)
+		return NONE
+	var/turf/target_turf = interacting_with
+	for(var/atom/atom_to_check AS in target_turf)
+		if(atom_to_check.density)
+			return NONE
 
-		to_chat(user, span_notice("You pick up [src]."))
-		forceMove(RH)
-		RH.held = src
+	deploy_roller(user, target_turf)
+	return ITEM_INTERACT_SUCCESS
 
+/obj/item/roller/item_interaction(mob/living/user, obj/item/tool, list/modifiers)
+	. = ..()
+	if(.)
+		return
+
+	if(istype(tool, /obj/item/roller_holder) && rollertype == /obj/structure/bed/roller)
+		var/obj/item/roller_holder/roller_holder = tool
+		if(roller_holder.held)
+			to_chat(user, span_warning("[roller_holder] already has a roller bed loaded!"))
+			return ITEM_INTERACT_BLOCKING
+
+		user.visible_message(
+			span_notice("[user] loads [src]."),
+			span_notice("You load [src] into [roller_holder].")
+		)
+		forceMove(roller_holder)
+		roller_holder.held = src
+		return ITEM_INTERACT_SUCCESS
 
 /obj/item/roller/proc/deploy_roller(mob/user, atom/location)
 	var/obj/structure/bed/roller/R = new rollertype(location)

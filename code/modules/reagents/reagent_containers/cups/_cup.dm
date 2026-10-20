@@ -27,44 +27,59 @@
 		. += span_notice("It is [LOWER_TEXT(english_list(types))].")
 
 /obj/item/reagent_containers/cup/interact_with_atom(atom/interacting_with, mob/living/user, list/modifiers)
+	. = ..()
+	if(.)
+		return
+
 	if(!check_allowed_items(interacting_with, target_self = TRUE))
 		return NONE
 
 	user.changeNext_move(CLICK_CD_RAPID)
+
 	if(ismob(interacting_with))
-		return try_consume(interacting_with, user, gulp_size)
-	if(interacting_with.is_refillable())
-		return try_refill(interacting_with, user, amount_per_transfer_from_this)
-	if(interacting_with.is_drainable())
-		return try_drain(interacting_with, user, amount_per_transfer_from_this)
-
-	return NONE
-
-/obj/item/reagent_containers/cup/interact_with_atom_secondary(atom/interacting_with, mob/living/user, list/modifiers)
-	if(!check_allowed_items(interacting_with, target_self = TRUE))
-		return NONE
-
-	user.changeNext_move(CLICK_CD_RAPID)
-	if(interacting_with.is_drainable())
-		return try_drain(interacting_with, user, amount_per_transfer_from_this)
-	if(user.a_intent == INTENT_HARM)
-		if(try_splash(target, user))
+		if(try_consume(interacting_with, user, gulp_size))
 			return ITEM_INTERACT_SUCCESS
 		return ITEM_INTERACT_BLOCKING
 
-	return NONE
-
-/obj/item/reagent_containers/cup/item_interaction(mob/living/user, obj/item/tool, list/modifiers)
-	if(!istype(tool, /obj/item/reagent_containers/food/snacks/egg))
-		return NONE
-	if(reagents.holder_full())
-		to_chat(user, span_notice("[src] is full."))
+	if(interacting_with.is_refillable())
+		if(try_refill(interacting_with, user, amount_per_transfer_from_this))
+			return ITEM_INTERACT_SUCCESS
 		return ITEM_INTERACT_BLOCKING
 
-	to_chat(user, span_notice("You break [tool] in [src]."))
-	tool.reagents.trans_to(src, tool.reagents.total_volume)
-	qdel(tool)
-	return ITEM_INTERACT_SUCCESS
+	if(interacting_with.is_drainable())
+		if(try_drain(interacting_with, user, amount_per_transfer_from_this))
+			return ITEM_INTERACT_SUCCESS
+		return ITEM_INTERACT_BLOCKING
+
+/obj/item/reagent_containers/cup/interact_with_atom_secondary(atom/interacting_with, mob/living/user, list/modifiers)
+	. = ..()
+	if(.)
+		return
+
+	if(!check_allowed_items(interacting_with, target_self = TRUE))
+		return NONE
+
+	user.changeNext_move(CLICK_CD_RAPID)
+
+	if(user.a_intent == INTENT_HARM)
+		if(try_splash(interacting_with, user))
+			return ITEM_INTERACT_SUCCESS
+		return ITEM_INTERACT_BLOCKING
+
+	if(interacting_with.is_drainable())
+		return try_drain(interacting_with, user, amount_per_transfer_from_this)
+
+/obj/item/reagent_containers/cup/item_interaction(mob/living/user, obj/item/tool, list/modifiers)
+	if(istype(tool, /obj/item/reagent_containers/food/snacks/egg))
+		if(reagents.holder_full())
+			to_chat(user, span_notice("[src] is full."))
+			return ITEM_INTERACT_BLOCKING
+		to_chat(user, span_notice("You break [tool] in [src]."))
+		tool.reagents.trans_to(src, tool.reagents.total_volume)
+		qdel(tool)
+		return ITEM_INTERACT_SUCCESS
+
+	return NONE
 
 /// Callback for [datum/component/takes_reagent_appearance] to inherent style footypes
 /obj/item/reagent_containers/cup/proc/on_cup_change(datum/glass_style/has_foodtype/style)

@@ -14,6 +14,10 @@
 	var/filled = FALSE
 
 /obj/item/reagent_containers/dropper/interact_with_atom(atom/interacting_with, mob/living/user, list/modifiers)
+	. = ..()
+	if(.)
+		return
+
 	if(!interacting_with.reagents)
 		return NONE
 

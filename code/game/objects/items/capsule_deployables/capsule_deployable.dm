@@ -46,10 +46,15 @@
 	return TRUE
 
 /obj/item/deploy_capsule/interact_with_atom(atom/interacting_with, mob/living/user, list/modifiers)
+	. = ..()
+	if(.)
+		return
+
 	if(!primed || user.next_move > world.time)
 		return NONE
 	if(!user.throw_item(interacting_with))
 		return NONE
+
 	user.changeNext_move(CLICK_CD_THROWING)
 	return ITEM_INTERACT_SUCCESS
 
