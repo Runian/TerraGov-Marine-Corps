@@ -143,7 +143,7 @@
 		if(held_item)
 			held_item.melee_attack_chain(src, clicked_atom, modifiers)
 		else
-			UnarmedAttack(clicked_atom, TRUE, modifiers) // TODO: Proximity was set to FALSE. Why? I don't know.
+			UnarmedAttack(clicked_atom, TRUE, modifiers)
 		return
 
 	// Can't reach anything else in lockers or other weirdness.
@@ -162,7 +162,7 @@
 	if(held_item)
 		clicked_atom.base_ranged_item_interaction(src, held_item, modifiers)
 	else
-		RangedAttack(clicked_atom, modifiers)
+		RangedAttack(clicked_atom, params) // TODO: This should be converted to modifiers.
 
 /**
  * A backwards depth-limited breadth-first-search to see if the target is

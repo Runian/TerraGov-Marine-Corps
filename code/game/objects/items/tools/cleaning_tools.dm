@@ -13,37 +13,30 @@
 	throw_range = 10
 	w_class = WEIGHT_CLASS_NORMAL
 	attack_verb = list("mops", "bashes", "bludgeons", "whacks")
-	var/mopping = 0
-	var/mopcount = 0
-
 
 /obj/item/tool/mop/Initialize(mapload)
 	. = ..()
 	create_reagents(5)
 
-/turf/proc/clean(atom/source)
-	if(source.reagents.has_reagent(/datum/reagent/water, 1))
-		wash()
-		for(var/obj/effect/O in src)
-			if(istype(O, /obj/effect/decal/cleanable/rune) || istype(O,/obj/effect/decal/cleanable) || istype(O,/obj/effect/overlay))
-				qdel(O)
-	source.reagents.reaction(src, TOUCH, 10)	//10 is the multiplier for the reaction effect. probably needed to wet the floor properly.
-	source.reagents.remove_any(1)				//reaction() doesn't use up the reagents
+/obj/item/tool/mop/interact_with_atom(atom/interacting_with, mob/living/user, list/modifiers)
+	if(reagents.total_volume < 1)
+		balloon_alert(user, "mop is dry!")
+		return ITEM_INTERACT_BLOCKING
 
+	var/turf/turf_to_clean = get_turf(interacting_with)
+	user.visible_message(
+		span_notice("[user] begins to clean \the [turf_to_clean]."),
+		span_notice("You begin to clean \the [turf_to_clean].")
+	)
+	if(!do_after(user, 4 SECONDS, NONE, turf_to_clean, BUSY_ICON_GENERIC))
+		return ITEM_INTERACT_BLOCKING
+	balloon_alert(user, "finished")
 
-/obj/item/tool/mop/afterattack(atom/A, mob/user, list/modifiers)
-	if(istype(A, /turf) || istype(A, /obj/effect/decal/cleanable) || istype(A, /obj/effect/overlay) || istype(A, /obj/effect/decal/cleanable/rune))
-		if(reagents.total_volume < 1)
-			balloon_alert(user, "mop is dry!")
-			return
-
-		var/turf/T = get_turf(A)
-		user.visible_message(span_warning("[user] begins to clean \the [T]."))
-
-		if(do_after(user, 40, NONE, T, BUSY_ICON_GENERIC))
-			T.clean(src)
-			balloon_alert(user, "finished")
-
+	if(reagents.has_reagent(/datum/reagent/water, 1))
+		turf_to_clean.wash()
+	reagents.reaction(turf_to_clean, TOUCH, 10) // 10 is the multiplier for the reaction effect. Probably needed to wet the floor properly.
+	reagents.remove_any(1) // reaction() doesn't use up the reagents.
+	return ITEM_INTERACT_SUCCESS
 
 /obj/item/tool/wet_sign
 	name = "wet floor sign"
@@ -75,7 +68,6 @@
 	attack_verb = list("warns", "cautions", "smashes")
 	soft_armor = list(MELEE = 30, BULLET = 30, LASER = 30, ENERGY = 30, BOMB = 15, BIO = 10, FIRE = 20, ACID = 20)
 
-
 /obj/item/tool/soap
 	name = "soap"
 	desc = "A cheap bar of soap. Doesn't smell."
@@ -90,27 +82,26 @@
 	. = ..()
 	AddComponent(/datum/component/slippery, 0.3 SECONDS, 0.2 SECONDS)
 
-
-/obj/item/tool/soap/afterattack(atom/target, mob/user as mob, list/modifiers)
-	//I couldn't feasibly  fix the overlay bugs caused by cleaning items we are wearing.
-	//So this is a workaround. This also makes more sense from an IC standpoint. ~Carn
-	if(user.client && (target in user.client.screen))
-		balloon_alert(user, "take that off first!")
-	else if(isturf(target))
+/obj/item/tool/soap/interact_with_atom(atom/interacting_with, mob/living/user, list/modifiers)
+	if(isturf(interacting_with))
 		balloon_alert(user, "scrubbed")
-		var/turf/target_turf = target
-		target_turf.wash()
-	else if(istype(target,/obj/effect/decal/cleanable))
-		balloon_alert(user, "scrubbed")
-		qdel(target)
-	else
-		balloon_alert(user, "cleaned")
-		target.wash()
-
-/obj/item/tool/soap/attack_mob(mob/target, mob/user)
-	if(target && user && ishuman(target) && ishuman(user) && !target.stat && !user.stat && user.zone_selected == "mouth" )
-		balloon_alert_to_viewers("washes mouth out with soap")
-		return
+		var/turf/interacting_turf = interacting_with
+		interacting_turf.wash()
+		return ITEM_INTERACT_SUCCESS
+	if(istype(interacting_with, /obj/effect/decal/cleanable))
+		balloon_alert(user, "scrubbed!")
+		qdel(interacting_with)
+		return ITEM_INTERACT_SUCCESS
+	if(ishuman(interacting_with) && user.zone_selected == BODY_ZONE_PRECISE_MOUTH)
+		var/mob/living/carbon/human/interacting_human = interacting_with
+		if(!(interacting_human.head?.inventory_flags & COVERMOUTH) && !(interacting_human.wear_mask?.inventory_flags & COVERMOUTH))
+			balloon_alert_to_viewers("washes mouth out with soap!")
+			return ITEM_INTERACT_SUCCESS
+		balloon_alert(user, "mouth covered!")
+		return ITEM_INTERACT_BLOCKING
+	balloon_alert(user, "cleaned!")
+	interacting_with.wash()
+	return ITEM_INTERACT_SUCCESS
 
 /obj/item/tool/soap/nanotrasen
 	desc = "A Nanotrasen brand bar of soap. Smells of phoron."

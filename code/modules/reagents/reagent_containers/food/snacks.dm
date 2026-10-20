@@ -819,30 +819,33 @@
 	icon_state = "monkeycube"
 	bitesize = 12
 	filling_color = "#ADAC7F"
-	var/monkey_type = /mob/living/carbon/human/species/monkey
 	list_reagents = list(/datum/reagent/consumable/nutriment = 10)
 	tastes = list("the jungle" = 1, "bananas" = 1)
+	/// The mob typepath to create.
+	var/monkey_type = /mob/living/carbon/human/species/monkey
 
 /obj/item/reagent_containers/food/snacks/monkeycube/examine(mob/user)
 	. = ..()
 	if(package)
 		. += "It is wrapped in waterproof cellophane. Maybe using it in your hand would tear it off?"
 
-/obj/item/reagent_containers/food/snacks/monkeycube/afterattack(obj/O, mob/user, proximity)
-	if(!proximity)
-		return
-	if(istype(O,/obj/structure/sink) && !package)
-		to_chat(user, "You place \the [name] under a stream of water...")
-		user.drop_held_item()
-		return Expand()
-	return ..()
-
 /obj/item/reagent_containers/food/snacks/monkeycube/attack_self(mob/user)
 	if(!package)
-		return
+		return FALSE
 	icon_state = "monkeycube"
 	balloon_alert_to_viewers("unwraps [src]")
 	package = FALSE
+	return TRUE
+
+/obj/item/reagent_containers/food/snacks/monkeycube/interact_with_atom(atom/interacting_with, mob/living/user, list/modifiers)
+	if(package || !istype(interacting_with, /obj/structure/sink))
+		return NONE
+	if(!user.drop_held_item())
+		to_chat(user, span_warning("The [src] is stuck to your hand!"))
+		return ITEM_INTERACT_BLOCKING
+	to_chat(user, "You place \the [name] under a stream of water...")
+	Expand()
+	return ITEM_INTERACT_SUCCESS
 
 /obj/item/reagent_containers/food/snacks/monkeycube/On_Consume(mob/consumer)
 	to_chat(consumer, span_warning("Something inside of you suddently expands!</span>"))

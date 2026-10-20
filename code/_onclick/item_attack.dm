@@ -8,16 +8,16 @@
  * Use pre_attack to cancel attacks early based on conditions ("You can't attack with this unless you're a pacifist!")
  *
  * After pre-attack, we go into [atom/proc/attackby] which is where individual atoms handle what happens when being hit.
- * Mobs (/mob/living) -> [obj/item/proc/attack].
+ * Mobs (/mob) -> [obj/item/proc/attack_mob].
  * Turfs (/turf) -> [obj/item/proc/attack_turf].
  * Objects (/obj) -> [obj/item/proc/attack_obj].
  *
- * You GENERALLY should never override [obj/item/proc/attack]; use NOBLUDGEON to ensure parent can be called with no issue if overridden.
+ * You GENERALLY should never override [obj/item/proc/attack_mob].
  * All on-attack effects should dealt with in [obj/item/proc/afterattack] which should handle any on-attack effects or special item.
  * e.g. stuff like "my stick stuns when it hits people".
  *
  * Regardless, we go BACK to the atom to call [atom/proc/attacked_by], which is where the damage is actually applied.
- * Finally we call [obj/item/proc/afterattack] after damage is dealt, to handle special item interacts after an attack occurs.
+ * Finally we call [obj/item/proc/afterattack] after damage is dealt and/or to handle special item interactions after an attack occurs.
  * Use afterattack for stuff like "My stick stuns when it hits people".
  *
  * Arguments
@@ -47,7 +47,7 @@
 			if(SECONDARY_ATTACK_CANCEL_ATTACK_CHAIN)
 				return TRUE
 			if(SECONDARY_ATTACK_CONTINUE_CHAIN)
-				EMPTY_BLOCK_GUARD // Normal behavior
+				EMPTY_BLOCK_GUARD // Normal behavior.
 			else
 				CRASH("pre_attack_secondary must return an SECONDARY_ATTACK_* define, please consult code/__DEFINES/combat.dm")
 	if(pre_attack_result)
