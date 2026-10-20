@@ -124,7 +124,7 @@
 			continue
 		. += "; [next_reagent.name]([next_reagent.volume]u)"
 
-/// Returns true if this object currently contains at least its starting reagents, false otherwise. Extra reagents are ignored.
+/// Returns TRUE if this object currently contains at least its starting reagents, false otherwise. Extra reagents are ignored.
 /obj/item/reagent_containers/proc/has_initial_reagents()
 	for(var/reagent_to_check in list_reagents)
 		if(reagents.get_reagent_amount(reagent_to_check) != list_reagents[reagent_to_check])
@@ -139,12 +139,6 @@
 /*
  * Reagent containers are not necessarily things that you can refill, pour, drink, etc.
  * Because of this, these procs below are here to reduce copy and paste & maintain consistency across everything.
- *
- * These subtypes use them:
- * /obj/item/reagent_containers/cup
- * /obj/item/reagent_containers/glass
- * /obj/item/reagent_containers/cup/glass
- * /obj/item/reagent_containers/food/drinks
 */
 
 /// Can the target drink at all from us?

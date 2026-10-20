@@ -4,7 +4,7 @@
 	icon_state = "autoinjector"
 	worn_icon_state = "hypo"
 	w_class = WEIGHT_CLASS_TINY
-	skill_lock = 0
+	skill_lock = FALSE
 	reagent_flags = DRAWABLE
 	amount_per_transfer_from_this = 10
 	volume = 30
