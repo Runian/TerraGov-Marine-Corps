@@ -12,7 +12,7 @@
 
 
 /**
- * Called when a human attacks us with an empty hand via LEFT CLICK.
+ * When a human attacks us with an empty hand via LEFT CLICK.
  *
  * Arguments:
  * * mob/living/carbon/human/user - The human that touched us.
@@ -59,7 +59,7 @@
 		return TRUE
 
 /**
- * Called when a human attacks us with an empty hand via RIGHT CLICK.
+ * When a human attacks us with an empty hand via RIGHT CLICK.
  *
  * Arguments:
  * * mob/living/carbon/human/user - The human that touched us.

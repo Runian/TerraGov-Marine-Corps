@@ -116,7 +116,7 @@
 	victim.do_resist_grab()
 
 
-/obj/item/grab/attack(mob/living/attacked, mob/living/user, def_zone)
+/obj/item/grab/attack_mob(mob/living/attacked, mob/living/user, def_zone)
 	if(attacked == user && CHECK_BITFIELD(SEND_SIGNAL(user, COMSIG_GRAB_SELF_ATTACK), COMSIG_GRAB_SUCCESSFUL_SELF_ATTACK))
 		return TRUE
 	if(user.grab_state > GRAB_KILL)

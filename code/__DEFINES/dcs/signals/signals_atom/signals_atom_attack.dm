@@ -34,20 +34,24 @@
 /// Sent from [/obj/item/proc/melee_attack_chain()] to the atom: (/obj/item/weapon, /mob/user, list/modifiers)
 #define COMSIG_ATOM_AFTER_ATTACKEDBY "atom_after_attackby"
 
-/// Sent from [/obj/item/proc/attack()] to the item: (/mob/living/target_mob, /mob/user, list/modifiers)
+/// Sent from [/obj/item/proc/attack_mob()] to the item: (/mob/living/target_mob, /mob/user, list/modifiers)
 #define COMSIG_ITEM_ATTACK "item_attack"
 /// Sent from [/obj/item/proc/attack_secondary()] to the item: (/mob/living/target_mob, /mob/user, list/modifiers)
 #define COMSIG_ITEM_ATTACK_SECONDARY "item_attack_secondary"
 /// Sent from [/obj/item/proc/attack_atom()] to the item: (/atom/target_atom, /mob/user, list/modifiers)
 #define COMSIG_ITEM_ATTACK_ATOM "item_attack_atom"
+/// Sent from [/obj/item/proc/melee_attack_chain()] to the item: (/atom/target_atom, /mob/user, list/modifiers)
+#define COMSIG_ITEM_AFTERATTACK "item_afterattack"
 
-/// Sent from [/obj/item/proc/attack()] to the user: (/atom/target_atom, /obj/item/weapon, list/modifiers)
+/// Sent from [/obj/item/proc/attack_mob()] to the user: (/atom/target_atom, /obj/item/weapon, list/modifiers)
 #define COMSIG_MOB_ITEM_ATTACK "mob_item_attack"
-/// Sent from [/obj/item/proc/attack_atom()] to the user: (/atom/target_atom, /obj/item/weapon, list/modifiers)
-#define COMSIG_LIVING_ATTACK_ATOM "living_attack_atom"
+/// Sent from [/obj/item/proc/attack_atom()] to the user: (/obj/target_obj, /obj/item/weapon, list/modifiers)
+#define COMSIG_LIVING_ATTACK_OBJ "living_attack_atom"
 
 /// Sent from [/obj/item/proc/attack_turf()] to the item: (/turf/target_turf, /obj/item/weapon, list/modifiers)
 #define COMSIG_ITEM_ATTACK_TURF "item_attack_turf"
+/// Sent from [/obj/item/proc/attack_turf()] to the item: (/obj/target_obj, /obj/item/weapon, list/modifiers)
+#define COMSIG_ITEM_ATTACK_OBJ "item_attack_obj"
 
 /// Sent from [/atom/proc/attack_hand()] to the atom: (/mob/living/carbon/human/user)
 #define COMSIG_ATOM_ATTACK_HAND "atom_attack_hand"

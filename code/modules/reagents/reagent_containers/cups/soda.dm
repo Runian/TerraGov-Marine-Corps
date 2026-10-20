@@ -25,7 +25,7 @@
 	new T(loc)
 	return INITIALIZE_HINT_QDEL
 
-/obj/item/reagent_containers/cup/soda_cans/attack(mob/target_mob, mob/living/user)
+/obj/item/reagent_containers/cup/soda_cans/attack_mob(mob/target_mob, mob/living/user)
 	if(iscarbon(target_mob) && !reagents.total_volume && (user.a_intent == INTENT_HARM) && user.zone_selected == BODY_ZONE_HEAD)
 		if(target_mob == user)
 			user.visible_message(span_warning("[user] crushes the can of [src] on [user.p_their()] forehead!"), span_notice("You crush the can of [src] on your forehead."))

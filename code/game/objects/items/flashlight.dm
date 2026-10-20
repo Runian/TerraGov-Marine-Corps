@@ -86,7 +86,7 @@
 		qdel(src) //Delete da old flashlight
 
 
-/obj/item/flashlight/attack(mob/living/M, mob/living/user)
+/obj/item/flashlight/attack_mob(mob/living/M, mob/living/user)
 	if(light_on && user.zone_selected == BODY_ZONE_PRECISE_EYES)
 
 		if((user.getBrainLoss() >= 60) && prob(50))	//too dumb to use flashlight properly

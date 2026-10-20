@@ -174,7 +174,7 @@ GLOBAL_LIST_EMPTY(alive_hugger_list)
 			go_idle()
 	return FALSE // Else you can't pick.
 
-/obj/item/clothing/mask/facehugger/attack(mob/M, mob/user)
+/obj/item/clothing/mask/facehugger/attack_mob(mob/M, mob/user)
 	if(stat != CONSCIOUS)
 		return ..()
 	if(!M.can_be_facehugged(src, provoked = TRUE))

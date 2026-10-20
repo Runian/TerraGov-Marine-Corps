@@ -106,7 +106,7 @@
 		to_chat(user, span_notice("You carve out the pages from [title]! You didn't want to read it anyway."))
 		carved = TRUE
 
-/obj/item/book/attack(mob/living/carbon/M as mob, mob/living/carbon/user as mob)
+/obj/item/book/attack_mob(mob/living/carbon/M as mob, mob/living/carbon/user as mob)
 	if(user.zone_selected == "eyes")
 		user.visible_message(span_notice("You open up the book and show it to [M]."), \
 			span_notice("[user] opens up a book and shows it to [M]."))

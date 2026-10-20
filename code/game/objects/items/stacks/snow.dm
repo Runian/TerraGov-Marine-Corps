@@ -55,9 +55,7 @@
 	use(transf_amt)
 	return TRUE
 
-/obj/item/stack/snow/afterattack(atom/target, mob/user, proximity)
-	if(!proximity)
-		return
+/obj/item/stack/snow/afterattack(atom/target, mob/user, list/modifiers)
 	if(isopenturf(target))
 		if(user.do_actions)
 			return

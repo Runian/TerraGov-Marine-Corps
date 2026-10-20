@@ -48,7 +48,7 @@
 		return
 	. += loaded
 
-/obj/item/tool/kitchen/utensil/attack(mob/living/carbon/M as mob, mob/living/carbon/user as mob)
+/obj/item/tool/kitchen/utensil/attack_mob(mob/living/carbon/M as mob, mob/living/carbon/user as mob)
 	if(!istype(M))
 		return ..()
 
@@ -115,7 +115,7 @@
 							span_danger("[user] is slitting [user.p_their()] stomach open with the [name]! It looks like [user.p_theyre()] trying to commit seppuku.")))
 	return (BRUTELOSS)
 
-/obj/item/tool/kitchen/utensil/knife/attack(target as mob, mob/living/user as mob)
+/obj/item/tool/kitchen/utensil/knife/attack_mob(target as mob, mob/living/user as mob)
 	playsound(loc, 'sound/weapons/bladeslice.ogg', 25, 1, 5)
 	return ..()
 

@@ -242,7 +242,7 @@
 		set_light_on(TRUE)
 
 
-/obj/item/tool/pickaxe/plasmacutter/attack(mob/living/M, mob/living/user)
+/obj/item/tool/pickaxe/plasmacutter/attack_mob(mob/living/M, mob/living/user)
 	if(!powered)
 		fizzle_message(user)
 	else

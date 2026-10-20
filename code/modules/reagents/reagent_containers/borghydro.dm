@@ -39,7 +39,7 @@
 
 	return 1
 
-/obj/item/reagent_containers/borghypo/attack(mob/living/M as mob, mob/user as mob)
+/obj/item/reagent_containers/borghypo/attack_mob(mob/living/M as mob, mob/user as mob)
 	if(!istype(M))
 		return
 

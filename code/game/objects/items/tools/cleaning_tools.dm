@@ -31,8 +31,7 @@
 	source.reagents.remove_any(1)				//reaction() doesn't use up the reagents
 
 
-/obj/item/tool/mop/afterattack(atom/A, mob/user, proximity)
-	if(!proximity) return
+/obj/item/tool/mop/afterattack(atom/A, mob/user, list/modifiers)
 	if(istype(A, /turf) || istype(A, /obj/effect/decal/cleanable) || istype(A, /obj/effect/overlay) || istype(A, /obj/effect/decal/cleanable/rune))
 		if(reagents.total_volume < 1)
 			balloon_alert(user, "mop is dry!")
@@ -92,9 +91,7 @@
 	AddComponent(/datum/component/slippery, 0.3 SECONDS, 0.2 SECONDS)
 
 
-/obj/item/tool/soap/afterattack(atom/target, mob/user as mob, proximity)
-	if(!proximity)
-		return
+/obj/item/tool/soap/afterattack(atom/target, mob/user as mob, list/modifiers)
 	//I couldn't feasibly  fix the overlay bugs caused by cleaning items we are wearing.
 	//So this is a workaround. This also makes more sense from an IC standpoint. ~Carn
 	if(user.client && (target in user.client.screen))
@@ -110,7 +107,7 @@
 		balloon_alert(user, "cleaned")
 		target.wash()
 
-/obj/item/tool/soap/attack(mob/target, mob/user)
+/obj/item/tool/soap/attack_mob(mob/target, mob/user)
 	if(target && user && ishuman(target) && ishuman(user) && !target.stat && !user.stat && user.zone_selected == "mouth" )
 		balloon_alert_to_viewers("washes mouth out with soap")
 		return

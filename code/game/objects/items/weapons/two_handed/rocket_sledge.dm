@@ -88,7 +88,7 @@
 	balloon_alert(user, "mode: KNOCKBACK")
 	playsound(loc, 'sound/machines/switch.ogg', 25, FALSE, MEDIUM_SOUND_RANGE)
 
-/obj/item/weapon/twohanded/rocketsledge/attack(mob/living/carbon/M, mob/living/carbon/user as mob)
+/obj/item/weapon/twohanded/rocketsledge/attack_mob(mob/living/carbon/M, mob/living/carbon/user as mob)
 	if(!CHECK_BITFIELD(item_flags, WIELDED))
 		to_chat(user, span_warning("You need a more secure grip to use [src]!"))
 		return

@@ -35,7 +35,7 @@
 	QDEL_NULL(scanner)
 	return ..()
 
-/obj/item/healthanalyzer/attack(mob/living/carbon/patient_candidate, mob/living/user)
+/obj/item/healthanalyzer/attack_mob(mob/living/carbon/patient_candidate, mob/living/user)
 	. = ..()
 	scanner.analyze_vitals(patient_candidate, user)
 

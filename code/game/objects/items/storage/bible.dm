@@ -31,8 +31,8 @@
 	new /obj/item/spacecash(src)
 	new /obj/item/spacecash(src)
 
-/obj/item/storage/bible/afterattack(atom/A, mob/user, proximity)
-	if(!proximity || !isliving(user))
+/obj/item/storage/bible/afterattack(atom/A, mob/user, list/modifiers)
+	if(!isliving(user))
 		return
 	var/mob/living/living_user = user
 	if(ischaplainjob(living_user.job))

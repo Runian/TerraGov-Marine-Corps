@@ -34,7 +34,7 @@
 	found_turf.add_fingerprint(user, "pour_fuel", "doused with fuel from [src]")
 	return ITEM_INTERACT_SUCCESS
 
-/obj/item/reagent_containers/jerrycan/attack(mob/living/target_mob, mob/living/user, list/modifiers)
+/obj/item/reagent_containers/jerrycan/attack_mob(mob/living/target_mob, mob/living/user, list/modifiers)
 	. = ..()
 	if(!.)
 		return FALSE

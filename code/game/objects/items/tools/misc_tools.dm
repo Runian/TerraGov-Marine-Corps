@@ -108,7 +108,7 @@
 	colour = "white"
 
 
-/obj/item/tool/pen/attack(mob/M as mob, mob/user as mob)
+/obj/item/tool/pen/attack_mob(mob/M as mob, mob/user as mob)
 	if(!ismob(M))
 		return
 	to_chat(user, span_warning("You stab [M] with the pen."))
@@ -129,7 +129,7 @@
 	create_reagents(30, OPENCONTAINER, list(/datum/reagent/toxin/chloralhydrate = 22))
 
 
-/obj/item/tool/pen/sleepypen/attack(mob/M as mob, mob/user as mob)
+/obj/item/tool/pen/sleepypen/attack_mob(mob/M as mob, mob/user as mob)
 	if(!(istype(M,/mob)))
 		return
 	. = ..()
@@ -146,7 +146,7 @@
 	equip_slot_flags = ITEM_SLOT_BELT
 
 
-/obj/item/tool/pen/paralysis/attack(mob/living/M as mob, mob/user as mob)
+/obj/item/tool/pen/paralysis/attack_mob(mob/living/M as mob, mob/user as mob)
 	if(!(istype(M,/mob)))
 		return
 	..()

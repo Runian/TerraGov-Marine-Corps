@@ -45,12 +45,13 @@
 	addtimer(CALLBACK(src, PROC_REF(expand), user), 5 SECONDS)
 	return TRUE
 
-/obj/item/deploy_capsule/afterattack(atom/target, mob/user, has_proximity, click_parameters)
-	. = ..()
+/obj/item/deploy_capsule/interact_with_atom(atom/interacting_with, mob/living/user, list/modifiers)
 	if(!primed || user.next_move > world.time)
-		return
-	if(user.throw_item(target))
-		user.changeNext_move(CLICK_CD_THROWING)
+		return NONE
+	if(!user.throw_item(interacting_with))
+		return NONE
+	user.changeNext_move(CLICK_CD_THROWING)
+	return ITEM_INTERACT_SUCCESS
 
 ///Gets the correct template for this capsule
 /obj/item/deploy_capsule/proc/get_template()

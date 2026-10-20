@@ -10,7 +10,7 @@
 	equip_slot_flags = ITEM_SLOT_BELT
 	force = 10
 
-/obj/item/weapon/classic_baton/attack(mob/living/M, mob/living/user)
+/obj/item/weapon/classic_baton/attack_mob(mob/living/M, mob/living/user)
 	. = ..()
 	if(!.)
 		return
@@ -73,7 +73,7 @@
 
 		overlays += blood_overlay
 
-/obj/item/weapon/telebaton/attack(mob/target as mob, mob/living/user as mob)
+/obj/item/weapon/telebaton/attack_mob(mob/target as mob, mob/living/user as mob)
 	if(on)
 		if(..())
 			//playsound(loc, SFX_SWING_HIT, 25, 1, 6)

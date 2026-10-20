@@ -14,7 +14,7 @@
 	item_flags = NOBLUDGEON
 	equip_slot_flags = ITEM_SLOT_BELT
 
-/obj/item/detective_scanner/attack(mob/living/carbon/human/M as mob, mob/user as mob)
+/obj/item/detective_scanner/attack_mob(mob/living/carbon/human/M as mob, mob/user as mob)
 	to_chat(user, span_warning("This device is non-functional."))
 
 /obj/item/detective_scanner/afterattack(atom/A as obj|turf, mob/user, proximity)

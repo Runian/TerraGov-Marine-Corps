@@ -41,7 +41,7 @@
 	..()
 	deploy(user)
 
-/obj/item/stool/attack(mob/M as mob, mob/user as mob)
+/obj/item/stool/attack_mob(mob/M as mob, mob/user as mob)
 	if (prob(25) && istype(M,/mob/living))
 		user.visible_message(span_warning("[user] breaks [src] over [M]'s back!"))
 		user.temporarilyRemoveItemFromInventory(src)

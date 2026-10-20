@@ -181,7 +181,7 @@
 		return FALSE
 	return ..()
 
-/obj/item/reagent_containers/cup/glass/waterbottle/attack(mob/target, mob/living/user, def_zone)
+/obj/item/reagent_containers/cup/glass/waterbottle/attack_mob(mob/target, mob/living/user, def_zone)
 	if(!target)
 		return
 

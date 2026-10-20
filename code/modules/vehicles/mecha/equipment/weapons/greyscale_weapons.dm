@@ -555,7 +555,7 @@
 	chassis.throw_at(target, laser_dash_range, 1)
 	return ..()
 
-/obj/item/mecha_parts/mecha_equipment/laser_sword/attack(mob/living/M, mob/living/user)
+/obj/item/mecha_parts/mecha_equipment/laser_sword/attack_mob(mob/living/M, mob/living/user)
 	var/user_target_zone = user.zone_selected //stops 1 hit delimbs
 	user.zone_selected = BODY_ZONE_CHEST
 	. = ..()

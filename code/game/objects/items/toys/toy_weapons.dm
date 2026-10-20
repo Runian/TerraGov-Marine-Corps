@@ -149,7 +149,7 @@
 		visible_message(span_warning("[user] realized they were out of ammo and starting scrounging for some!"))
 
 
-/obj/item/toy/crossbow/attack(mob/M as mob, mob/user as mob)
+/obj/item/toy/crossbow/attack_mob(mob/M as mob, mob/user as mob)
 
 // ******* Check
 

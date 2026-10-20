@@ -261,7 +261,7 @@
 
 	qdel(src)
 
-/obj/item/reagent_containers/food/drinks/bottle/attack(mob/living/target as mob, mob/living/user as mob)
+/obj/item/reagent_containers/food/drinks/bottle/attack_mob(mob/living/target as mob, mob/living/user as mob)
 
 	if(!target)
 		return

@@ -18,7 +18,7 @@
 /obj/item/reagent_containers/food/condiment/attack_self(mob/user)
 	return
 
-/obj/item/reagent_containers/food/condiment/attack(mob/M, mob/user, def_zone)
+/obj/item/reagent_containers/food/condiment/attack_mob(mob/M, mob/user, def_zone)
 	var/datum/reagents/R = reagents
 
 	if(!R || !R.total_volume)

@@ -257,76 +257,78 @@
 	popup.set_content(dat)
 	popup.open()
 
-
-/obj/item/detpack/afterattack(atom/target, mob/user, flag)
-	if(!flag)
-		return FALSE
-	if(issignaler(target))
-		var/obj/item/assembly/signaler/signaler = target
+/obj/item/detpack/interact_with_atom(atom/interacting_with, mob/living/user, list/modifiers)
+	if(issignaler(interacting_with))
+		var/obj/item/assembly/signaler/signaler = interacting_with
 		code = signaler.code
 		set_frequency(signaler.frequency)
 		to_chat(user, "You transfer the frequency and code of [signaler] to [src].")
-		return
-	if(istype(target, /obj/item) || istype(target, /mob))
-		return FALSE
-	if(target.resistance_flags & INDESTRUCTIBLE)
-		return FALSE
-	if(istype(target, /obj/vehicle/unmanned))
-		var/obj/vehicle/unmanned/unmanned_target = target
-		if(!unmanned_target.allow_explosives)
-			to_chat(user, "[span_warning("[src] doesnt fit on [unmanned_target]")]!")
-			return FALSE
-	if(istype(target, /obj/structure/window))
-		var/obj/structure/window/W = target
-		if(!(W.resistance_flags & INDESTRUCTIBLE))
-			to_chat(user, "[span_warning("[W] is much too tough for you to do anything to it with [src]")].")
-			return FALSE
-	if((locate(/obj/item/detpack) in target) || (locate(/obj/item/explosive/plastique) in target)) //This needs a refactor.
-		to_chat(user, "[span_warning("There is already a device attached to [target]")].")
-		return FALSE
+		return ITEM_INTERACT_SUCCESS
+
+	if(istype(interacting_with, /obj/item) || istype(interacting_with, /mob))
+		return NONE
+	if(interacting_with.resistance_flags & INDESTRUCTIBLE)
+		return NONE
+
+
+	if(istype(interacting_with, /obj/vehicle/unmanned))
+		var/obj/vehicle/unmanned/interacting_vehicle = interacting_with
+		if(!interacting_vehicle.allow_explosives)
+			to_chat(user, "[span_warning("[src] doesnt fit on [interacting_vehicle]")]!")
+			return ITEM_INTERACT_BLOCKING
+
+	// TODO: This needs to be refactored.
+	if((locate(/obj/item/detpack) in interacting_with) || (locate(/obj/item/explosive/plastique) in interacting_with))
+		to_chat(user, "[span_warning("There is already a device attached to [interacting_with]")].")
+		return ITEM_INTERACT_BLOCKING
 
 	if(user.skills.getRating(SKILL_ENGINEER) < SKILL_ENGINEER_METAL)
 		user.visible_message(span_notice("[user] fumbles around figuring out how to use [src]."),
 		span_notice("You fumble around figuring out how to use [src]."))
-		if(!do_after(user, 5 SECONDS, NONE, target, BUSY_ICON_UNSKILLED))
-			return
+		if(!do_after(user, 5 SECONDS, NONE, interacting_with, BUSY_ICON_UNSKILLED))
+			return ITEM_INTERACT_BLOCKING
 
-	user.visible_message(span_warning("[user] is trying to plant [name] on [target]!"),
-	span_warning("You are trying to plant [name] on [target]!"))
+	user.visible_message(
+		span_warning("[user] is trying to plant [name] on [interacting_with]!"),
+		span_warning("You are trying to plant [name] on [interacting_with]!")
+	)
 
-	if(do_after(user, 3 SECONDS, NONE, target, BUSY_ICON_HOSTILE))
-		if((locate(/obj/item/detpack) in target) || (locate(/obj/item/explosive/plastique) in target)) //This needs a refactor.
-			to_chat(user, "[span_warning("There is already a device attached to [target]")].")
-			return
-		user.drop_held_item()
-		playsound(src.loc, 'sound/weapons/mine_armed.ogg', 25, TRUE, SHORT_SOUND_RANGE)
-		var/location
-		location = target
-		forceMove(location)
-		setAnchored(TRUE)
-		boom_direction = get_dir(user, location)
+	if(!do_after(user, 3 SECONDS, NONE, interacting_with, BUSY_ICON_HOSTILE))
+		return ITEM_INTERACT_BLOCKING
 
-		log_game("[key_name(user)] planted [src.name] on [target.name] at [AREACOORD(target.loc)] with [timer] second fuse.")
-		message_admins("[ADMIN_TPMONTY(user)] planted [src.name] on [target.name] at [ADMIN_VERBOSEJMP(target.loc)] with [timer] second fuse.")
+	// TODO: This needs to be refactored.
+	if((locate(/obj/item/detpack) in interacting_with) || (locate(/obj/item/explosive/plastique) in interacting_with))
+		to_chat(user, "[span_warning("There is already a device attached to [interacting_with]")].")
+		return
 
-		notify_ghosts("<b>[user]</b> has planted \a <b>[name]</b> on <b>[target.name]</b> with a <b>[timer]</b> second fuse!", source = user, action = NOTIFY_ORBIT)
+	user.drop_held_item()
+	playsound(loc, 'sound/weapons/mine_armed.ogg', 25, TRUE, SHORT_SOUND_RANGE)
 
-		target.balloon_alert_to_viewers("[timer] seconds", vision_distance = COMBAT_MESSAGE_RANGE)
+	forceMove(interacting_with)
+	setAnchored(TRUE)
+	boom_direction = get_dir(user, interacting_with)
 
-		plant_target = target
-		if(ismovable(plant_target))
-			var/atom/movable/movable = plant_target
-			movable.vis_contents += src
-			layer = ABOVE_ALL_MOB_LAYER
-			//We use w and z due to sidemap, but need to take into account x/y and w/z pixel shifts, to get a roughly reliable center point
-			pixel_w = -(movable.pixel_x + movable.pixel_w)
-			pixel_z = -(movable.pixel_y + movable.pixel_z)
-			if(movable.drag_delay < 3) //Anything with a fast drag delay we need to modify to avoid kamikazi tactics
-				target_drag_delay = movable.drag_delay
-				movable.drag_delay = 3
-		if(radio_connection == null)
-			set_frequency(frequency)
-		update_icon()
+	var/turf/current_turf = get_turf(interacting_with)
+	log_game("[key_name(user)] planted [name] on [interacting_with.name] at [AREACOORD(current_turf)] with [timer] second fuse.")
+	message_admins("[ADMIN_TPMONTY(user)] planted [name] on [interacting_with.name] at [ADMIN_VERBOSEJMP(current_turf)] with [timer] second fuse.")
+	notify_ghosts("<b>[user]</b> has planted \a <b>[name]</b> on <b>[interacting_with.name]</b> with a <b>[timer]</b> second fuse!", source = user, action = NOTIFY_ORBIT)
+
+	interacting_with.balloon_alert_to_viewers("[timer] seconds", vision_distance = COMBAT_MESSAGE_RANGE)
+
+	plant_target = interacting_with
+	if(ismovable(plant_target))
+		var/atom/movable/movable = plant_target
+		movable.vis_contents += src
+		layer = ABOVE_ALL_MOB_LAYER
+		//We use w and z due to sidemap, but need to take into account x/y and w/z pixel shifts, to get a roughly reliable center point
+		pixel_w = -(movable.pixel_x + movable.pixel_w)
+		pixel_z = -(movable.pixel_y + movable.pixel_z)
+		if(movable.drag_delay < 3) //Anything with a fast drag delay we need to modify to avoid kamikazi tactics
+			target_drag_delay = movable.drag_delay
+			movable.drag_delay = 3
+	if(radio_connection == null)
+		set_frequency(frequency)
+	update_icon()
 
 /obj/item/detpack/proc/change_to_loud_sound()
 	if(sound_timer)
@@ -389,5 +391,5 @@
 		explosion(det_location, 3, 4, 4, 0, 4, explosion_cause=src) // TODO PASS THE USER HERE
 	qdel(src)
 
-/obj/item/detpack/attack(mob/M as mob, mob/user as mob, def_zone)
+/obj/item/detpack/attack_mob(mob/M as mob, mob/user as mob, def_zone)
 	return

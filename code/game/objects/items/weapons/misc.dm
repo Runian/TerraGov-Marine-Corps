@@ -40,7 +40,7 @@
 	edge = 0
 	var/icon/broken_outline = icon('icons/obj/items/drinks.dmi', "broken")
 
-/obj/item/weapon/broken_bottle/attack(mob/living/carbon/M as mob, mob/living/carbon/user as mob)
+/obj/item/weapon/broken_bottle/attack_mob(mob/living/carbon/M as mob, mob/living/carbon/user as mob)
 	playsound(loc, 'sound/weapons/bladeslice.ogg', 25, 1, MEDIUM_SOUND_RANGE)
 	return ..()
 
@@ -87,7 +87,7 @@
 		setting += 1
 	balloon_alert(user, "level [setting]")
 
-/obj/item/weapon/powerfist/attack(mob/living/carbon/M, mob/living/carbon/user)
+/obj/item/weapon/powerfist/attack_mob(mob/living/carbon/M, mob/living/carbon/user)
 	if(!cell)
 		to_chat(user, span_warning("\The [src] can't operate without a source of power!"))
 		return

@@ -1080,7 +1080,7 @@
 	if(!heat_amount)
 		return PROCESS_KILL
 
-/obj/item/weapon/gun/attack(mob/living/M, mob/living/user, def_zone)
+/obj/item/weapon/gun/attack_mob(mob/living/M, mob/living/user, def_zone)
 	if(!CHECK_BITFIELD(gun_features_flags, GUN_CAN_POINTBLANK) || !able_to_fire(user) || gun_on_cooldown(user) || CHECK_BITFIELD(M.status_flags, INCORPOREAL)) // If it can't point blank, you can't suicide and such.
 		if(master_gun)
 			return

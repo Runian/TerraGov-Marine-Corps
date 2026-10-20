@@ -483,7 +483,7 @@ GLOBAL_LIST(cable_radial_layer_list)
 // General procedures
 ///////////////////////////////////
 //you can use wires to heal robotics
-/obj/item/stack/cable_coil/attack(mob/living/carbon/human/H, mob/user)
+/obj/item/stack/cable_coil/attack_mob(mob/living/carbon/human/H, mob/user)
 	if(!istype(H))
 		return ..()
 

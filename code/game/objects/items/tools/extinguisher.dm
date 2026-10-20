@@ -49,13 +49,13 @@
 	icon_state = "[sprite_name][!safety]"
 	balloon_alert(user, "safety [safety ? "on" : "off"]")
 
-/obj/item/tool/extinguisher/attack(mob/M, mob/user)
+/obj/item/tool/extinguisher/attack_mob(mob/M, mob/user)
 	if(user.a_intent == INTENT_HELP && !safety) //If we're on help intent and going to spray people, don't bash them.
 		return FALSE
 	return ..()
 
 
-/obj/item/tool/extinguisher/afterattack(atom/target, mob/user, flag)
+/obj/item/tool/extinguisher/afterattack(atom/target, mob/user, list/modifiers)
 	//TODO; Add support for reagents in water.
 
 	if( istype(target, /obj/structure/reagent_dispensers/watertank) && get_dist(src,target) <= 1)

@@ -59,12 +59,13 @@
 		var/image/grenade = image('icons/mob/talk.dmi', user, "grenade")
 		user.add_emote_overlay(grenade)
 
-/obj/item/explosive/grenade/afterattack(atom/target, mob/user, has_proximity, click_parameters)
-	. = ..()
+/obj/item/explosive/grenade/interact_with_atom(atom/interacting_with, mob/living/user, list/modifiers)
 	if(!active || user.next_move > world.time)
-		return
-	if(user.throw_item(target))
-		user.changeNext_move(CLICK_CD_THROWING)
+		return NONE
+	if(!user.throw_item(interacting_with))
+		return NONE
+	user.changeNext_move(CLICK_CD_THROWING)
+	return ITEM_INTERACT_SUCCESS
 
 /obj/item/explosive/grenade/update_overlays()
 	. = ..()

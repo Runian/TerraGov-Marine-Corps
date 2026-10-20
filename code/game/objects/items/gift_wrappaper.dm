@@ -223,7 +223,7 @@
 	. += "There is about [amount] square units of paper left!"
 
 
-/obj/item/wrapping_paper/attack(mob/target, mob/user)
+/obj/item/wrapping_paper/attack_mob(mob/target, mob/user)
 	if(!ishuman(target))
 		return
 

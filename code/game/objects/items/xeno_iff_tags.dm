@@ -8,7 +8,7 @@
 	///The IFF signal this tag will create a component with
 	var/carried_iff = TGMC_LOYALIST_IFF
 
-/obj/item/xeno_iff_tag/attack(mob/living/M, mob/living/user)
+/obj/item/xeno_iff_tag/attack_mob(mob/living/M, mob/living/user)
 	if(!isxeno(M))
 		return ..()
 	. = TRUE

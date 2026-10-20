@@ -148,7 +148,7 @@
 	var/obj/item/O = pick(contents)
 	. += span_notice("You think you can see [O] in there.")
 
-/obj/item/reagent_containers/food/snacks/sandwiches/csandwich/attack(mob/M as mob, mob/user as mob, def_zone)
+/obj/item/reagent_containers/food/snacks/sandwiches/csandwich/attack_mob(mob/M as mob, mob/user as mob, def_zone)
 
 	var/obj/item/shard
 	for(var/obj/item/O in contents)

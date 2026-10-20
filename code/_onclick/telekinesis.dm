@@ -140,7 +140,7 @@ Redefine as needed.
 	update_icon()
 
 
-/obj/item/tk_grab/afterattack(atom/target, mob/living/carbon/user, proximity, params)//TODO: go over this
+/obj/item/tk_grab/afterattack(atom/target, mob/living/carbon/user, list/modifiers)//TODO: go over this
 	. = ..()
 	if(!target || !user)
 		return
@@ -159,7 +159,7 @@ Redefine as needed.
 	if(!isturf(target) && isitem(focus) && target.Adjacent(focus))
 		apply_focus_overlay()
 		var/obj/item/I = focus
-		I.melee_attack_chain(tk_user, target, params) //isn't copying the attack chain fun. we should do it more often.
+		I.melee_attack_chain(tk_user, target, modifiers) //isn't copying the attack chain fun. we should do it more often.
 		if(check_if_focusable(focus))
 			focus.do_attack_animation(target, null, focus)
 	else
@@ -177,7 +177,7 @@ Redefine as needed.
 	return TRUE
 
 
-/obj/item/tk_grab/attack(mob/living/L, mob/living/user, def_zone)
+/obj/item/tk_grab/attack_mob(mob/living/L, mob/living/user, def_zone)
 	return
 
 

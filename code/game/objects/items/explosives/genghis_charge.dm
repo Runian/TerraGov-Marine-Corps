@@ -3,7 +3,7 @@
 	desc = "A specialized device for incineration of bulk organic matter, patented Thermal Memory ensuring that all ignition proceeds safely away from the user. Will not attach to plants due to environmental concerns."
 	icon_state = "genghis-charge"
 
-/obj/item/explosive/plastique/genghis_charge/afterattack(atom/target, mob/user, flag)
+/obj/item/explosive/plastique/genghis_charge/afterattack(atom/target, mob/user, list/modifiers)
 	if(target.allow_pass_flags & PASS_FIRE)
 		return ..()
 	if(istype(target, /obj/structure/mineral_door/resin))

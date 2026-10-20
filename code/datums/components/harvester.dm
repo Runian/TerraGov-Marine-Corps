@@ -205,7 +205,7 @@
 	INVOKE_ASYNC(src, PROC_REF(activate_blade_async), source, user)
 
 ///Signal handler calling when user attacks
-/datum/component/harvester/proc/attack(datum/source, mob/living/target, mob/living/user, obj/item/weapon)
+/datum/component/harvester/proc/attack_mob(datum/source, mob/living/target, mob/living/user, obj/item/weapon)
 	SIGNAL_HANDLER
 	. = FALSE
 	weapon = user.get_active_held_item()

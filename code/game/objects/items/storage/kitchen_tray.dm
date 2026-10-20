@@ -35,7 +35,7 @@
 		item_image.pixel_y = rand(-10, 8)
 		. += item_image
 
-/obj/item/storage/kitchen_tray/attack(mob/living/attacked, mob/living/user as mob)
+/obj/item/storage/kitchen_tray/attack_mob(mob/living/attacked, mob/living/user as mob)
 	. = ..()
 	if(length(contents))
 		visible_message(span_warning("The force of the blow sends the contents of [src] flying!"))

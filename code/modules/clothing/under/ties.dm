@@ -28,7 +28,7 @@
 	desc = "An outdated medical apparatus for listening to the sounds of the human body. It also makes you look like you know what you're doing."
 	icon_state = "stethoscope"
 
-/obj/item/clothing/tie/stethoscope/attack(mob/living/carbon/human/M, mob/living/user)
+/obj/item/clothing/tie/stethoscope/attack_mob(mob/living/carbon/human/M, mob/living/user)
 	if(ishuman(M) && isliving(user))
 		if(user.a_intent == INTENT_HELP)
 			var/body_part = parse_zone(user.zone_selected)
@@ -194,7 +194,7 @@
 		desc = "This glowing blue badge marks [stored_name] as THE LAW."
 
 
-/obj/item/clothing/tie/holobadge/attack(mob/living/carbon/human/M, mob/living/user)
+/obj/item/clothing/tie/holobadge/attack_mob(mob/living/carbon/human/M, mob/living/user)
 	if(isliving(user))
 		user.visible_message(span_warning("[user] invades [M]'s personal space, thrusting [src] into [M.p_their()] face insistently."),span_warning("You invade [M]'s personal space, thrusting [src] into [M.p_their()] face insistently. You are the law."))
 

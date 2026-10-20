@@ -21,7 +21,7 @@
 	if (N)
 		H.amount_per_transfer_from_this = N
 
-/obj/item/reagent_containers/food/drinks/cans/attack(mob/M as mob, mob/user as mob, def_zone)
+/obj/item/reagent_containers/food/drinks/cans/attack_mob(mob/M as mob, mob/user as mob, def_zone)
 	if (canopened == FALSE)
 		to_chat(user, span_notice("You need to open the drink first!"))
 		return

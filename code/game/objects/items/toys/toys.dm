@@ -46,7 +46,7 @@
 	reagents = R
 	R.my_atom = WEAKREF(src)
 
-/obj/item/toy/balloon/attack(mob/living/carbon/human/M as mob, mob/user as mob)
+/obj/item/toy/balloon/attack_mob(mob/living/carbon/human/M as mob, mob/user as mob)
 	return
 
 /obj/item/toy/balloon/afterattack(atom/A as mob|obj, mob/user as mob, proximity)
@@ -227,7 +227,7 @@
 	R.my_atom = WEAKREF(src)
 	R.add_reagent(/datum/reagent/water, 10)
 
-/obj/item/toy/waterflower/attack(mob/living/carbon/human/M as mob, mob/user as mob)
+/obj/item/toy/waterflower/attack_mob(mob/living/carbon/human/M as mob, mob/user as mob)
 	return
 
 /obj/item/toy/waterflower/afterattack(atom/A as mob|obj, mob/user as mob)

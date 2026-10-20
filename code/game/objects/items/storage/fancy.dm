@@ -150,7 +150,7 @@
 	. = ..()
 	icon_state = "[initial(icon_state)][length(contents)]"
 
-/obj/item/storage/fancy/cigarettes/attack(mob/living/carbon/M as mob, mob/living/carbon/user as mob)
+/obj/item/storage/fancy/cigarettes/attack_mob(mob/living/carbon/M as mob, mob/living/carbon/user as mob)
 	if(!istype(M, /mob))
 		return
 
@@ -245,7 +245,7 @@
 	. = ..()
 	icon_state = "[initial(icon_state)][length(contents)]"
 
-/obj/item/storage/fancy/cigar/attack(mob/living/carbon/M as mob, mob/living/carbon/user as mob)
+/obj/item/storage/fancy/cigar/attack_mob(mob/living/carbon/M as mob, mob/living/carbon/user as mob)
 	if(!istype(M, /mob))
 		return
 

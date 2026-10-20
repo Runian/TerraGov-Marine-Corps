@@ -123,7 +123,7 @@
 	. = ..()
 	. += "It contains [reagents.get_reagent_amount(/datum/reagent/fuel)]/[max_fuel] units of fuel!"
 
-/obj/item/weapon/twohanded/chainsaw/attack(mob/living/carbon/M, mob/living/carbon/user)
+/obj/item/weapon/twohanded/chainsaw/attack_mob(mob/living/carbon/M, mob/living/carbon/user)
 	rip_apart(user)
 	return ..()
 

@@ -31,7 +31,7 @@
 	. = ..()
 	. += "it contains [imp ? "a [imp.name]" : "no implant"]!"
 
-/obj/item/implanter/attack(mob/target, mob/user)
+/obj/item/implanter/attack_mob(mob/target, mob/user)
 	. = ..()
 	if(!ishuman(target))
 		return FALSE
@@ -87,7 +87,7 @@
 	. = ..()
 	icon_state = initial(icon_state)
 
-/obj/item/implanter/sandevistan/attack(mob/target, mob/user)
+/obj/item/implanter/sandevistan/attack_mob(mob/target, mob/user)
 	. = ..()
 	if(!.)
 		return

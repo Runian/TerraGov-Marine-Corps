@@ -46,7 +46,7 @@
 		return FALSE
 	attack_hand(xeno_attacker)
 
-/obj/item/reagent_containers/food/snacks/attack(mob/M, mob/user, def_zone)
+/obj/item/reagent_containers/food/snacks/attack_mob(mob/M, mob/user, def_zone)
 	if(!reagents?.total_volume)						//Shouldn't be needed but it checks to see if it has anything left in it.
 		to_chat(user, span_warning("There is nothing left of \the [src], oh no!"))
 		M.dropItemToGround(src)	//so icons update :[

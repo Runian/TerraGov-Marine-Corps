@@ -23,20 +23,17 @@
 		QDEL_NULL(unfoldedbag_instance)
 	return ..()
 
-
 /obj/item/bodybag/attack_self(mob/user)
 	deploy_bodybag(user, user.loc)
 
-
-/obj/item/bodybag/afterattack(atom/target, mob/user, proximity)
-	if(!proximity || !isturf(target) || target.density)
-		return
-	var/turf/target_turf = target
+/obj/item/bodybag/interact_with_atom(atom/interacting_with, mob/living/user, list/modifiers)
+	if(!isturf(interacting_with) || interacting_with.density)
+		return NONE
+	var/turf/target_turf = interacting_with
 	for(var/atom/atom_to_check AS in target_turf)
 		if(atom_to_check.density)
 			return
-	deploy_bodybag(user, target)
-
+	deploy_bodybag(user, target_turf)
 
 /obj/item/bodybag/proc/deploy_bodybag(mob/user, atom/location)
 	if(QDELETED(unfoldedbag_instance))

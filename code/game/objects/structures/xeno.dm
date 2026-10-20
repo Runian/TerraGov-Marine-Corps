@@ -333,7 +333,7 @@
 		return
 	activate_jelly(user)
 
-/obj/item/resin_jelly/attack(mob/living/carbon/xenomorph/M, mob/living/user)
+/obj/item/resin_jelly/attack_mob(mob/living/carbon/xenomorph/M, mob/living/user)
 	//Activates if active hand and clicked on mob in game.
 	//Can target self so we need to check for that.
 	if(!isxeno(user))

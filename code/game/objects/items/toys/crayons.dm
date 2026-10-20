@@ -97,7 +97,7 @@
 		to_chat(user, span_notice("\The [src] breaks apart in your hand."))
 		qdel(src)
 
-/obj/item/toy/crayon/attack(mob/living/M, mob/living/user)
+/obj/item/toy/crayon/attack_mob(mob/living/M, mob/living/user)
 	if(M != user)
 		return ..()
 

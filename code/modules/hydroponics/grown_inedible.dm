@@ -73,7 +73,7 @@
 	throw_speed = 1
 	throw_range = 3
 
-/obj/item/grown/sunflower/attack(mob/M as mob, mob/user as mob)
+/obj/item/grown/sunflower/attack_mob(mob/M as mob, mob/user as mob)
 	to_chat(M, "<font color='green'><b> [user] smacks you with a sunflower!</font><font color='yellow'><b>FLOWER POWER<b></font>")
 	to_chat(user, "<font color='green'> Your sunflower's </font><font color='yellow'><b>FLOWER POWER</b></font><font color='green'> strikes [M]</font>")
 
@@ -138,13 +138,13 @@
 		user.Unconscious(10 SECONDS)
 		to_chat(user, span_warning("You are stunned by the deathnettle when you try picking it up!"))
 
-/obj/item/grown/nettle/attack(mob/living/carbon/M as mob, mob/user as mob)
+/obj/item/grown/nettle/attack_mob(mob/living/carbon/M as mob, mob/user as mob)
 
 	if(!..()) return
 
 	lose_leaves(user)
 
-/obj/item/grown/nettle/death/attack(mob/living/carbon/M as mob, mob/user as mob)
+/obj/item/grown/nettle/death/attack_mob(mob/living/carbon/M as mob, mob/user as mob)
 
 	if(!..()) return
 

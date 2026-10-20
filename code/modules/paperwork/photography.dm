@@ -333,7 +333,7 @@
 	adjust_zoom(user)
 
 
-/obj/item/camera/attack(mob/living/carbon/human/M, mob/user)
+/obj/item/camera/attack_mob(mob/living/carbon/human/M, mob/user)
 	return
 
 

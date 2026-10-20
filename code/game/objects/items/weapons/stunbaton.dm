@@ -126,7 +126,7 @@
 		else
 			to_chat(user, span_warning("[src] is out of charge."))
 
-/obj/item/weapon/baton/attack(mob/M, mob/user)
+/obj/item/weapon/baton/attack_mob(mob/M, mob/user)
 	if(M.status_flags & INCORPOREAL || user.status_flags & INCORPOREAL) //Incorporeal beings cannot attack or be attacked
 		return
 
@@ -140,8 +140,8 @@
 
 	var/target_zone = check_zone(user.zone_selected)
 	if(user.a_intent == INTENT_HARM)
-		if (!..())	//item/attack() does it's own messaging and logs
-			return 0	// item/attack() will return 1 if they hit, 0 if they missed.
+		if (!..())	//item/attack_mob() does it's own messaging and logs
+			return 0	// item/attack_mob() will return 1 if they hit, 0 if they missed.
 		stamloss_applied *= 0.5	//whacking someone causes a much poorer contact than prodding them.
 		stun_applied *= 0.5
 		//we can't really extract the actual hit zone from ..(), unfortunately. Just act like they attacked the area they intended to.
@@ -236,7 +236,7 @@
 		status = 0
 		to_chat(user, span_warning("\The [src] is out of charge."))
 
-/obj/item/weapon/stunprod/attack(mob/M, mob/user)
+/obj/item/weapon/stunprod/attack_mob(mob/M, mob/user)
 	if(user.a_intent == INTENT_HARM)
 		return
 
@@ -272,7 +272,7 @@
 	desc = "A specialised prod designed for incapacitating xenomorphic lifeforms with. This one seems to be much more effective than its predecessor."
 	color = "#FF6666"
 
-/obj/item/weapon/stunprod/improved/attack(mob/M, mob/user)
+/obj/item/weapon/stunprod/improved/attack_mob(mob/M, mob/user)
 	. = ..()
 	if(!isliving(M))
 		return

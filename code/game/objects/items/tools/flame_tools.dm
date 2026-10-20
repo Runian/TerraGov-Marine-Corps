@@ -260,9 +260,9 @@ CIGARETTE PACKETS ARE IN FANCY.DM
 		return ..()
 
 
-/obj/item/clothing/mask/cigarette/afterattack(obj/item/reagent_containers/glass/glass, mob/living/user, proximity)
+/obj/item/clothing/mask/cigarette/afterattack(obj/item/reagent_containers/glass/glass, mob/living/user, list/modifiers)
 	. = ..()
-	if(!proximity || lit) //can't dip if cigarette is lit
+	if(!lit) //can't dip if cigarette is lit
 		return
 	if(istype(glass))	//you can dip cigarettes into beakers
 		if(glass.reagents.trans_to(src, chem_volume))	//if reagents were transfered, show the message
@@ -625,7 +625,7 @@ CIGARETTE PACKETS ARE IN FANCY.DM
 		return TRUE
 	return FALSE
 
-/obj/item/tool/lighter/attack(mob/living/carbon/M as mob, mob/living/carbon/user as mob)
+/obj/item/tool/lighter/attack_mob(mob/living/carbon/M as mob, mob/living/carbon/user as mob)
 	if(!isliving(M))
 		return
 	M.IgniteMob()

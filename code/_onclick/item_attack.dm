@@ -242,7 +242,7 @@
  *
  * Returns TRUE if the attack has fully resolved / if the attack chain should end here.
  */
-/obj/item/proc/attack(mob/living/target_mob, mob/user, list/modifiers)
+/obj/item/proc/attack_mob(mob/living/target_mob, mob/user, list/modifiers)
 	var/signal_return = SEND_SIGNAL(src, COMSIG_ITEM_ATTACK, target_mob, user, modifiers) || SEND_SIGNAL(user, COMSIG_MOB_ITEM_ATTACK, target_mob, src, modifiers)
 	if(signal_return & COMPONENT_CANCEL_ATTACK_CHAIN)
 		return TRUE
@@ -280,32 +280,6 @@
 	return SECONDARY_ATTACK_CALL_NORMAL
 
 /**
- * The equivalent of the standard version of [/obj/item/proc/attack] but for non-mob targets.
- * Called on an item that is being used to attack an atom via RIGHT CLICK.
- *
- * Arguments:
- * * atom/target_atom - The atom getting attacked.
- * * mob/living/user - The living mob that is attacking.
- * * list/modifiers - The click modifiers, e.g. alt, shift.
- *
- * Returns TRUE if the attack has been handled or to prevent any afterattack.
- */
-
-/obj/item/proc/attack_atom(atom/target_atom, mob/living/user, list/modifiers)
-	var/signal_return = SEND_SIGNAL(src, COMSIG_ITEM_ATTACK_ATOM, target_atom, user, modifiers) | SEND_SIGNAL(user, COMSIG_LIVING_ATTACK_ATOM, target_atom, src, modifiers)
-	add_fingerprint(user, "attack_atom")
-	if(signal_return & COMPONENT_CANCEL_ATTACK_CHAIN)
-		return TRUE
-	if(signal_return & COMPONENT_CONTINUE_ATTACK_CHAIN)
-		return FALSE
-	if(item_flags & NOBLUDGEON)
-		return TRUE
-	user.changeNext_move(attack_speed)
-	if(!target_atom.attacked_by(src, user, modifiers))
-		return TRUE
-	return FALSE
-
-/**
  * The equivalent of the standard version of [/obj/item/proc/attack] but for object targets.
  * Called on an item that is being used to attack an obj.
  *
@@ -317,7 +291,7 @@
  * Returns TRUE if the attack has been handled or to prevent any afterattack.
  */
 /obj/item/proc/attack_obj(obj/target_object, mob/living/user, modifiers)
-	var/signal_return =  SEND_SIGNAL(src, COMSIG_ITEM_ATTACK_OBJ, target_object, user, modifiers)
+	var/signal_return = SEND_SIGNAL(src, COMSIG_ITEM_ATTACK_OBJ, target_atom, user, modifiers) | SEND_SIGNAL(user, COMSIG_LIVING_ATTACK_OBJ, target_atom, src, modifiers)
 	add_fingerprint(user, "attack_obj")
 	if(signal_return & COMPONENT_CANCEL_ATTACK_CHAIN)
 		return TRUE

@@ -44,7 +44,7 @@
 	resistance_flags = UNACIDABLE
 	attack_speed = 16
 
-/obj/item/weapon/twohanded/glaive/attack(mob/living/carbon/M as mob, mob/living/carbon/user as mob)
+/obj/item/weapon/twohanded/glaive/attack_mob(mob/living/carbon/M as mob, mob/living/carbon/user as mob)
 	playsound(loc, 'sound/weapons/bladeslice.ogg', 25, 1, MEDIUM_SOUND_RANGE)
 	return ..()
 

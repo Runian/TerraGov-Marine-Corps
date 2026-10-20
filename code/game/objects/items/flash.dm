@@ -25,7 +25,7 @@
 	times_used = max(0,round(times_used)) //sanity
 
 
-/obj/item/flash/attack(mob/living/M, mob/user)
+/obj/item/flash/attack_mob(mob/living/M, mob/user)
 	if(!user || !M)	return	//sanity
 	if(!ishuman(M)) return
 
@@ -144,7 +144,7 @@
 	desc = "When a problem arises, SCIENCE is the solution."
 	icon_state = "sflash"
 
-/obj/item/flash/synthetic/attack(mob/living/M as mob, mob/user as mob)
+/obj/item/flash/synthetic/attack_mob(mob/living/M as mob, mob/user as mob)
 	..()
 	if(!broken)
 		broken = 1

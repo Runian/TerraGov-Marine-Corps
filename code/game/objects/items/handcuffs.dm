@@ -16,7 +16,7 @@
 	var/cuff_sound = 'sound/weapons/handcuffs.ogg'
 	var/cuff_delay = 40 //how many deciseconds it takes to cuff someone
 
-/obj/item/restraints/handcuffs/attack(mob/living/carbon/C, mob/user)
+/obj/item/restraints/handcuffs/attack_mob(mob/living/carbon/C, mob/user)
 	if(!istype(C))
 		return ..()
 	if (!ishuman(user))
@@ -118,7 +118,7 @@
 /obj/item/restraints/handcuffs/cyborg
 	dispenser = 1
 
-/obj/item/restraints/handcuffs/cyborg/attack(mob/living/carbon/C as mob, mob/user as mob)
+/obj/item/restraints/handcuffs/cyborg/attack_mob(mob/living/carbon/C as mob, mob/user as mob)
 	if(!C.handcuffed)
 		var/turf/p_loc = user.loc
 		var/turf/p_loc_m = C.loc

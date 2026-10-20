@@ -49,12 +49,10 @@
 	if(severity == EXPLODE_DEVASTATE)
 		take_damage(INFINITY, BRUTE, BOMB, 0)
 
-/obj/item/explosive/plastique/attack(mob/M as mob, mob/user as mob, def_zone)
+/obj/item/explosive/plastique/attack_mob(mob/M as mob, mob/user as mob, def_zone)
 	return
 
-/obj/item/explosive/plastique/afterattack(atom/target, mob/user, flag)
-	if(!flag)
-		return FALSE
+/obj/item/explosive/plastique/afterattack(atom/target, mob/user, list/modifiers)
 	if(!target.can_plastique(user, src))
 		return FALSE
 	user.visible_message(span_warning("[user] is trying to plant [name] on [target]!"),

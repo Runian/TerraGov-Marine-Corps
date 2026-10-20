@@ -154,7 +154,7 @@
 	w_class = WEIGHT_CLASS_BULKY
 	hitsound = "punch"
 
-/obj/item/weapon/heldglove/boxing/attack(mob/living/M, mob/living/user)
+/obj/item/weapon/heldglove/boxing/attack_mob(mob/living/M, mob/living/user)
 	. = ..()
 	if(!ishuman(M))
 		return

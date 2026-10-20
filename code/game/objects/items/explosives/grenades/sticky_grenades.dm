@@ -20,7 +20,7 @@
 		return FALSE
 	return TRUE
 
-/obj/item/explosive/grenade/sticky/afterattack(atom/target, mob/user, has_proximity, click_parameters)
+/obj/item/explosive/grenade/sticky/afterattack(atom/target, mob/user, list/modifiers)
 	. = ..()
 	if(target != user)
 		return

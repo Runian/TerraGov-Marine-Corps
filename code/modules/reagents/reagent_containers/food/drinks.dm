@@ -19,7 +19,7 @@
 	if (gulp_size < 5) gulp_size = 5
 	else gulp_size = max(round(reagents.total_volume / 5), 5)
 
-/obj/item/reagent_containers/food/drinks/attack(mob/M as mob, mob/user as mob, def_zone)
+/obj/item/reagent_containers/food/drinks/attack_mob(mob/M as mob, mob/user as mob, def_zone)
 	var/datum/reagents/R = src.reagents
 
 	if(!R.total_volume || !R)
