@@ -54,7 +54,7 @@
 		return TRUE
 
 	// At this point, the attack is really about to happen.
-	if(user.lying_angle) // TODO: Is this really needed?
+	if(user.lying_angle)
 		user.balloon_alert(user, "can't while prone!")
 		return
 
@@ -79,25 +79,37 @@
 	SEND_SIGNAL(src, COMSIG_ITEM_AFTERATTACK, target, user, modifiers)
 	SEND_SIGNAL(target, COMSIG_ATOM_AFTER_ATTACKEDBY, src, user, modifiers)
 	afterattack(target, user, modifiers)
-
 	return TRUE
 
-/// Called when the item is in the active hand is LEFT CLICKED.
+/**
+ * Called before an atom is attacked by an item via LEFT CLICK.
+ *
+ * Arguments:
+ * * mob/user - The mob using us.
+ *
+ * Returns TRUE if it did something.
+ */
 /obj/item/proc/attack_self(mob/user)
 	SHOULD_CALL_PARENT(FALSE)// When possible, parent should be called - but some may need to completely override us.
 	add_fingerprint(user, "attack_self")
 	if(SEND_SIGNAL(src, COMSIG_ITEM_ATTACK_SELF, user) & COMPONENT_CANCEL_ATTACK_CHAIN)
 		return TRUE
-
-	// TODO: This likely need to be moved elsewhere?
 	if(item_flags & ITEM_ACTIVATABLE)
 		toggle_active(!active, user)
-		return
-	if(!can_interact(user))
-		return
-	interact(user)
+		return TRUE
+	if(can_interact(user))
+		interact(user)
+		return TRUE
+	return FALSE
 
-/// Called when the item is in the active hand is RIGHT CLICKED.
+/**
+ * Called before an atom is attacked by an item via RIGHT CLICK.
+ *
+ * Arguments:
+ * * mob/user - The mob using us.
+ *
+ * Returns TRUE if it did something.
+ */
 /obj/item/proc/attack_self_secondary(mob/user)
 	SHOULD_CALL_PARENT(TRUE)
 	add_fingerprint(user, "attack_self_secondary")
@@ -106,14 +118,14 @@
 	return FALSE
 
 /**
- * Called on the item before it hits something, via LEFT CLICK.
+ * Called before an atom is attacked by an item via RIGHT CLICK.
  *
  * Arguments:
  * * atom/target - The atom about to be hit.
- * * mob/living/user - The mob doing the htting.
+ * * mob/living/user - The mob doing the hitting.
  * * list/modifiers - The click modifiers, e.g. alt, shift.
  *
- * Returns TRUE if the attack chain should end here.
+ * Returns TRUE if the attack has fully resolved / if the attack chain should end here.
  *
  * See: [/obj/item/proc/melee_attack_chain]
  */
@@ -124,14 +136,14 @@
 	return FALSE
 
 /**
- * Called on the item before it hits something via RIGHT CLICK.
+ * When an item is being used to attack an atom via RIGHT CLICK. Called before the [/atom/proc/attackby_secondary].
  *
  * Arguments:
  * * atom/target - The atom about to be hit.
- * * mob/living/user - The mob doing the htting.
+ * * mob/living/user - The mob doing the hitting.
  * * list/modifiers - The click modifiers, e.g. alt, shift.
  *
- * Returns TRUE if the attack chain should end here.
+ * Returns TRUE if the attack has fully resolved / if the attack chain should end here.
  *
  * See: [/obj/item/proc/melee_attack_chain]
  */
@@ -144,14 +156,14 @@
 	return SECONDARY_ATTACK_CALL_NORMAL
 
 /**
- * Called on an atom is getting attacked by an item via LEFT CLICK.
+ * When an atom is being attacked by an item via LEFT CLICK.
  *
  * Arguments:
  * * obj/item/attacking_item - The item hitting this atom.
  * * mob/user - The mob doing the hitting.
  * * list/modifiers - The click modifiers, e.g. alt, shift.
  *
- * Returns TRUE if the attack chain should end here.
+ * Returns TRUE if the attack has fully resolved / if the attack chain should end here.
  *
  * See: [/obj/item/proc/melee_attack_chain]
  */
@@ -196,14 +208,14 @@
 		return TRUE
 
 /**
- * Called on an atom is getting attacked by an item via RIGHT CLICK.
+ * When an atom is being attacked by an item via RIGHT CLICK.
  *
  * Arguments:
  * * obj/item/attacking_item - The item hitting this atom.
  * * mob/user - The mob doing the hitting.
  * * list/modifiers - The click modifiers, e.g. alt, shift.
  *
- * Returns TRUE if the attack chain should end here.
+ * Returns TRUE if the attack has fully resolved / if the attack chain should end here.
  *
  * See: [/obj/item/proc/melee_attack_chain]
  */
@@ -221,7 +233,7 @@
 	return attacking_item.attack_secondary(src, user)
 
 /**
- * Called on an item that is being used to attack a living mob via LEFT CLICK.
+ * When an item is being used to attack a living mob via LEFT CLICK.
  *
  * Arguments:
  * * mob/living/target_mob - The living mob getting attacked.
@@ -250,14 +262,14 @@
 		playsound(loc, hitsound, 25, TRUE, MEDIUM_SOUND_RANGE)
 
 /**
- * Called on an item that is being used to attack a living mob via RIGHT CLICK.
+ * When an item is being used to attack a living mob via RIGHT CLICK.
  *
  * Arguments:
  * * mob/living/target_mob - The living mob getting attacked.
  * * mob/living/user - The living mob that is attacking.
  * * list/modifiers - The click modifiers, e.g. alt, shift.
  *
- * Returns TRUE if the attack has been fully handled / failed to connect.
+ * Returns any [SECONDARY_ATTACK_*].
  */
 /obj/item/proc/attack_secondary(mob/living/target_mob, mob/living/user, list/modifiers)
 	var/signal_result = SEND_SIGNAL(src, COMSIG_ITEM_ATTACK_SECONDARY, target_mob, user, modifiers)
@@ -276,7 +288,7 @@
  * * mob/living/user - The living mob that is attacking.
  * * list/modifiers - The click modifiers, e.g. alt, shift.
  *
- * Returns TRUE if the attack has been fully handled / failed to connect.
+ * Returns TRUE if the attack has been handled or to prevent any afterattack.
  */
 
 /obj/item/proc/attack_atom(atom/target_atom, mob/living/user, list/modifiers)
@@ -302,7 +314,7 @@
  * * mob/living/user - The living mob that is attacking.
  * * list/modifiers - The click modifiers, e.g. alt, shift.
  *
- * Returns TRUE if the attack has been fully handled, failed to connect, or to prevent any afterattack.
+ * Returns TRUE if the attack has been handled or to prevent any afterattack.
  */
 /obj/item/proc/attack_obj(obj/target_object, mob/living/user, modifiers)
 	var/signal_return =  SEND_SIGNAL(src, COMSIG_ITEM_ATTACK_OBJ, target_object, user, modifiers)
@@ -327,11 +339,10 @@
  * * mob/living/user - The living mob that is attacking.
  * * list/modifiers - The click modifiers, e.g. alt, shift.
  *
- * Returns TRUE if the attack has been fully handled, failed to connect, or to prevent any afterattack.
+ * Returns TRUE if the attack has been handled or to prevent any afterattack.
  */
 /obj/item/proc/attack_turf(turf/target_turf, mob/living/user, modifiers)
-	var/signal_return = NONE
-	//var/signal_return = SEND_SIGNAL(src, COMSIG_ITEM_ATTACK_TURF, target_turf, user, modifiers)
+	var/signal_return = SEND_SIGNAL(src, COMSIG_ITEM_ATTACK_TURF, target_turf, user, modifiers)
 	add_fingerprint(user, "attack_turf")
 	if(signal_return & COMPONENT_CANCEL_ATTACK_CHAIN)
 		return TRUE
@@ -417,11 +428,15 @@
 	take_damage(power, attacking_item.damtype, MELEE, blame_mob = user)
 	return TRUE
 
-// has_proximity is TRUE if this afterattack was called on something adjacent, in your square, or on your person.
-// Click parameters is the params string from byond Click() code, see that documentation.
-/obj/item/proc/afterattack(atom/target, mob/user, has_proximity, click_parameters)
-	SEND_SIGNAL(src, COMSIG_ITEM_AFTERATTACK, target, user, has_proximity, click_parameters)
-	SEND_SIGNAL(user, COMSIG_MOB_ITEM_AFTERATTACK, target, user, has_proximity, click_parameters)
+/**
+ * Deals with the additional attack effects by an item after the default attack.
+ *
+ * Arguments:
+ * * atom/target_atom - The atom getting attacked.
+ * * mob/user - The mob that is attacking.
+ * * list/modifiers - The click modifiers, e.g. alt, shift.
+ */
+/obj/item/proc/afterattack(atom/target_atom, mob/user, list/modifiers)
 	return
 
 /**

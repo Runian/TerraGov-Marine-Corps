@@ -166,7 +166,7 @@
 		return ITEM_INTERACT_SUCCESS
 	if(isxeno(interacting_with))
 		var/mob/living/carbon/xenomorph/interacting_xenomorph = interacting_with
-		if(interacting_xenomorph.stat == DEAD && !interacting_xenomorph.anchored && user.a_intent == INTENT_HELP))
+		if(interacting_xenomorph.stat == DEAD && !interacting_xenomorph.anchored && user.a_intent == INTENT_HELP)
 			do_load(interacting_with)
 			return ITEM_INTERACT_SUCCESS
 	return interacting_with.powerloader_act(user, src)

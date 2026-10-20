@@ -66,7 +66,6 @@
  *
  * Returns TRUE if the attack has fully resolved.
  */
-
 /atom/proc/attack_hand_secondary(mob/living/carbon/human/user)
 	. = FALSE
 	if(QDELETED(src))

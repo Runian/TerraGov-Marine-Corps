@@ -46,6 +46,9 @@
 /// Sent from [/obj/item/proc/attack_atom()] to the user: (/atom/target_atom, /obj/item/weapon, list/modifiers)
 #define COMSIG_LIVING_ATTACK_ATOM "living_attack_atom"
 
+/// Sent from [/obj/item/proc/attack_turf()] to the item: (/turf/target_turf, /obj/item/weapon, list/modifiers)
+#define COMSIG_ITEM_ATTACK_TURF "item_attack_turf"
+
 /// Sent from [/atom/proc/attack_hand()] to the atom: (/mob/living/carbon/human/user)
 #define COMSIG_ATOM_ATTACK_HAND "atom_attack_hand"
 /// Sent from [/atom/proc/attack_hand_secondary()] to the atom: (/mob/living/carbon/human/user)
