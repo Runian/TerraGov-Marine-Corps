@@ -47,6 +47,12 @@
 	user.changeNext_move(CLICK_CD_RAPID)
 	if(interacting_with.is_drainable())
 		return try_drain(interacting_with, user, amount_per_transfer_from_this)
+	if(user.a_intent == INTENT_HARM)
+		if(try_splash(target, user))
+			return ITEM_INTERACT_SUCCESS
+		return ITEM_INTERACT_BLOCKING
+
+	return NONE
 
 /obj/item/reagent_containers/cup/item_interaction(mob/living/user, obj/item/tool, list/modifiers)
 	if(!istype(tool, /obj/item/reagent_containers/food/snacks/egg))
@@ -59,11 +65,6 @@
 	tool.reagents.trans_to(src, tool.reagents.total_volume)
 	qdel(tool)
 	return ITEM_INTERACT_SUCCESS
-
-/obj/item/reagent_containers/cup/afterattack(atom/target, mob/user, has_proximity, click_parameters)
-	. = ..()
-	if(user.a_intent == INTENT_HARM)
-		try_splash(target, user)
 
 /// Callback for [datum/component/takes_reagent_appearance] to inherent style footypes
 /obj/item/reagent_containers/cup/proc/on_cup_change(datum/glass_style/has_foodtype/style)

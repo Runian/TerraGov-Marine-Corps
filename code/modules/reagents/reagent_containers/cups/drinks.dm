@@ -181,30 +181,21 @@
 		return FALSE
 	return ..()
 
-/obj/item/reagent_containers/cup/glass/waterbottle/attack_mob(mob/target, mob/living/user, def_zone)
-	if(!target)
-		return
-
-	if(cap_on && reagents.total_volume && istype(target))
+/obj/item/reagent_containers/cup/glass/waterbottle/interact_with_atom(atom/interacting_with, mob/living/user, list/modifiers)
+	if(cap_on)
 		to_chat(user, span_warning("You must remove the cap before you can do that!"))
-		return
-
+		return ITEM_INTERACT_BLOCKING
 	return ..()
 
-/obj/item/reagent_containers/cup/glass/waterbottle/afterattack(atom/target, mob/user, has_proximity, click_parameters)
-	if(!has_proximity)
-		return FALSE
-
+/obj/item/reagent_containers/cup/glass/waterbottle/item_interaction(mob/living/user, obj/item/tool, list/modifiers)
 	if(cap_on && (target.is_refillable() || target.is_drainable() || (reagents.total_volume && user.a_intent != INTENT_HARM)))
 		to_chat(user, span_warning("You must remove the cap before you can do that!"))
-		return
-
-	else if(istype(target, /obj/item/reagent_containers/cup/glass/waterbottle))
-		var/obj/item/reagent_containers/cup/glass/waterbottle/other_bottle = target
+		return ITEM_INTERACT_BLOCKING
+	if(istype(tool, /obj/item/reagent_containers/cup/glass/waterbottle))
+		var/obj/item/reagent_containers/cup/glass/waterbottle/other_bottle = tool
 		if(other_bottle.cap_on)
 			to_chat(user, span_warning("[other_bottle] has a cap firmly twisted on!"))
-			return
-
+			return ITEM_INTERACT_BLOCKING
 	return ..()
 
 // heehoo bottle flipping

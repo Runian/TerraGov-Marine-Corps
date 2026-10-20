@@ -319,6 +319,58 @@
 	var/can_customise = TRUE
 	var/default_picture_name
 
+/obj/item/camera/examine(mob/user)
+	. = ..()
+	. += "It has [pictures_left] photos left."
+
+/obj/item/camera/AltClick(mob/user)
+	if(!can_interact(user))
+		return
+	adjust_zoom(user)
+
+/obj/item/camera/interact_with_atom(atom/interacting_with, mob/living/user, list/modifiers)
+	if(istype(interacting_with, /obj/item/camera_film))
+		if(pictures_left)
+			to_chat(user, span_notice("[src] still has some film in it!"))
+			return ITEM_INTERACT_BLOCKING
+		if(!user.temporarilyRemoveItemFromInventory(interacting_with))
+			return ITEM_INTERACT_BLOCKING
+		to_chat(user, span_notice("You insert [interacting_with] into [src]."))
+		qdel(interacting_with)
+		pictures_left = pictures_max
+		return ITEM_INTERACT_SUCCESS
+	if(try_take_picture(interacting_with, user))
+		return ITEM_INTERACT_SUCCESS
+	return NONE
+
+/obj/item/camera/ranged_interact_with_atom(atom/interacting_with, mob/living/user, list/modifiers)
+	return interact_with_atom(interacting_with, user, modifiers)
+
+/// Can we take a picture of this target right now?
+/obj/item/camera/proc/can_take_picture_of(atom/target, mob/user)
+	if(!on || blending || !pictures_left)
+		return FALSE
+	var/turf/target_turf = get_turf(target)
+	if(!target_turf)
+		return FALSE
+	if(isAI(user) && !GLOB.cameranet.checkTurfVis(target_turf))
+		return FALSE
+	if(user.client && !(target_turf in get_hear(user.client.view, user)))
+		return FALSE
+	if(!(target_turf in get_hear(WORLD_VIEW, user)))
+		return FALSE
+	return TRUE
+
+/// Tries to take a picture of the target.
+/obj/item/camera/proc/try_take_picture(atom/target, mob/user)
+	if(!can_take_picture_of(target, user))
+		return FALSE
+	on = FALSE
+	addtimer(CALLBACK(src, PROC_REF(cooldown)), cooldown)
+	icon_state = state_off
+
+	INVOKE_ASYNC(src, PROC_REF(captureimage), target, user, picture_size_x - 1, picture_size_y - 1)
+	return TRUE
 
 /obj/item/camera/proc/adjust_zoom(mob/user)
 	var/desired_x = input(user, "How high do you want the camera to shoot, between [picture_size_x_min] and [picture_size_x_max]?", "Zoom", picture_size_x) as num
@@ -326,73 +378,10 @@
 	picture_size_x = min(clamp(desired_x, picture_size_x_min, picture_size_x_max), CAMERA_PICTURE_SIZE_HARD_LIMIT)
 	picture_size_y = min(clamp(desired_y, picture_size_y_min, picture_size_y_max), CAMERA_PICTURE_SIZE_HARD_LIMIT)
 
-
-/obj/item/camera/AltClick(mob/user)
-	if(!can_interact(user))
-		return
-	adjust_zoom(user)
-
-
-/obj/item/camera/attack_mob(mob/living/carbon/human/M, mob/user)
-	return
-
-
-/obj/item/camera/attackby(obj/item/I, mob/user, params)
-	. = ..()
-	if(.)
-		return
-
-	if(istype(I, /obj/item/camera_film))
-		if(pictures_left)
-			to_chat(user, span_notice("[src] still has some film in it!"))
-			return
-		if(!user.temporarilyRemoveItemFromInventory(I))
-			return
-		to_chat(user, span_notice("You insert [I] into [src]."))
-		qdel(I)
-		pictures_left = pictures_max
-
-
-/obj/item/camera/examine(mob/user)
-	. = ..()
-	. += "It has [pictures_left] photos left."
-
-
-/obj/item/camera/proc/can_target(atom/target, mob/user, prox_flag)
-	if(!on || blending || !pictures_left)
-		return FALSE
-	var/turf/T = get_turf(target)
-	if(!T)
-		return FALSE
-	if(istype(user))
-		if(isAI(user) && !GLOB.cameranet.checkTurfVis(T))
-			return FALSE
-		else if(user.client && !(get_turf(target) in get_hear(user.client.view, user)))
-			return FALSE
-		else if(!(get_turf(target) in get_hear(WORLD_VIEW, user)))
-			return FALSE
-	else					//user is an atom
-		if(!(get_turf(target) in view(WORLD_VIEW, user)))
-			return FALSE
-	return TRUE
-
-
-/obj/item/camera/afterattack(atom/target, mob/user, flag)
-	if(!can_target(target, user, flag))
-		return
-
-	on = FALSE
-	addtimer(CALLBACK(src, PROC_REF(cooldown)), cooldown)
-	icon_state = state_off
-
-	INVOKE_ASYNC(src, PROC_REF(captureimage), target, user, flag, picture_size_x - 1, picture_size_y - 1)
-
-
 /obj/item/camera/proc/cooldown()
 	UNTIL(!blending)
 	icon_state = state_on
 	on = TRUE
-
 
 /obj/item/camera/proc/show_picture(mob/user, datum/picture/selection)
 	var/obj/item/photo/P = new(src, selection)
@@ -400,8 +389,7 @@
 	to_chat(user, P.desc)
 	qdel(P)
 
-
-/obj/item/camera/proc/captureimage(atom/target, mob/user, flag, size_x = 1, size_y = 1)
+/obj/item/camera/proc/captureimage(atom/target, mob/user, size_x = 1, size_y = 1)
 	if(flash_enabled)
 		flash_lighting_fx(8, light_power, light_color)
 	blending = TRUE
@@ -450,11 +438,11 @@
 	get_icon.Blend("#000", ICON_UNDERLAY)
 
 	var/datum/picture/P = new("picture", desc.Join(" "), mobs_spotted, dead_spotted, get_icon, null, psize_x, psize_y)
-	after_picture(user, P, flag)
+	after_picture(user, P)
 	blending = FALSE
 
 
-/obj/item/camera/proc/after_picture(mob/user, datum/picture/picture, has_proximity)
+/obj/item/camera/proc/after_picture(mob/user, datum/picture/picture)
 	printpicture(user, picture)
 	if(!silent)
 		if(istype(custom_sound))

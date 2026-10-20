@@ -241,7 +241,7 @@
 /obj/item/reagent_containers/proc/try_splash(atom/target, mob/living/user)
 	if(!is_open_container()) //Can't splash stuff from a sealed container. I dare you to try.
 		to_chat(user, span_warning("An airtight seal prevents you from splashing the solution!"))
-		return
+		return FALSE
 
 	if(ismob(target) && target.reagents && reagents.total_volume)
 		to_chat(user, span_notice("You splash the solution onto [target]."))
@@ -258,12 +258,13 @@
 		visible_message(span_warning("[target] has been splashed with something by [user]!"))
 		reagents.reaction(target, TOUCH)
 		addtimer(CALLBACK(reagents, TYPE_PROC_REF(/datum/reagents, clear_reagents)), 5)
-		return
+		return TRUE
 
-
-	else if(reagents.total_volume)
+	if(reagents.total_volume)
 		to_chat(user, span_notice("You splash the solution onto [target]."))
 		playsound(target, 'sound/effects/slosh.ogg', 25, 1, MEDIUM_SOUND_RANGE)
 		reagents.reaction(target, TOUCH)
 		addtimer(CALLBACK(reagents, TYPE_PROC_REF(/datum/reagents, clear_reagents)), 5)
-		return
+		return TRUE
+
+	return FALSE

@@ -21,11 +21,57 @@
 	///Light level this gives off when on
 	var/brightness = 2
 
+
+/obj/item/light_bulb/Initialize(mapload)
+	. = ..()
+	switch(name)
+		if("light tube")
+			brightness = rand(6,9)
+		if("light bulb")
+			brightness = rand(4,6)
+	update()
+
 /obj/item/light_bulb/throw_impact(atom/hit_atom)
 	. = ..()
 	if(!.)
 		return
 	shatter()
+
+// called after an attack with a light item
+// shatter light, unless it was an attempt to put it in a light socket
+// now only shatter if the intent was harm
+/obj/item/light_bulb/afterattack(atom/target_atom, mob/user, list/modifiers)
+	. = ..()
+	if(istype(target_atom, /obj/machinery/light))
+		return
+	if(user.a_intent != INTENT_HARM)
+		return
+	shatter()
+
+/obj/item/light_bulb/proc/shatter()
+	if(status == LIGHT_OK || status == LIGHT_BURNED)
+		src.visible_message(span_warning("[name] shatters."),span_warning("You hear a small glass object shatter."))
+		status = LIGHT_BROKEN
+		force = 5
+		sharp = IS_SHARP_ITEM_SIMPLE
+		playsound(src.loc, 'sound/effects/Glasshit.ogg', 25, 1, MEDIUM_SOUND_RANGE)
+		update()
+
+// Updates the icon state and description of the light
+/obj/item/light_bulb/proc/update()
+	switch(status)
+		if(LIGHT_OK)
+			icon_state = base_icon_state
+			desc = "A replacement [name]."
+			worn_icon_state = "ltube"
+		if(LIGHT_BURNED)
+			icon_state = "[base_icon_state]_burned"
+			desc = "A burnt-out [name]."
+			worn_icon_state = "ltube-burned"
+		if(LIGHT_BROKEN)
+			icon_state = "[base_icon_state]_broken"
+			desc = "A broken [name]."
+			worn_icon_state = "ltube-broken"
 
 /obj/item/light_bulb/tube
 	name = "light tube"
@@ -82,50 +128,3 @@
 		syringe_tool.reagents.clear_reagents()
 		return ITEM_INTERACT_SUCCESS
 	return NONE
-
-// Updates the icon state and description of the light
-/obj/item/light_bulb/proc/update()
-	switch(status)
-		if(LIGHT_OK)
-			icon_state = base_icon_state
-			desc = "A replacement [name]."
-			worn_icon_state = "ltube"
-		if(LIGHT_BURNED)
-			icon_state = "[base_icon_state]_burned"
-			desc = "A burnt-out [name]."
-			worn_icon_state = "ltube-burned"
-		if(LIGHT_BROKEN)
-			icon_state = "[base_icon_state]_broken"
-			desc = "A broken [name]."
-			worn_icon_state = "ltube-broken"
-
-/obj/item/light_bulb/Initialize(mapload)
-	. = ..()
-	switch(name)
-		if("light tube")
-			brightness = rand(6,9)
-		if("light bulb")
-			brightness = rand(4,6)
-	update()
-
-// called after an attack with a light item
-// shatter light, unless it was an attempt to put it in a light socket
-// now only shatter if the intent was harm
-/obj/item/light_bulb/afterattack(atom/target, mob/user, has_proximity, click_parameters)
-	. = ..()
-	if(!has_proximity)
-		return
-	if(istype(target, /obj/machinery/light))
-		return
-	if(user.a_intent != INTENT_HARM)
-		return
-	shatter()
-
-/obj/item/light_bulb/proc/shatter()
-	if(status == LIGHT_OK || status == LIGHT_BURNED)
-		src.visible_message(span_warning("[name] shatters."),span_warning("You hear a small glass object shatter."))
-		status = LIGHT_BROKEN
-		force = 5
-		sharp = IS_SHARP_ITEM_SIMPLE
-		playsound(src.loc, 'sound/effects/Glasshit.ogg', 25, 1, MEDIUM_SOUND_RANGE)
-		update()

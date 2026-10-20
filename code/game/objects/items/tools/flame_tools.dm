@@ -188,91 +188,6 @@ CIGARETTE PACKETS ARE IN FANCY.DM
 	var/mutable_appearance/emissive_overlay = emissive_appearance(icon_used, emissive_state, src)
 	standing.overlays.Add(emissive_overlay)
 
-/obj/item/clothing/mask/cigarette/attackby(obj/item/W, mob/user, params)
-	if(lit || smoketime <= 0)
-		return
-
-	if(iswelder(W))
-		var/obj/item/tool/weldingtool/WT = W
-		if(WT.isOn())//Badasses dont get blinded while lighting their cig with a blowtorch
-			light(span_notice("[user] casually lights the [name] with [W]."))
-
-	else if(istype(W, /obj/item/tool/lighter/zippo))
-		var/obj/item/tool/lighter/zippo/Z = W
-		if(Z.heat)
-			light(span_rose("With a flick of [user.p_their()] wrist, [user] lights their [name] with [W]."))
-
-	else if(istype(W, /obj/item/explosive/grenade/flare/civilian))
-		var/obj/item/explosive/grenade/flare/civilian/FL = W
-		if(FL.heat)
-			light(span_notice("[user] lights [user.p_their()] [name] with [W]."))
-
-	else if(istype(W, /obj/item/explosive/grenade/flare))
-		var/obj/item/explosive/grenade/flare/FL2 = W
-		if(FL2.heat)
-			light(span_notice("[user] lights [user.p_their()] [name] with [W]."))
-
-	else if(istype(W, /obj/item/tool/lighter))
-		var/obj/item/tool/lighter/L = W
-		if(L.heat)
-			light(span_notice("[user] manages to light [user.p_their()] [name] with [W]."))
-
-	else if(istype(W, /obj/item/tool/match))
-		var/obj/item/tool/match/M = W
-		if(M.heat)
-			light(span_notice("[user] lights [user.p_their()] [name] with their [W]."))
-
-	else if(istype(W, /obj/item/weapon/energy/sword))
-		var/obj/item/weapon/energy/sword/S = W
-		if(S.active)
-			light(span_warning("[user] swings [user.p_their()] [W], barely missing [user.p_their()] nose. [user.p_they()] light [user.p_their()] [name] in the process."))
-
-	else if(istype(W, /obj/item/assembly/igniter))
-		light(span_notice("[user] fiddles with [W], and manages to light [user.p_their()] [name]."))
-
-	else if(istype(W, /obj/item/weapon/gun/flamer))
-		light(span_notice("[user] lights [user.p_their()] [src] with the pilot light of the [W]."))
-
-	else if(istype(W, /obj/item/weapon/gun))
-		var/obj/item/weapon/gun/G = W
-		if(istype(G, /obj/item/weapon/gun/energy/lasgun))
-			var/obj/item/weapon/gun/energy/lasgun/L = G
-			if(L.rounds)
-				light(span_notice("[user] deftly lights [user.p_their()] [src] with the [L]'s low power setting."))
-			else
-				to_chat(user, span_warning("You try to light your [src] with the [L] but your power cell has no charge!"))
-		else if(istype(LAZYACCESS(G.attachments_by_slot, ATTACHMENT_SLOT_UNDER), /obj/item/weapon/gun/flamer))
-			light(span_notice("[user] lights [user.p_their()] [src] with the underbarrel [LAZYACCESS(G.attachments_by_slot, ATTACHMENT_SLOT_UNDER)]."))
-
-	else if(istype(W, /obj/item/tool/surgery/cautery))
-		light(span_notice("[user] lights [user.p_their()] [src] with the [W]."))
-
-	else if(istype(W, /obj/item/clothing/mask/cigarette))
-		var/obj/item/clothing/mask/cigarette/C = W
-		if(C.lit)
-			light(span_notice("[user] lights [user.p_their()] [src] with the [C] after a few attempts."))
-
-	else if(istype(W, /obj/item/tool/candle))
-		if(W.heat > 200)
-			light(span_notice("[user] lights [user.p_their()] [src] with the [W] after a few attempts."))
-
-	else
-		return ..()
-
-
-/obj/item/clothing/mask/cigarette/afterattack(obj/item/reagent_containers/glass/glass, mob/living/user, list/modifiers)
-	. = ..()
-	if(!lit) //can't dip if cigarette is lit
-		return
-	if(istype(glass))	//you can dip cigarettes into beakers
-		if(glass.reagents.trans_to(src, chem_volume))	//if reagents were transfered, show the message
-			to_chat(user, span_notice("You dip \the [src] into \the [glass]."))
-		else			//if not, either the beaker was empty, or the cigarette was full
-			if(!glass.reagents.total_volume)
-				to_chat(user, span_notice("[glass] is empty."))
-			else
-				to_chat(user, span_notice("[src] is full."))
-
 /obj/item/clothing/mask/cigarette/surgery_tool_check()
 	return lit
 
@@ -344,14 +259,12 @@ CIGARETTE PACKETS ARE IN FANCY.DM
 			reagents.remove_any(REAGENTS_METABOLISM)
 
 
-
 /obj/item/clothing/mask/cigarette/attack_self(mob/user)
 	if(lit)
 		user.visible_message(span_notice("[user] calmly drops and treads on the lit [src], putting it out instantly."))
 		playsound(src, 'sound/items/cig_snuff.ogg', 15, 1, SHORT_SOUND_RANGE)
 		die()
 	return ..()
-
 
 /obj/item/clothing/mask/cigarette/interact_with_atom(atom/interacting_with, mob/living/user, list/modifiers)
 	if(lit)
@@ -363,6 +276,18 @@ CIGARETTE PACKETS ARE IN FANCY.DM
 			return ITEM_INTERACT_BLOCKING
 		light(span_notice("[user] lights [user.p_their()] [src] from the broken light."))
 		return ITEM_INTERACT_SUCCESS
+
+	if(istype(interacting_with, /obj/item/reagent_containers/glass) && !lit)
+		var/obj/item/reagent_containers/glass_container = interacting_with
+		if(glass_container.reagents.trans_to(src, chem_volume))	// If reagents were transfered, show the message.
+			to_chat(user, span_notice("You dip \the [src] into \the [glass]."))
+			return ITEM_INTERACT_SUCCESS
+		// If not, either the beaker was empty or the cigarette was full.
+		if(!glass.reagents.total_volume)
+			to_chat(user, span_notice("[glass] is empty."))
+			return ITEM_INTERACT_BLOCKING
+		to_chat(user, span_notice("[src] is full."))
+		return ITEM_INTERACT_BLOCKING
 
 	if(isliving(interacting_with))
 		var/mob/living/living_target = interacting_with
@@ -376,6 +301,59 @@ CIGARETTE PACKETS ARE IN FANCY.DM
 
 	if(isturf(interacting_with) && locate(/obj/fire/flamer) in interacting_with.contents)
 		light(span_notice("[user] lights [user.p_their()] [src] with the burning ground."))
+		return ITEM_INTERACT_SUCCESS
+
+	return NONE
+
+/obj/item/clothing/mask/cigarette/item_interaction(mob/living/user, obj/item/tool, list/modifiers)
+	if(lit || smoketime <= 0)
+		return NONE
+
+	if(iswelder(tool))
+		var/obj/item/tool/weldingtool/welder = tool
+		if(welder.isOn())// Badasses dont get blinded while lighting their cig with a blowtorch.
+			light(span_notice("[user] casually lights the [name] with [W]."))
+			return ITEM_INTERACT_SUCCESS
+		return NONE
+
+	if(istype(tool, /obj/item/assembly/igniter))
+		light(span_notice("[user] fiddles with [W], and manages to light [user.p_their()] [name]."))
+		return ITEM_INTERACT_SUCCESS
+
+	if(istype(tool, /obj/item/tool/surgery/cautery))
+		light(span_notice("[user] lights [user.p_their()] [src] with the [tool]."))
+		return ITEM_INTERACT_SUCCESS
+
+	if(istype(tool, /obj/item/weapon/gun))
+		var/obj/item/weapon/gun/tool_gun = tool
+		if(istype(tool_gun, /obj/item/weapon/gun/energy/lasgun))
+			if(tool_gun.rounds)
+				light(span_notice("[user] deftly lights [user.p_their()] [src] with the [tool_gun]'s low power setting."))
+				return ITEM_INTERACT_SUCCESS
+			to_chat(user, span_warning("You try to light your [src] with the [L] but your power cell has no charge!"))
+			return ITEM_INTERACT_BLOCKING
+		if(istype(tool, /obj/item/weapon/gun/flamer))
+			light(span_notice("[user] lights [user.p_their()] [src] with the pilot light of the [tool]."))
+			return ITEM_INTERACT_SUCCESS
+		if(istype(LAZYACCESS(tool_gun.attachments_by_slot, ATTACHMENT_SLOT_UNDER), /obj/item/weapon/gun/flamer))
+			light(span_notice("[user] lights [user.p_their()] [src] with the underbarrel [LAZYACCESS(tool_gun.attachments_by_slot, ATTACHMENT_SLOT_UNDER)]."))
+			return ITEM_INTERACT_SUCCESS
+
+	// Anything hot enough can light us up and typically means that they're lit, active, etc.
+	if(tool.heat)
+		if(istype(tool, /obj/item/tool/lighter/zippo))
+			light(span_rose("With a flick of [user.p_their()] wrist, [user] lights their [name] with [tool]."))
+			return ITEM_INTERACT_SUCCESS
+		if(istype(tool, /obj/item/tool/lighter))
+			light(span_notice("[user] manages to light [user.p_their()] [name] with [tool]."))
+			return ITEM_INTERACT_SUCCESS
+		if(istype(tool, /obj/item/weapon/energy/sword))
+			light(span_warning("[user] swings [user.p_their()] [tool], barely missing [user.p_their()] nose. [user.p_they()] light [user.p_their()] [name] in the process."))
+			return ITEM_INTERACT_SUCCESS
+		if(istype(tool, /obj/item/tool/candle) || istype(tool, /obj/item/clothing/mask/cigarette))
+			light(span_notice("[user] lights [user.p_their()] [src] with the [W] after a few attempts."))
+			return ITEM_INTERACT_SUCCESS
+		light(span_notice("[user] lights [user.p_their()] [name] with [tool]."))
 		return ITEM_INTERACT_SUCCESS
 
 	return NONE
