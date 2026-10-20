@@ -20,15 +20,18 @@
 		return FALSE
 	return TRUE
 
-/obj/item/explosive/grenade/sticky/afterattack(atom/target, mob/user, list/modifiers)
+/obj/item/explosive/grenade/sticky/interact_with_atom(atom/interacting_with, mob/living/user, list/modifiers)
 	. = ..()
-	if(target != user)
+	if(.)
 		return
-	if(!self_sticky)
-		return
+
+	if(!self_sticky || interacting_with != user)
+		return NONE
+
 	user.drop_held_item()
 	activate()
-	stuck_to(target)
+	stuck_to(interacting_with)
+	return ITEM_INTERACT_SUCCESS
 
 /obj/item/explosive/grenade/sticky/launched_det_time()
 	det_time -= 1 SECONDS

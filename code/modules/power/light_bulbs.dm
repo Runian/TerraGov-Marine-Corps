@@ -37,16 +37,17 @@
 		return
 	shatter()
 
-// called after an attack with a light item
-// shatter light, unless it was an attempt to put it in a light socket
-// now only shatter if the intent was harm
-/obj/item/light_bulb/afterattack(atom/target_atom, mob/user, list/modifiers)
+/obj/item/light_bulb/attacked_by(obj/item/attacking_item, mob/living/user, list/modifiers)
 	. = ..()
-	if(istype(target_atom, /obj/machinery/light))
+	if(!.)
 		return
-	if(user.a_intent != INTENT_HARM)
-		return
+	// Certain things (/obj/machinery/light) already have handled interaction with us, so anything else are unhandled and shall be shattered.
+	to_chat(world, "attacked_by shatter")
 	shatter()
+
+/obj/item/light_bulb/afterattack(atom/target_atom, mob/user, list/modifiers)
+	// Certain things (/obj/machinery/light) already have handled interaction with us, so anything else are unhandled and shall be shattered.
+	to_chat(world, "afterattack shatter")
 
 /obj/item/light_bulb/proc/shatter()
 	if(status == LIGHT_OK || status == LIGHT_BURNED)

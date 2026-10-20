@@ -135,88 +135,86 @@
 	if(flickering)
 		. += "The fixture seems to be damaged and the cabling is partially broken."
 
-/obj/machinery/light/attackby(obj/item/I, mob/user, params)
+/obj/machinery/light/item_interaction(mob/living/user, obj/item/tool, list/modifiers)
 	. = ..()
 	if(.)
 		return
 
-	if(istype(I, /obj/item/lightreplacer))
-		if(!isliving(user))
-			return
-		var/mob/living/living_user = user
-		var/obj/item/lightreplacer/lightreplacer = I
-		lightreplacer.ReplaceLight(src, living_user)
-		return
+	if(istype(tool, /obj/item/lightreplacer))
+		var/obj/item/lightreplacer/light_replacer = tool
+		light_replacer.ReplaceLight(src, user)
+		return ITEM_INTERACT_SUCCESS
 
-	if(istype(I, /obj/item/light_bulb))
+	if(istype(tool, /obj/item/light_bulb))
 		if(status != LIGHT_EMPTY)
 			to_chat(user, "There is a [fitting] already inserted.")
-			return
+			return ITEM_INTERACT_BLOCKING
 
-		var/obj/item/light_bulb/L = I
-		if(!istype(L, light_type))
+		var/obj/item/light_bulb/light_bulb = tool
+		if(!istype(light_bulb, light_type))
 			to_chat(user, "This type of light requires a [fitting].")
+			return ITEM_INTERACT_BLOCKING
+
+		if(!user.temporarilyRemoveItemFromInventory(light_bulb))
+			to_chat(user, span_warning("The [tool] is stuck to your hand!"))
 			return
 
-		status = L.status
-		to_chat(user, "You insert \the [L].")
-		switchcount = L.switchcount
-		rigged = L.rigged
-		brightness = L.brightness
+		status = light_bulb.status
+		switchcount = light_bulb.switchcount
+		rigged = light_bulb.rigged
+		brightness = light_bulb.brightness
+		to_chat(user, "You insert \the [light_bulb].")
 		update()
 
-		if(!user.temporarilyRemoveItemFromInventory(L))
-			return
-
-		qdel(L)
-
+		qdel(light_bulb)
 		if(light_on && rigged)
 			explode()
-		return
+		return ITEM_INTERACT_SUCCESS
 
-	if(status == LIGHT_EMPTY && has_power() && (I.atom_flags & CONDUCT))
-		to_chat(user, "You stick \the [I] into the light socket!")
-		var/datum/effect_system/spark_spread/s = new /datum/effect_system/spark_spread(src)
-		s.set_up(3, 1, loc)
-		s.start()
+	if(status == LIGHT_EMPTY && has_power() && (tool.atom_flags & CONDUCT))
+		to_chat(user, "You stick \the [tool] into the light socket!")
+		var/datum/effect_system/spark_spread/effect = new /datum/effect_system/spark_spread(src)
+		effect.set_up(3, 1, loc)
+		effect.start()
 		if(prob(75))
 			electrocute_mob(user, get_area(src), src, rand(7, 10) * 0.1)
 
-/obj/machinery/light/attacked_by(obj/item/I, mob/living/user, def_zone)
+/obj/machinery/light/attacked_by(obj/item/attacking_item, mob/living/user, list/modifiers)
 	. = ..()
-	if(QDELETED(src))
+	if(!. || QDELETED(src) || status == LIGHT_BROKEN)
 		return
-	if(status != LIGHT_OK && status != LIGHT_BURNED)
-		return
-	if(!prob(1 + I.force * 5))
-		return
+	if(prob(1 + attacking_item.force * 5))
+		visible_message(
+			span_notice("[user] smashed the light!"),
+			span_notice("You hit the light, and it smashes!")
+		)
+		if(light_on && (attacking_item.atom_flags & CONDUCT) && prob(12))
+			electrocute_mob(user, get_area(src), src, 0.3)
+		broken()
 
-	visible_message("[user] smashed the light!", "You hit the light, and it smashes!")
-	if(light_on && (I.atom_flags & CONDUCT) && prob(12))
-		electrocute_mob(user, get_area(src), src, 0.3)
-	broken()
-
-/obj/machinery/light/screwdriver_act(mob/living/user, obj/item/I)
-	if(user.a_intent == INTENT_HARM)
-		return FALSE
+/obj/machinery/light/screwdriver_act(mob/living/user, obj/item/tool)
 	if(status != LIGHT_EMPTY)
-		balloon_alert(user, "Remove bulb first")
+		balloon_alert(user, "remove bulb first!")
 		return TRUE
 
-	I.play_tool_sound(src)
-	user.visible_message("[user] opens [src]'s casing.", \
-		"You open [src]'s casing.", "You hear a noise.")
-	var/obj/machinery/light_construct/newlight
+	tool.play_tool_sound(src)
+	user.visible_message(
+		"[user] opens [src]'s casing.", \
+		"You open [src]'s casing.", "You hear a noise."
+	)
+
+	var/obj/machinery/light_construct/new_light
 	switch(fitting)
 		if("bulb")
-			newlight = new /obj/machinery/light_construct/small(loc)
-			newlight.icon_state = "bulb-construct-stage2"
-		else //we'll assume tube as the default in case of shitcodery
-			newlight = new /obj/machinery/light_construct(loc)
-			newlight.icon_state = "tube-construct-stage2"
-	newlight.setDir(dir)
-	newlight.stage = 2
+			new_light = new /obj/machinery/light_construct/small(loc)
+			new_light.icon_state = "bulb-construct-stage2"
+		else // We'll assume tube as the default in case of shitcodery.
+			new_light = new /obj/machinery/light_construct(loc)
+			new_light.icon_state = "tube-construct-stage2"
+	new_light.setDir(dir)
+	new_light.stage = 2
 	qdel(src)
+
 	return TRUE
 
 /obj/machinery/light/attack_alien(mob/living/carbon/xenomorph/xeno_attacker, damage_amount = xeno_attacker.xeno_caste.melee_damage, damage_type = BRUTE, armor_type = MELEE, effects = TRUE, armor_penetration = xeno_attacker.xeno_caste.melee_ap, isrightclick = FALSE)
