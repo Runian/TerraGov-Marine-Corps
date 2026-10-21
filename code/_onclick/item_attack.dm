@@ -76,10 +76,13 @@
 	if(QDELETED(target) || QDELETED(src))
 		return TRUE
 
-	SEND_SIGNAL(src, COMSIG_ITEM_AFTERATTACK, target, user, modifiers)
-	SEND_SIGNAL(target, COMSIG_ATOM_AFTER_ATTACKEDBY, src, user, modifiers)
-	afterattack(target, user, modifiers)
-	return TRUE
+	var/signal_return = SEND_SIGNAL(src, COMSIG_ITEM_AFTERATTACK, target, user, modifiers) | SEND_SIGNAL(target, COMSIG_ATOM_AFTER_ATTACKEDBY, src, user, modifiers)
+	if(signal_return & COMPONENT_CANCEL_ATTACK_CHAIN)
+		return TRUE
+	if(afterattack(target, user, modifiers))
+		return TRUE
+
+	return FALSE // Nothing happened / unresolved.
 
 /**
  * Called before an atom is attacked by an item via LEFT CLICK.
@@ -163,7 +166,7 @@
  * * mob/user - The mob doing the hitting.
  * * list/modifiers - The click modifiers, e.g. alt, shift.
  *
- * Returns TRUE if the attack has fully resolved / if the attack chain should end here.
+ * Returns TRUE if the attack chain should end here.
  *
  * See: [/obj/item/proc/melee_attack_chain]
  */
@@ -240,7 +243,7 @@
  * * mob/living/user - The living mob that is attacking.
  * * list/modifiers - The click modifiers, e.g. alt, shift.
  *
- * Returns TRUE if the attack has fully resolved / if the attack chain should end here.
+ * Returns TRUE if the attack chain should end here.
  */
 /obj/item/proc/attack_mob(mob/living/target_mob, mob/user, list/modifiers)
 	var/signal_return = SEND_SIGNAL(src, COMSIG_ITEM_ATTACK, target_mob, user, modifiers) || SEND_SIGNAL(user, COMSIG_MOB_ITEM_ATTACK, target_mob, src, modifiers)
@@ -409,9 +412,14 @@
  * * atom/target_atom - The atom getting attacked.
  * * mob/user - The mob that is attacking.
  * * list/modifiers - The click modifiers, e.g. alt, shift.
+ *
+ * Returns TRUE if something happened.
  */
 /obj/item/proc/afterattack(atom/target_atom, mob/user, list/modifiers)
-	return
+	var/signal_return = SEND_SIGNAL(src, COMSIG_ITEM_AFTERATTACK, target, user, modifiers) | SEND_SIGNAL(target, COMSIG_ATOM_AFTER_ATTACKEDBY, src, user, modifiers)
+	if(signal_return & COMPONENT_CANCEL_ATTACK_CHAIN)
+		return TRUE
+	return FALSE
 
 /**
  * This proc is called when an atom gets attacked (clicked on) by a powerloader clamp

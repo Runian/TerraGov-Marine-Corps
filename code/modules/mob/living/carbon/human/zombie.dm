@@ -57,30 +57,36 @@
 			return TRUE
 	return ..()
 
-/obj/item/weapon/zombie_claw/melee_attack_chain(mob/user, atom/target, params, rightclick)
+/obj/item/weapon/zombie_claw/melee_attack_chain(mob/user, atom/target, list/modifiers)
 	. = ..()
-	if(!.)
+	if(.) // This means this item had its interaction handled already.
 		return
-	target.attack_zombie(user, src, params, rightclick)
+	target.attack_zombie(user, src, modifiers)
+	return TRUE // TODO: This should be dealt with in the attack_zombie().
 
 /obj/item/weapon/zombie_claw/strong
 	force = 35
 
 /obj/item/weapon/zombie_claw/tank
-	attack_speed = 12
 	force = 40
+	attack_speed = 12
 
 /obj/item/weapon/zombie_claw/no_zombium
 	zombium_per_hit = 0
 
 /**
- * Any special attack by zombie behavior
- * Called after melee_attack_chain if it returns true
-*/
-/atom/proc/attack_zombie(mob/living/carbon/human/zombie, obj/item/weapon/zombie_claw/claw, params, rightclick)
+ * Handles specific on-attack zombie effects that can't be dealt with anywhere else.
+ * Called if melee_attack_chain does not end early.
+ *
+ * Arguments:
+ * * obj/item/weapon/zombie_claw/claw - The zombie claw that is hitting us.
+ * * mob/living/carbon/human/zombie - The zombie attacking us / holding the zombie claw.
+ * * list/modifiers - The click modifiers, e.g. alt, shift.
+ */
+/atom/proc/attack_zombie(obj/item/weapon/zombie_claw/claw, mob/living/carbon/human/zombie, list/modifiers)
 	return
 
-/obj/machinery/door/attack_zombie(mob/living/carbon/human/zombie, obj/item/weapon/zombie_claw/claw, params, rightclick)
+/obj/machinery/door/attack_zombie(obj/item/weapon/zombie_claw/claw, mob/living/carbon/human/zombie, list/modifiers)
 	if(!density)
 		return
 	if(zombie.do_actions)
@@ -97,12 +103,12 @@
 		return
 	playsound(zombie.loc, 'sound/effects/metal_creaking.ogg', 25, 1, MEDIUM_SOUND_RANGE)
 
-	if(!density || operating) //Make sure it's still closed
+	if(!density || operating) // Make sure it's still closed.
 		return
 	zombie.changeNext_move(claw.attack_speed)
 	open(TRUE)
 
-/obj/machinery/power/apc/attack_zombie(mob/living/carbon/human/zombie, obj/item/weapon/zombie_claw/claw, params, rightclick)
+/obj/machinery/power/apc/attack_zombie(obj/item/weapon/zombie_claw/claw, mob/living/carbon/human/zombie, list/modifiers)
 	zombie.do_attack_animation(src, ATTACK_EFFECT_CLAW)
 	zombie.visible_message(span_danger("[zombie] slashes \the [src]!"), \
 	span_danger("We slash \the [src]!"), null, 5)
@@ -124,7 +130,7 @@
 	zombie.changeNext_move(claw.attack_speed)
 	zombie.do_attack_animation(src, used_item = claw)
 
-/obj/machinery/nuclearbomb/attack_zombie(mob/living/carbon/human/zombie, obj/item/weapon/zombie_claw/claw, params, rightclick)
+/obj/machinery/nuclearbomb/attack_zombie(obj/item/weapon/zombie_claw/claw, mob/living/carbon/human/zombie, list/modifiers)
 	if(!timer_enabled)
 		to_chat(zombie, span_warning("\The [name] isn't active."))
 		return
@@ -135,7 +141,7 @@
 		return
 	do_defuse(zombie)
 
-/mob/living/carbon/human/attack_zombie(mob/living/carbon/human/zombie, obj/item/weapon/zombie_claw/claw, params, rightclick)
+/mob/living/carbon/human/attack_zombie(obj/item/weapon/zombie_claw/claw, mob/living/carbon/human/zombie, list/modifiers)
 	if(stat == DEAD)
 		return
 	if(!claw.zombium_per_hit)
@@ -145,7 +151,7 @@
 	else
 		reagents.add_reagent(/datum/reagent/zombium, modify_by_armor(claw.zombium_per_hit, BIO, 0, zombie.get_limbzone_target()))
 
-/obj/structure/barricade/attack_zombie(mob/living/carbon/human/zombie, obj/item/weapon/zombie_claw/claw, params, rightclick)
+/obj/structure/barricade/attack_zombie(obj/item/weapon/zombie_claw/claw, mob/living/carbon/human/zombie, list/modifiers)
 	if(!(barricade_flags & BARRICADE_IS_WIRED))
 		return
 	if(zombie.a_intent != INTENT_HARM)
@@ -153,12 +159,12 @@
 	balloon_alert(zombie, "barbed wire slices into you!")
 	zombie.apply_damage(20, blocked = MELEE , sharp = TRUE, updating_health = TRUE)//Higher damage since zombies have high healing rate, and theyre using their hands
 
-/obj/machinery/vending/attack_zombie(mob/living/carbon/human/zombie, obj/item/weapon/zombie_claw/claw, params, rightclick)
+/obj/machinery/vending/attack_zombie(obj/item/weapon/zombie_claw/claw, mob/living/carbon/human/zombie, list/modifiers)
 	if(tipped_level == 2)
 		return
 	tip_over()
 
-/obj/structure/razorwire/attack_zombie(mob/living/carbon/human/zombie, obj/item/weapon/zombie_claw/claw, params, rightclick)
+/obj/structure/razorwire/attack_zombie(obj/item/weapon/zombie_claw/claw, mob/living/carbon/human/zombie, list/modifiers)
 	if(zombie.a_intent != INTENT_HARM)
 		return
 	zombie.apply_damage(ZOMBIE_RAZORWIRE_DAMAGE, blocked = MELEE, updating_health = TRUE)//Less health but more damage
