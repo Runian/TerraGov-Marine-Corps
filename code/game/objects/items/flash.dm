@@ -125,6 +125,17 @@
 			carbon_holder.Paralyze(20 SECONDS)
 			carbon_holder.visible_message(span_disarm("[carbon_holder] is blinded by the flash!"))
 
+/// Checks if the flash can be used.
+/obj/item/flash/proc/can_use(mob/user)
+	if(user?.skills.getRating(SKILL_POLICE) < SKILL_POLICE_FLASH)
+		to_chat(user, span_warning("You don't seem to know how to use [src]..."))
+		return FALSE
+	if(broken)
+		if(user)
+			to_chat(user, span_warning("\The [src] is broken."))
+		return FALSE
+	return TRUE
+
 /// Recharges the flash's uses based on how much time has passed.
 /obj/item/flash/proc/flash_recharge()
 	for(var/i = 0, i < 3, i++)

@@ -14,7 +14,6 @@
 	. = ..()
 	give_component()
 
-
 /obj/item/explosive/grenade/sticky/interact_with_atom(atom/interacting_with, mob/living/user, list/modifiers)
 	. = ..()
 	if(.)
