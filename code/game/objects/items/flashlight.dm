@@ -87,36 +87,48 @@
 
 
 /obj/item/flashlight/attack(mob/living/M, mob/living/user)
-	if(light_on && user.zone_selected == BODY_ZONE_PRECISE_EYES)
-
-		if((user.getBrainLoss() >= 60) && prob(50))	//too dumb to use flashlight properly
-			return ..()	//just hit them in the head
-
-
-		var/mob/living/carbon/human/H = M	//mob has protective eyewear
-		if(ishuman(M) && ((H.head && H.head.inventory_flags & COVEREYES) || (H.wear_mask && H.wear_mask.inventory_flags & COVEREYES) || (H.glasses && H.glasses.inventory_flags & COVEREYES)))
-			to_chat(user, span_notice("You're going to need to remove that [(H.head && H.head.inventory_flags & COVEREYES) ? "helmet" : (H.wear_mask && H.wear_mask.inventory_flags & COVEREYES) ? "mask": "glasses"] first."))
-			return
-
-		if(M == user)	//they're using it on themselves
-			M.flash_act()
-			M.visible_message(span_notice("[M] directs [src] to [M.p_their()] eyes."), \
-								span_notice("You wave the light in front of your eyes! Trippy!"))
-			return
-
-		user.visible_message(span_notice("[user] directs [src] to [M]'s eyes."), \
-							span_notice("You direct [src] to [M]'s eyes."))
-
-		if(ishuman(M))	//robots and aliens are unaffected
-			var/mob/living/carbon/C = M
-			if(C.stat == DEAD || C.disabilities & BLIND)	//mob is dead or fully blind
-				to_chat(user, span_notice("[C] pupils does not react to the light!"))
-			else	//they're okay!
-				C.flash_act()
-				to_chat(user, span_notice("[C]'s pupils narrow."))
-	else
+	if(!light_on || user.zone_selected != BODY_ZONE_PRECISE_EYES)
 		return ..()
 
+	/// Dumb people shall randomly just fail.
+	if((user.getBrainLoss() >= 60) && prob(50))
+		return ..()
+
+	var/obj/item/protective_item = M.is_eyes_covered()
+	if(protective_item && ishuman(M))
+		var/mob/living/carbon/human/human_target = M
+		var/simplified_name = "whatever is covering their eyes" // Fallback if everything somehow fails.
+		if(human_target.head == protective_item)
+			simplified_name = "that helmet"
+		else if(human_target.wear_mask == protective_item)
+			simplified_name = "that mask"
+		else if(human_target.glasses == protective_item)
+			simplified_name = "that glasses"
+		to_chat(user, span_notice("You're going to need to remove [simplified_name] first."))
+		return
+
+	// Using it on themselves.
+	if(M == user)
+		M.flash_act()
+		M.visible_message(
+			span_notice("[M] directs [src] to [M.p_their()] eyes."), \
+			span_notice("You wave the light in front of your eyes! Trippy!"))
+		return
+
+	user.visible_message(
+		span_notice("[user] directs [src] to [M]'s eyes."), \
+		span_notice("You direct [src] to [M]'s eyes."))
+
+	// Robots and aliens are not affected.
+	if(!ishuman(M))
+		return
+
+	var/mob/living/carbon/carbon_target = M
+	if(carbon_target.stat == DEAD || carbon_target.disabilities & BLIND)
+		to_chat(user, span_notice("[carbon_target] pupils does not react to the light!"))
+		return
+	carbon_target.flash_act()
+	to_chat(user, span_notice("[carbon_target]'s pupils narrow."))
 
 /obj/item/flashlight/pen
 	name = "penlight"

@@ -62,7 +62,7 @@
 			attacked_human.take_limb_damage(5)
 		return
 
-	if(attacked_human?.head.inventory_flags & COVEREYES || attacked_human?.wear_mask.inventory_flags & COVEREYES || attacked_human?.glasses.inventory_flags & COVEREYES)
+	if(attacked_human.is_eyes_covered())
 		attacked_human.visible_message(span_danger("[user] slams [attacked_human] with the tray!"), span_warning("You get slammed in the face with the tray, against your mask!"))
 
 		if(prob(10))

@@ -168,28 +168,10 @@
 	if(!(method in list(TOUCH, VAPOR)) || !ishuman(L))
 		return
 	var/mob/living/carbon/human/victim = L
-	var/mouth_covered = 0
-	var/eyes_covered = 0
-	var/obj/item/safe_thing = null
-	if( victim.wear_mask )
-		if( victim.wear_mask.inventory_flags & COVEREYES )
-			eyes_covered = 1
-			safe_thing = victim.wear_mask
-		if( victim.wear_mask.inventory_flags & COVERMOUTH )
-			mouth_covered = 1
-			safe_thing = victim.wear_mask
-	if( victim.head )
-		if( victim.head.inventory_flags & COVEREYES )
-			eyes_covered = 1
-			safe_thing = victim.head
-		if( victim.head.inventory_flags & COVERMOUTH )
-			mouth_covered = 1
-			safe_thing = victim.head
-	if(victim.glasses)
-		eyes_covered = 1
-		if( !safe_thing )
-			safe_thing = victim.glasses
-	if( eyes_covered && mouth_covered )
+	var/mouth_covered = victim.is_mouth_covered()
+	var/eyes_covered = victim.is_eyes_covered()
+	var/obj/item/safe_thing = mouth_covered || eyes_covered // This is either: an item OR null.
+	if(safe_thing)
 		if(show_message)
 			to_chat(victim, span_danger("Your [safe_thing.name] protects you from the pepperspray!"))
 		return

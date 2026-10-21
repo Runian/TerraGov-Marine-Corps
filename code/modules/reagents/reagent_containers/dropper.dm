@@ -13,8 +13,8 @@
 	reagent_flags = TRANSPARENT
 	var/filled = 0
 
-/obj/item/reagent_containers/dropper/afterattack(obj/target, mob/user , flag)
-	if(!target.reagents || !flag)
+/obj/item/reagent_containers/dropper/afterattack(atom/target, mob/user, has_proximity, click_parameters)
+	if(!target.reagents || !has_proximity)
 		return
 
 	if(filled)
@@ -38,19 +38,8 @@
 				return
 
 			if(ishuman(target))
-				var/mob/living/carbon/human/victim = target
-
-				var/obj/item/safe_thing = null
-				if( victim.wear_mask )
-					if ( victim.wear_mask.inventory_flags & COVEREYES )
-						safe_thing = victim.wear_mask
-				if( victim.head )
-					if ( victim.head.inventory_flags & COVEREYES )
-						safe_thing = victim.head
-				if(victim.glasses)
-					if ( !safe_thing )
-						safe_thing = victim.glasses
-
+				var/mob/living/carbon/human/human_target = target
+				var/obj/item/safe_thing = human_target.is_eyes_covered()
 				if(safe_thing)
 					if(!safe_thing.reagents)
 						safe_thing.create_reagents(100)

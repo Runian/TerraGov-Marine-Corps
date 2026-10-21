@@ -53,11 +53,11 @@
 				to_chat(human_user, span_boldnotice("You can't help this one, [p_they()] [p_have()] no lungs!"))
 				return FALSE
 
-			if((head && (head.inventory_flags & COVERMOUTH)) || (wear_mask && (wear_mask.inventory_flags & COVERMOUTH)))
+			if(is_mouth_covered())
 				to_chat(human_user, span_boldnotice("Remove [p_their()] mask!"))
 				return FALSE
 
-			if((human_user.head && (human_user.head.inventory_flags & COVERMOUTH)) || (human_user.wear_mask && (human_user.wear_mask.inventory_flags & COVERMOUTH)))
+			if(human_user.is_mouth_covered())
 				to_chat(human_user, span_boldnotice("Remove your mask!"))
 				return FALSE
 

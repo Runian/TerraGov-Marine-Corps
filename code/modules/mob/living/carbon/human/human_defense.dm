@@ -466,3 +466,41 @@ Contains most of the procs that are called when a mob is attacked by something
 				balloon_alert(user, "dents fully repaired")
 				break
 	return TRUE
+
+/**
+ * Checks if our mob has their mouth covered.
+ *
+ * Note that we only care about [ITEM_SLOT_HEAD] and [ITEM_SLOT_MASK].
+ * That is also the priority order (so if you check all slots, it'll return head, then mask).
+ *
+ * Arguments
+ * * check_flags: What item slots should we check?
+ *
+ * Retuns a truthy value (a ref to what is covering mouth), or a falsy value (null).
+ */
+/mob/living/carbon/human/proc/is_mouth_covered(check_flags = ALL)
+	if((check_flags & ITEM_SLOT_HEAD) && head && (head.inventory_flags & COVERMOUTH))
+		return head
+	if((check_flags & ITEM_SLOT_MASK) && wear_mask && (wear_mask.inventory_flags & COVERMOUTH))
+		return wear_mask
+	return null
+
+/**
+ * Checks if our human has their eyes covered.
+ *
+ * Note that we only care about [ITEM_SLOT_HEAD], [ITEM_SLOT_MASK], and [ITEM_SLOT_GLASSES].
+ * That is also the priority order (so if you check all slots, it'll return head, then mask, then glasses).
+ *
+ * Arguments
+ * * check_flags: What item slots should we check?
+ *
+ * Retuns a truthy value (a ref to what is covering eyes), or a falsy value (null).
+ */
+/mob/living/carbon/human/proc/is_eyes_covered(check_flags = ALL)
+	if((check_flags & ITEM_SLOT_HEAD) && head && (head.inventory_flags & COVEREYES))
+		return head
+	if((check_flags & ITEM_SLOT_MASK) && wear_mask && (wear_mask.inventory_flags & COVEREYES))
+		return wear_mask
+	if((check_flags & ITEM_SLOT_EYES) && glasses && (glasses.inventory_flags & COVEREYES))
+		return glasses
+	return null
