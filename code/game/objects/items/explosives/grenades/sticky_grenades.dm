@@ -7,18 +7,13 @@
 	det_time = 5 SECONDS
 	light_impact_range = 2
 	weak_impact_range = 3
-
-	///if this specific grenade should be allowed to self sticky
+	/// Should this specific grenade should be allowed to self-sticky?
 	var/self_sticky = FALSE
 
 /obj/item/explosive/grenade/sticky/Initialize(mapload)
 	. = ..()
 	give_component()
 
-/obj/item/explosive/grenade/sticky/can_stick_to(atom/hit_atom)
-	if(!active || isturf(hit_atom))
-		return FALSE
-	return TRUE
 
 /obj/item/explosive/grenade/sticky/interact_with_atom(atom/interacting_with, mob/living/user, list/modifiers)
 	. = ..()
@@ -32,6 +27,11 @@
 	activate()
 	stuck_to(interacting_with)
 	return ITEM_INTERACT_SUCCESS
+
+/obj/item/explosive/grenade/sticky/can_stick_to(atom/hit_atom)
+	if(!active || isturf(hit_atom))
+		return FALSE
+	return TRUE
 
 /obj/item/explosive/grenade/sticky/launched_det_time()
 	det_time -= 1 SECONDS
@@ -62,7 +62,7 @@
 	var/turf/T = get_turf(src)
 	T.ignite(25, 25)
 
-///causes fire tiles underneath target when stuck_to
+// Causes fire tiles underneath target when stuck_to.
 /obj/item/explosive/grenade/sticky/trailblazer/on_move_sticky()
 	var/turf/T = get_turf(src)
 	T.ignite(25, 25)
