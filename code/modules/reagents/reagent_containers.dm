@@ -231,7 +231,7 @@
 	target.update_appearance()
 	return TRUE
 
-/// Splashes atom/target with whatever reagents are contained
+/// Splashes atom/target with whatever reagents are contained.
 /obj/item/reagent_containers/proc/try_splash(atom/target, mob/living/user)
 	if(!is_open_container()) // Can't splash stuff from a sealed container. I dare you to try.
 		to_chat(user, span_warning("An airtight seal prevents you from splashing the solution!"))
