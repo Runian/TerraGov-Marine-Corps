@@ -730,3 +730,115 @@
 /datum/action/ability/activable/xeno/psy_blast/proc/end_channel()
 	QDEL_NULL(particle_holder)
 	xeno_owner.update_glow()
+
+// ***************************************
+// *********** Psychic Grab
+// ***************************************
+/datum/action/ability/activable/xeno/psychic_grab
+	name = "Psychic Grab"
+	action_icon_state = "psy_blast" // tba
+	action_icon = 'icons/Xeno/actions/warlock.dmi'
+	desc = "Grabs an item from ranged with your physhic might and flings it at a direction of your choosing."
+	cooldown_duration = 1 SECONDS // TBA
+	ability_cost = 0 // TBA
+	target_flags = NONE // TBA
+	/// How far can we grab items?
+	var/grab_range = 5
+	/// The item that we are actively grabbing.
+	var/obj/item/grabbed_item = null
+	/// Ref of the beam following the grabbed atom.
+	var/datum/beam/kinesis_beam
+	/// Overlay we add to each grabbed atom.
+	var/mutable_appearance/kinesis_overlay
+
+/datum/action/ability/activable/xeno/psychic_grab/use_ability(atom/targetted_atom)
+	if(grabbed_item)
+		throw_away()
+		return TRUE
+	if(is_valid_to_grab(targetted_atom))
+		start_grab(targetted_atom)
+		return TRUE
+
+/// Checks if we are allowed to grab this atom.
+/datum/action/ability/activable/xeno/psychic_grab/proc/is_valid_to_grab(atom/target)
+	if(!isturf(xeno_owner.loc))
+		return FALSE
+	if(!isobj(target))
+		return FALSE
+	var/obj/obj_target = target
+	if(obj_target.anchored)
+		return FALSE
+	var/static/list/allowed_grabbable_types = typecacheof(list(
+		/obj/item,
+		/obj/structure/closet,
+	))
+	if(!is_type_in_typecache(obj_target, allowed_grabbable_types))
+		return FALSE
+	if(get_dist(xeno_owner, obj_target) > grab_range)
+		xeno_owner.balloon_alert(xeno_owner, "too far!")
+		return FALSE
+	if(!line_of_sight(xeno_owner, obj_target))
+		xeno_owner.balloon_alert(xeno_owner, "can't see!")
+		return FALSE
+	return TRUE
+
+/// Ends our grab on the item.
+/datum/action/ability/activable/xeno/psychic_grab/proc/start_grab(atom/target)
+	if(grabbed_item)
+		return
+	grabbed_item = target
+	playsound(grabbed_item, 'sound/effects/snap.ogg', 75, TRUE)
+	//playsound(grabbed_item, 'sound/effects/contractorbatonhit.ogg', 75, TRUE)
+	kinesis_overlay = mutable_appearance(icon = 'icons/effects/effects.dmi', icon_state = "kinesis", layer = grabbed_item.layer - 0.1)
+	kinesis_overlay.appearance_flags = RESET_ALPHA|RESET_COLOR|RESET_TRANSFORM
+	kinesis_overlay.overlays += emissive_appearance(icon = 'icons/effects/effects.dmi', icon_state = "kinesis", offset_spokesman = grabbed_item)
+	grabbed_item.add_overlay(kinesis_overlay)
+	kinesis_beam = xeno_owner.beam(grabbed_item, "kinesis", 'icons/effects/beam.dmi')
+
+	// todo: register a fuckton of signals
+
+/// Ends our grab on the item.
+/datum/action/ability/activable/xeno/psychic_grab/proc/end_grab(playsound = TRUE)
+	if(!grabbed_item)
+		return
+	if(playsound)
+		playsound(grabbed_item, 'sound/effects/empulse.ogg', 75, TRUE)
+	grabbed_item.cut_overlay(kinesis_overlay)
+	QDEL_NULL(kinesis_beam)
+	//animate(grabbed_item, 0.2 SECONDS, pixel_x = grabbed_item.base_pixel_x, pixel_y = grabbed_item.base_pixel_y)
+	grabbed_item = null
+	// todo: unregister a fuckton of signals
+
+/// Throws our grabbed item straight away from us.
+/datum/action/ability/activable/xeno/psychic_grab/proc/throw_away()
+	if(!grabbed_item)
+		return
+	playsound(grabbed_item, 'sound/effects/repulse.ogg', 100, TRUE)
+	var/turf/target_turf = get_turf_in_angle(Get_Angle(xeno_owner, grabbed_item), get_turf(xeno_owner), 10)
+	grabbed_item.throw_at(target_turf, range = grab_range, speed = grabbed_item.density ? 3 : 4, thrower = xeno_owner, spin = TRUE)
+	end_grab()
+
+// TODO: This is temporary!
+/proc/get_turf_in_angle(angle, turf/starting, increments)
+	var/pixel_x = 0
+	var/pixel_y = 0
+	for(var/i in 1 to increments)
+		pixel_x += sin(angle) + 16 * sin(angle) * 2
+		pixel_y += cos(angle) + 16 * cos(angle) * 2
+	var/new_x = starting.x
+	var/new_y = starting.y
+	while(pixel_x > 16)
+		pixel_x -= 32
+		new_x++
+	while(pixel_x < -16)
+		pixel_x += 32
+		new_x--
+	while(pixel_y > 16)
+		pixel_y -= 32
+		new_y++
+	while(pixel_y < -16)
+		pixel_y += 32
+		new_y--
+	new_x = clamp(new_x, 1, world.maxx)
+	new_y = clamp(new_y, 1, world.maxy)
+	return locate(new_x, new_y, starting.z)

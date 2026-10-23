@@ -31,6 +31,7 @@
 		/datum/action/ability/activable/xeno/psychic_shield,
 		/datum/action/ability/activable/xeno/transfer_plasma/beam,
 		/datum/action/ability/xeno_action/psychic_whisper,
+		/datum/action/ability/activable/xeno/psychic_grab,
 	)
 
 	mutations = list(
