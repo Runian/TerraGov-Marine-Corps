@@ -333,6 +333,46 @@
 		return
 	activate_jelly(user)
 
+/obj/item/resin_jelly/preattack(atom/target, mob/user, params)
+	if(!isxenohivelord(user))
+		return FALSE
+	if(!isresinwall(target))
+		return FALSE
+	if(istype(target, /turf/closed/wall/resin/regenerating/special)) // Already upgraded.
+		return FALSE
+
+	var/turf/closed/wall/resin/wall_target = target
+	var/static/list/wall_types = list(
+		BULLETPROOF_WALL = image('icons/Xeno/actions/construction.dmi', icon_state = BULLETPROOF_WALL),
+		FIREPROOF_WALL = image('icons/Xeno/actions/construction.dmi', icon_state = FIREPROOF_WALL),
+		HARDY_WALL = image('icons/Xeno/actions/construction.dmi', icon_state = HARDY_WALL),
+	)
+
+	var/choice = show_radial_menu(user, wall_target, wall_types, require_near = TRUE, tooltips = TRUE)
+	if(!choice)
+		return TRUE
+
+	var/upgraded_wall_typepath
+	switch(choice)
+		if(BULLETPROOF_WALL)
+			upgraded_wall_typepath = /turf/closed/wall/resin/regenerating/special/bulletproof
+		if(FIREPROOF_WALL)
+			upgraded_wall_typepath = /turf/closed/wall/resin/regenerating/special/fireproof
+		if(HARDY_WALL)
+			upgraded_wall_typepath = /turf/closed/wall/resin/regenerating/special/hardy
+
+	user.balloon_alert(user, "applying...")
+	if(!do_after(user, 0.5 SECONDS, NONE, wall_target, BUSY_ICON_BUILD))
+		return TRUE
+
+	var/old_integrity_percentage = wall_target.wall_integrity / wall_target.max_integrity
+	var/list/baseturfs = islist(wall_target.baseturfs) ? wall_target.baseturfs : list(wall_target.baseturfs)
+	var/turf/closed/wall/new_wall = wall_target.ChangeTurf(upgraded_wall_typepath, baseturfs, CHANGETURF_KEEP_WEEDS)
+	new_wall.wall_integrity = new_wall.max_integrity * old_integrity_percentage
+
+	qdel(src)
+	return TRUE
+
 /obj/item/resin_jelly/attack(mob/living/carbon/xenomorph/M, mob/living/user)
 	//Activates if active hand and clicked on mob in game.
 	//Can target self so we need to check for that.
