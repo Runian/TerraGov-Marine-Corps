@@ -782,6 +782,9 @@
 // From [/mob/living/updatehealth()]
 #define COMSIG_LIVING_UPDATE_HEALTH "living_update_health"
 
+// From [/mob/living/proc/apply_damage()]: ()
+#define COMSIG_LIVING_TAKE_DAMAGE "living_take_damage"
+
 // Sent when a /living is dealing with being on fire & is still on fire. From [/mob/living/proc/handle_fire]: ()
 #define COMSIG_LIVING_HANDLE_FIRE "living_handle_fire"
 

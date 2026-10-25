@@ -27,6 +27,7 @@ require only minor tweaks.
 #define ZTRAIT_MARINE_MAIN_SHIP "Marine Main Ship"
 #define ZTRAIT_DOUBLE_SHIPS "Double Marine Ship"
 #define ZTRAIT_AWAY "Away"
+#define ZTRAIT_TECHTREE "Tech Tree"
 
 // boolean - weather types that occur on the level
 #define ZTRAIT_SNOWSTORM "weather_snowstorm"

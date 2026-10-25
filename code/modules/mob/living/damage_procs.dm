@@ -25,6 +25,7 @@
 	if(!damage) //no damage
 		return 0
 
+	SEND_SIGNAL(src, COMSIG_LIVING_TAKE_DAMAGE)
 	switch(damagetype)
 		if(BRUTE)
 			adjustBruteLoss(damage)
