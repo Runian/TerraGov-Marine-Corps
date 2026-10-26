@@ -1,5 +1,5 @@
 /obj/item/proc/melee_attack_chain(mob/user, atom/target, params, rightclick)
-	if(preattack(target, user, params))
+	if(target.base_item_interaction(user, src, params2list(params)))
 		return
 	if(target.tool_act(user, src, params2list(params)))
 		return
@@ -16,10 +16,6 @@
 		return TRUE
 	afterattack(target, user, TRUE, params) // TRUE: clicking something Adjacent
 	return TRUE
-
-//Called before any other attack proc.
-/obj/item/proc/preattack(atom/target, mob/user, params)
-	return FALSE
 
 ///Called when the item is in the active hand, and clicked; alternately, there is an 'activate held object' verb or you can hit pagedown.
 /obj/item/proc/attack_self(mob/user)

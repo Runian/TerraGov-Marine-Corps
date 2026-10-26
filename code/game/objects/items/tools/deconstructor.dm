@@ -14,7 +14,7 @@
 	///Construction skill to use this properly
 	var/skill_level = SKILL_CONSTRUCTION_PLASTEEL
 
-/obj/item/tool/deconstructor/preattack(atom/target, mob/user, params)
+/obj/item/tool/deconstructor/interact_with_atom(atom/target, mob/user, list/modifiers)
 	if(!isstructure(target))
 		return FALSE
 	var/obj/structure/decon_target = target

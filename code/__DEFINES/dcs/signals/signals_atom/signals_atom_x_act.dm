@@ -9,6 +9,19 @@
 /// signal sent when a mouse is hovering over us, sent by atom/proc/on_mouse_entered
 #define COMSIG_ATOM_MOUSE_ENTERED "mouse_entered"
 
+/// Sent from [atom/proc/item_interaction()] to the atom: [/mob/user, /obj/item/tool, list/modifiers]
+#define COMSIG_ATOM_ITEM_INTERACTION "atom_item_interaction"
+/// Sent from [atom/proc/item_interaction()] to the atom: [/mob/user, /obj/item/tool, list/modifiers]
+#define COMSIG_ATOM_ITEM_INTERACTION_SECONDARY "atom_item_interaction_secondary"
+/// Sent from [atom/proc/item_interaction()] to the item: [/mob/user, /atom/target, list/modifiers]
+#define COMSIG_ITEM_INTERACTING_WITH_ATOM "item_interacting_with_atom"
+/// Sent from [atom/proc/item_interaction()] to the item: [/mob/user, /atom/target, list/modifiers]
+#define COMSIG_ITEM_INTERACTING_WITH_ATOM_SECONDARY "item_interacting_with_atom_secondary"
+/// Sent from [atom/proc/item_interaction()] to the user: [/atom/target, /obj/item/tool, list/modifiers]
+#define COMSIG_USER_ITEM_INTERACTION "user_item_interaction"
+/// Sent from [atom/proc/item_interaction()] to the user: [/atom/target, /obj/item/tool, list/modifiers]
+#define COMSIG_USER_ITEM_INTERACTION_SECONDARY "user_item_interaction_secondary"
+
 /// Sent from [atom/proc/item_interaction()] to the atom: [/mob/user, /obj/item/tool]
 #define COMSIG_ATOM_TOOL_ACT(tooltype) "tool_act_[tooltype]"
 /// Sent from [atom/proc/item_interaction()] to the atom: [/mob/user, /obj/item/tool]
@@ -19,3 +32,4 @@
 #define COMSIG_TOOL_ATOM_ACTED_SECONDARY(tooltype) "tool_atom_acted_[tooltype]"
 /// Sent from [atom/proc/tool_act()] to the item: [/atom/target, /mob/user, tool_type]
 #define COMSIG_ITEM_TOOL_ACTED "tool_item_acted"
+

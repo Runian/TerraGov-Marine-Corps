@@ -49,13 +49,14 @@
 	. = ..()
 	ADD_TRAIT(src, TRAIT_NODROP, ABSTRACT_ITEM_TRAIT)
 
-/obj/item/weapon/zombie_claw/preattack(atom/target, mob/user, params)
-	if(ishuman(target))
-		var/mob/living/carbon/human/human_target = target
-		if(human_target.stat == DEAD)
-			to_chat(user, span_warning("[human_target] is already dead!"))
-			return TRUE
-	return ..()
+/obj/item/weapon/zombie_claw/interact_with_atom(atom/target, mob/user, list/modifiers)
+	if(!ishuman(target))
+		return FALSE
+	var/mob/living/carbon/human/human_target = target
+	if(human_target.stat != DEAD)
+		return FALSE
+	to_chat(user, span_warning("[human_target] is already dead!"))
+	return TRUE
 
 /obj/item/weapon/zombie_claw/melee_attack_chain(mob/user, atom/target, params, rightclick)
 	. = ..()
