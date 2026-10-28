@@ -1,16 +1,16 @@
-//Color variant defines
+// Color variant defines.
 #define NORMAL_COLOR ""
 #define RESTING_COLOR "white"
 #define STICKY_COLOR "green"
 
-//Stat defines
+// Stat defines.
 #define RESTING_BUFF 1.2
 #define WEED_SLOWDOWN 2
 
-// base weed type
+// Base weed type.
 /obj/alien/weeds
 	name = "weeds"
-	desc = "A layer of oozy slime, it feels slick, but not as slick for you to slip."
+	desc = "A layer of oozy slime. It feels slick, but not as slick for you to slip."
 	icon = 'icons/Xeno/weeds.dmi'
 	icon_state = "base"
 	anchored = TRUE
@@ -18,28 +18,26 @@
 	layer = XENO_WEEDS_LAYER
 	plane = FLOOR_PLANE
 	max_integrity = 25
-	ignore_weed_destruction = TRUE
-
-	var/obj/alien/weeds/node/parent_node
-	///The color variant of the sprite
+	ignore_weed_destruction = TRUE // We are the weeds!
+	/// The weed node that is keeping us alive.
+	var/obj/alien/weeds/node/parent_node = null
+	/// The hive that owns us.
+	var/datum/hive_status/parent_hive = null
+	/// The color variant of the sprite.
 	var/color_variant = NORMAL_COLOR
-	///The healing buff when resting on this weed
-	var/resting_buff = 1
+	/// The multiplier of xenomorph's passive health and plasma regeneration when ontop of us.
+	var/regeneration_multiplier = 1
 	///If these weeds are not destroyed but just swapped
+	// TODO: what does this do
 	var/swapped = FALSE
 
-/obj/alien/weeds/deconstruct(disassembled = TRUE, mob/living/blame_mob)
-	GLOB.round_statistics.weeds_destroyed++
-	SSblackbox.record_feedback("tally", "round_statistics", 1, "weeds_destroyed")
-	return ..()
-
-/obj/alien/weeds/plasmacutter_act(mob/user, obj/item/tool)
-	return FALSE // Just attack normally.
-
-/obj/alien/weeds/Initialize(mapload, obj/alien/weeds/node/node, swapped = FALSE)
+/obj/alien/weeds/Initialize(mapload, obj/alien/weeds/node/creator_node, datum/hive_status/creator_hive)
 	. = ..()
-	if(!set_parent_node(node))
-		return
+	if(!istype(creator_node)) // Someone messed up.
+		return INITIALIZE_HINT_QDEL
+	set_parent_node(creator_node)
+	creator_hive ||= GLOB.hive_datums[XENO_HIVE_NORMAL] // If none was provided, we will assume the default hive is the creator.
+	parent_hive = creator_hive
 
 	var/static/list/connections = list(
 		COMSIG_FIND_FOOTSTEP_SOUND = TYPE_PROC_REF(/atom/movable, footstep_override),
@@ -48,8 +46,7 @@
 	AddElement(/datum/element/connect_loc, connections)
 
 	update_icon()
-	if(!swapped)
-		update_neighbours()
+	update_neighbours()
 	for(var/mob/living/living_mob in loc.contents)
 		SEND_SIGNAL(living_mob, COMSIG_LIVING_WEEDS_AT_LOC_CREATED, src)
 
@@ -65,85 +62,44 @@
 
 /obj/alien/weeds/examine(mob/user)
 	. = ..()
-	var/turf/T = get_turf(src)
-	if(isfloorturf(T))
-		. += T.ceiling_desc()
+	var/turf/current_turf = get_turf(src)
+	if(isfloorturf(current_turf))
+		. += current_turf.ceiling_desc()
 
-/obj/alien/weeds/proc/update_neighbours(turf/U)
-	if(!U)
-		U = loc
-	if(istype(U))
-		for (var/dirn in GLOB.cardinals)
-			var/turf/T = get_step(U, dirn)
+/obj/alien/weeds/deconstruct(disassembled = TRUE, mob/living/blame_mob)
+	GLOB.round_statistics.weeds_destroyed++
+	SSblackbox.record_feedback("tally", "round_statistics", 1, "weeds_destroyed")
+	return ..()
 
-			if (!istype(T))
-				continue
-
-			var/obj/alien/weeds/W = locate() in T
-			if(W)
-				W.update_icon()
-
-///Replaces src with a new weed type. New type is typecast for checks
-/obj/alien/weeds/proc/replace_weed(new_weed_type)
-	if(!ispath(new_weed_type, /obj/alien/weeds))
-		qdel(src)
-	new new_weed_type(loc, parent_node)
-	qdel(src)
+/obj/alien/weeds/plasmacutter_act(mob/user, obj/item/tool)
+	return FALSE // Just attack normally.
 
 /obj/alien/weeds/ex_act(severity)
 	if(severity == EXPLODE_WEAK)
 		return
 	return ..()
 
-///Check if we have a parent node, if not, qdel ourselve
-/obj/alien/weeds/proc/check_for_parent_node()
-	if(parent_node)
-		return
-	qdel(src)
-
 /obj/alien/weeds/update_icon_state()
 	. = ..()
 	var/my_dir = 0
-	for (var/check_dir in GLOB.cardinals)
-		var/turf/check = get_step(src, check_dir)
-
-		if (!istype(check))
+	for(var/direction_to_check in GLOB.cardinals)
+		var/turf/adjacent_turf = get_step(src, direction_to_check)
+		if(!istype(adjacent_turf))
 			continue
-		if(istype(check, /turf/closed/wall/resin))
-			my_dir |= check_dir
-
-		else if (locate(/obj/alien/weeds) in check)
-			my_dir |= check_dir
-
-	if (my_dir == 15) //weeds in all four directions
-		icon_state = "weed[rand(0,15)]"
-	else if(my_dir == 0) //no weeds in any direction
-		icon_state = "base"
-	else
-		icon_state = "weed_dir[my_dir]"
+		if(istype(adjacent_turf, /turf/closed/wall/resin))
+			my_dir |= direction_to_check
+			continue
+		if(locate(/obj/alien/weeds) in adjacent_turf)
+			my_dir |= direction_to_check
+	switch(my_dir)
+		if(NONE) // Alone.
+			icon_state = "base"
+		if(ALL_CARDINALS) // Surrounded on all directions.
+			icon_state = "weed[rand(0,15)]"
+		else
+			icon_state = "weed_dir[my_dir]"
 	icon_state += color_variant
 
-///Set the parent_node to node
-/obj/alien/weeds/proc/set_parent_node(atom/node)
-	if(!istype(node))
-		if(!parent_node)
-			qdel(src)
-		return FALSE
-	if(parent_node)
-		UnregisterSignal(parent_node, COMSIG_QDELETING)
-	parent_node = node
-	color_variant = parent_node.color_variant
-	RegisterSignal(parent_node, COMSIG_QDELETING, PROC_REF(clean_parent_node))
-	return TRUE
-
-///Clean the parent node var
-/obj/alien/weeds/proc/clean_parent_node()
-	SIGNAL_HANDLER
-	if(!parent_node.swapped)
-		SSweeds_decay.decaying_list += src
-	parent_node = null
-
-///overrides the turf's normal footstep sound
 /obj/alien/weeds/footstep_override(atom/movable/source, list/footstep_overrides)
 	footstep_overrides[FOOTSTEP_RESIN] = get_footstep_layer(layer, plane)
 
@@ -151,7 +107,53 @@
 	if(!isxeno(crosser))
 		return
 	var/mob/living/carbon/xenomorph/xeno = crosser
-	xeno.next_move_slowdown += xeno?.xeno_caste?.weeds_speed_mod
+	xeno.next_move_slowdown += xeno.xeno_caste?.weeds_speed_mod
+
+/// Updates the icon of all surrounding weeds.
+/obj/alien/weeds/proc/update_neighbours(turf/turf_to_update)
+	turf_to_update ||= loc // If none was provided, we will assume our current turf is the target.
+	if(!istype(turf_to_update))
+		return
+
+	for(var/direction_to_check in GLOB.cardinals)
+		var/turf/adjacent_turf = get_step(turf_to_update, direction_to_check)
+		if(!istype(adjacent_turf))
+			continue
+		var/obj/alien/weeds/adjacent_weeds = locate() in adjacent_turf
+		adjacent_weeds?.update_icon()
+
+///Replaces src with a new weed type. New type is typecast for checks
+/obj/alien/weeds/proc/replace_weed(new_weed_type)
+	if(!ispath(new_weed_type, /obj/alien/weeds))
+		qdel(src)
+		return
+	new new_weed_type(loc, parent_node)
+	qdel(src)
+
+///Check if we have a parent node, if not, qdel ourselve
+/obj/alien/weeds/proc/check_for_parent_node()
+	if(parent_node)
+		return
+	qdel(src)
+
+/// Sets our parent node and handles everything caused by the change.
+/// Returns TRUE if it was successfully changed.
+/obj/alien/weeds/proc/set_parent_node(obj/alien/weeds/node/new_node)
+	if(parent_node == new_node)
+		return
+	if(parent_node)
+		UnregisterSignal(parent_node, COMSIG_QDELETING)
+	parent_node = new_node
+	color_variant = parent_node.color_variant
+	RegisterSignal(parent_node, COMSIG_QDELETING, PROC_REF(clean_parent_node))
+
+///Clean the parent node var
+/obj/alien/weeds/proc/clean_parent_node()
+
+	SIGNAL_HANDLER
+	if(!parent_node.swapped)
+		SSweeds_decay.decaying_list += src
+	parent_node = null
 
 /obj/alien/weeds/sticky
 	name = "sticky weeds"
@@ -166,7 +168,7 @@
 	name = "resting weeds"
 	desc = "This looks almost comfortable."
 	color_variant = RESTING_COLOR
-	resting_buff = RESTING_BUFF
+	regeneration_multiplier = RESTING_BUFF
 
 // =================
 // weed wall
@@ -312,5 +314,5 @@
 	weed_type = /obj/alien/weeds/resting
 	color_variant = RESTING_COLOR
 	node_icon = "weednodewhite"
-	resting_buff = RESTING_BUFF
+	regeneration_multiplier = RESTING_BUFF
 	ability_cost_mult = 2

@@ -100,4 +100,4 @@ SUBSYSTEM_DEF(weeds)
 			weed.swapped = TRUE
 			swapped = TRUE
 			qdel(O)
-	new weed_to_spawn(T, node, swapped)
+	new weed_to_spawn(T, node, null, swapped)
