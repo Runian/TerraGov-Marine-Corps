@@ -8,7 +8,7 @@
 	var/list/sources = list()
 
 /datum/status_effect/grouped/on_creation(mob/living/new_owner, source, ...)
-	//Get our supplied arguments, without new_owner
+	// Get our supplied arguments, without new_owner.
 	var/list/new_source_args = args.Copy(2)
 
 	if(isnull(source))
@@ -23,12 +23,17 @@
 		qdel(src)
 		return FALSE
 
-	/* We are the original */
-
+	// We are the original in this case.
 	. = ..()
 	if(.)
 		sources |= source
 		source_added(arglist(new_source_args))
+
+/datum/status_effect/grouped/before_remove(source)
+	sources -= source
+	var/was_last_source = !length(sources)
+	source_removed(source, was_last_source)
+	return was_last_source
 
 /**
  * Called after a source is added to the status effect,
@@ -44,9 +49,3 @@
  */
 /datum/status_effect/grouped/proc/source_removed(source, removing)
 	return
-
-/datum/status_effect/grouped/before_remove(source)
-	sources -= source
-	var/was_last_source = !length(sources)
-	source_removed(source, was_last_source)
-	return was_last_source

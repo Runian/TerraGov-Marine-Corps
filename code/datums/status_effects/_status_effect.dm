@@ -123,7 +123,6 @@
 		return
 	update_shown_duration()
 
-
 /// Called whenever the effect is applied in on_created.
 /// Returning FALSE will cause it to delete itself during creation instead.
 /datum/status_effect/proc/on_apply()
