@@ -55,7 +55,7 @@
 /// Returns the status effect, if it exists.
 /mob/living/proc/slowdown(amount)
 	if(amount <= 0)
-		return // Wrong proc. Use [/proc/adjust_slowdown()] instead.
+		CRASH("slowdown() called on a mob with an invalid amount.") // Wrong proc. Use [/proc/adjust_slowdown()] instead.
 	if((status_flags & GODMODE) || stat == DEAD || HAS_TRAIT(src, TRAIT_SLOWDOWNIMMUNE))
 		return
 
