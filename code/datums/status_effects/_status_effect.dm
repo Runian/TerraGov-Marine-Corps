@@ -34,8 +34,6 @@
 	var/show_duration = FALSE
 	/// Used to define if the status effect should be using SSfastprocess or SSprocessing.
 	var/processing_speed = STATUS_EFFECT_FAST_PROCESS
-	/// A particle effect, for things like embers - Should be set on update_particles().
-	VAR_FINAL/obj/effect/abstract/particle_holder/particle_effect
 	/// Special behavior flags.
 	var/status_flags = NONE
 
@@ -73,7 +71,7 @@
 	if(duration != STATUS_EFFECT_PERMANENT || tick_interval != STATUS_EFFECT_NO_TICK) // Don't process if we don't care.
 		start_processing()
 
-	update_particles()
+	create_particles()
 	return TRUE
 
 /datum/status_effect/Destroy()
@@ -84,8 +82,6 @@
 		LAZYREMOVE(owner.status_effects, src)
 		on_remove()
 		owner = null
-	if(particle_effect)
-		QDEL_NULL(particle_effect)
 	return ..()
 
 /// Updates the status effect alert's maptext (if possible).
@@ -184,16 +180,6 @@
 /datum/status_effect/proc/nextmove_adjust()
 	return 0
 
-/// Signal proc for [COMSIG_LIVING_POST_FULLY_HEAL] to remove us on fullheal
-/datum/status_effect/proc/remove_effect_on_heal(datum/source, heal_flags)
-	SIGNAL_HANDLER
-
-	if(!remove_on_fullheal)
-		return
-
-	if(!heal_flag_necessary || (heal_flags & heal_flag_necessary))
-		qdel(src)
-
 /// Removes [seconds] of duration from the status effect.
 /// Returns whether or not the status effect was qdeleted due to running out of duration.
 /datum/status_effect/proc/remove_duration(seconds)
@@ -208,13 +194,19 @@
 	update_shown_duration()
 	return FALSE
 
-/**
- * Updates the particles for the status effects
- * Should be handled by subtypes!
- */
-/datum/status_effect/proc/update_particles()
-	SHOULD_CALL_PARENT(FALSE)
-	return
+/// Effects that occur on owner death. Requires STATUS_FLAG_CHECK_OWNER_DEATH.
+/datum/status_effect/proc/on_owner_death(datum/source)
+	SIGNAL_HANDLER
+	if(status_flags & STATUS_FLAG_OWNER_DEATH_DEL)
+		qdel(src)
+		return
+	stop_ticking()
+	RegisterSignal(owner, COMSIG_MOB_REVIVE, PROC_REF(on_owner_revive))
+
+// Effects that occur on owner's revival / comes back to life if STATUS_FLAG_CHECK_OWNER_DEATH is used.
+/datum/status_effect/proc/on_owner_revive(datum/source)
+	SIGNAL_HANDLER
+	start_ticking()
 
 /datum/status_effect/vv_edit_var(var_name, var_value)
 	. = ..()

@@ -35,16 +35,6 @@
 	/// A reference to our overlay appearance.
 	var/mutable_appearance/status_overlay
 
-
-/datum/status_effect/stacking/Destroy()
-	owner?.cut_overlay(status_overlay)
-	QDEL_NULL(status_overlay)
-	return ..()
-
-
-
-
-
 /datum/status_effect/stacking/Destroy()
 	if(!owner || !status_overlay)
 		return ..()
@@ -53,8 +43,7 @@
 	QDEL_NULL(status_overlay)
 	return ..()
 
-
-/// What happens when threshold is crossed.
+/// What happens when threshold is crossed?
 /datum/status_effect/stacking/proc/threshold_cross_effect()
 
 /// Runs if status is deleted due to threshold being crossed.
@@ -90,9 +79,9 @@
 /datum/status_effect/stacking/tick(delta_time)
 	if(!can_have_status())
 		qdel(src)
-	else
-		add_stacks(-stack_decay)
-		stack_decay_effect()
+		return
+	add_stacks(-stack_decay)
+	stack_decay_effect()
 
 /datum/status_effect/stacking/on_creation(mob/living/new_owner, stacks_to_apply)
 	. = ..()
@@ -112,18 +101,10 @@
 	owner.add_overlay(status_overlay)
 	return ..()
 
-/datum/status_effect/stacking/tick(seconds_between_ticks)
-	if(!can_have_status())
-		qdel(src)
-		return
-	add_stacks(-stack_decay)
-	stack_decay_effect()
-
 /datum/status_effect/stacking/proc/add_stacks(stacks_added)
 	if(stacks_added > 0 && !can_gain_stacks())
 		return FALSE
 	owner.cut_overlay(status_overlay)
-	owner.underlays -= status_underlay
 
 	stacks = min(stacks + stacks_added, max_stacks)
 	if(stacks <= 0 && consumed_on_fadeout)
@@ -144,54 +125,5 @@
 		time_until_next_tick += delay_before_decay // refreshes time until decay
 
 	if(status_overlay)
-		status_overlay.icon_state = "[overlay_state][stacks]"
-		owner.add_overlay(status_overlay)
-
-	if(stacks > 0)
-		if(stacks >= stack_threshold && !threshold_crossed) //threshold_crossed check prevents threshold effect from occuring if changing from above threshold to still above threshold
-			threshold_crossed = TRUE
-			on_threshold_cross()
-			if(consumed_on_threshold)
-				return
-		else if(stacks < stack_threshold && threshold_crossed)
-			threshold_crossed = FALSE //resets threshold effect if we fall below threshold so threshold effect can trigger again
-			on_threshold_drop()
-		if(stacks_added > 0)
-			tick_interval += delay_before_decay //refreshes time until decay
-		if(isnum(max_stacks))
-			stacks = min(stacks, max_stacks)
-		status_overlay.icon_state = "[overlay_state][stacks]"
-		status_underlay.icon_state = "[underlay_state][stacks]"
-		owner.add_overlay(status_overlay)
-		owner.underlays += status_underlay
-	else if(consumed_on_fadeout)
-		fadeout_effect()
-		qdel(src) //deletes status if stacks fall under one
-
-/// Add (or remove) [stacks_added] stacks to our current stack count.
-/datum/status_effect/stacking/proc/add_stacks(stacks_added)
-	if(stacks_added > 0 && !can_gain_stacks())
-		return FALSE
-	if(status_overlay)
-		owner.cut_overlay(status_overlay)
-	stacks = min(stacks + stacks_added, max_stacks)
-	if(stacks <= 0)
-		fadeout_effect()
-		qdel(src) // deletes status if stacks fall under one
-		return
-
-	if(stacks >= stack_threshold && !threshold_crossed) // threshold_crossed check prevents threshold effect from occurring if changing from above threshold to still above threshold
-		threshold_crossed = TRUE
-		on_threshold_cross()
-		if(consumed_on_threshold)
-			return
-	else if(stacks < stack_threshold && threshold_crossed)
-		threshold_crossed = FALSE // resets threshold effect if we fall below threshold so threshold effect can trigger again
-		on_threshold_drop()
-
-	if(stacks_added > 0)
-		time_until_next_tick += delay_before_decay // refreshes time until decay
-
-	if (status_overlay)
 		status_overlay.icon_state = "[overlay_state][stacks]"
 		owner.add_overlay(status_overlay)

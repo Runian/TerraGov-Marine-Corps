@@ -426,10 +426,9 @@
 				var/datum/status_effect/stacking/stacking_status_effect = status_effect
 				stacking_status_effect.add_stacks(-debuff_removal_amount)
 				continue
-			if(status_effect.duration == -1)
+			if(status_effect.duration == STATUS_EFFECT_PERMANENT)
 				continue
-			status_effect.duration -= debuff_removal_amount * 2 SECONDS
-			status_effect.check_duration()
+			status_effect.remove_duration(debuff_removal_amount * 2 SECONDS)
 	if(resin_jelly_duration)
 		xeno_owner.apply_status_effect(STATUS_EFFECT_RESIN_JELLY_COATING, resin_jelly_duration)
 		if(xeno_owner.is_on_fire())

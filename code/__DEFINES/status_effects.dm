@@ -141,7 +141,7 @@
 ///armor reduction
 #define STATUS_EFFECT_SHATTER /datum/status_effect/shatter
 ///recenly hit by a sniper round
-#define STATUS_EFFECT_SNIPED /datum/status_effect/incapacitating/recently_sniped
+#define STATUS_EFFECT_SNIPED /datum/status_effect/grouped/recently_sniped
 // Applies a movement speed multiplier of 0.4 for 6 seconds.
 #define STATUS_EFFECT_DREAD  /datum/status_effect/dread
 /// Deals a variable amount of stamina damage for 6 seconds.

@@ -677,10 +677,11 @@
 /datum/status_effect/healing_infusion
 	id = "healing_infusion"
 	alert_type = /atom/movable/screen/alert/status_effect/healing_infusion
-	//Buff ends whenever we run out of either health or sunder ticks, or time, whichever comes first
-	///Health recovery ticks
+	show_duration = TRUE
+	// Buff ends whenever we run out of either health or sunder ticks, or time, whichever comes first!
+	/// Remaining health recovery ticks.
 	var/health_ticks_remaining
-	///Sunder recovery ticks
+	/// Remaining sunder recovery ticks.
 	var/sunder_ticks_remaining
 	/// Should the TRAIT_INNATE_HEALING trait be given?
 	var/innate_healing = FALSE
@@ -943,9 +944,10 @@
 
 /datum/status_effect/baton_pass
 	id = "xeno_batonpass"
-	alert_type = /atom/movable/screen/alert/status_effect/baton_pass
 	duration = 6 SECONDS
 	status_type = STATUS_EFFECT_REFRESH
+	alert_type = /atom/movable/screen/alert/status_effect/baton_pass
+	show_duration = TRUE
 	/// Used for particles. Holds the particles instead of the mob. See particle_holder for documentation.
 	var/obj/effect/abstract/particle_holder/particle_holder
 
@@ -960,7 +962,7 @@
 	particle_holder.pixel_y = -3
 
 	//only slower xenos get better movespeed amplify. No gigaspeed runners
-	var/movespeed_mod =((owner_xeno.xeno_caste.speed <= -1) ? -0.1 : (owner_xeno.xeno_caste.speed <= -0.8) ? -0.2 : -0.4)
+	var/movespeed_mod = ((owner_xeno.xeno_caste.speed <= -1) ? -0.1 : (owner_xeno.xeno_caste.speed <= -0.8) ? -0.2 : -0.4)
 	owner_xeno.add_movespeed_modifier(MOVESPEED_ID_PRAETORIAN_DANCER_BATON_PASS, TRUE, 1, NONE, TRUE, movespeed_mod)
 
 	to_chat(owner, span_notice("We feel on top of the world! Go, go, go!"))
