@@ -71,7 +71,6 @@
 	if(duration != STATUS_EFFECT_PERMANENT || tick_interval != STATUS_EFFECT_NO_TICK) // Don't process if we don't care.
 		start_processing()
 
-	create_particles()
 	return TRUE
 
 /datum/status_effect/Destroy()
