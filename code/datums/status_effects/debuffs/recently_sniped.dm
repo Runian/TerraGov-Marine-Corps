@@ -4,20 +4,19 @@
 	/// Used for the sniped effect.
 	var/obj/vis_sniped/visual_sniped
 
-/datum/status_effect/grouped/recently_sniped/on_creation(mob/living/new_owner, set_duration)
-	. = ..()
-
-	if(!. || new_owner.stat != CONSCIOUS)
+/datum/status_effect/grouped/recently_sniped/on_apply()
+	if((owner.status_flags & GODMODE) || owner.stat == DEAD)
 		return FALSE
 
 	visual_sniped = new
 	visual_sniped.icon_state = "sniper_zoom"
-
-	new_owner.vis_contents += visual_sniped
+	owner.vis_contents += visual_sniped
+	return ..()
 
 /datum/status_effect/grouped/recently_sniped/on_remove()
-	owner.vis_contents -= visual_sniped
-	QDEL_NULL(visual_sniped)
+	if(visual_sniped)
+		owner.vis_contents -= visual_sniped
+		QDEL_NULL(visual_sniped)
 
 /obj/vis_sniped
 	name = "sniped"

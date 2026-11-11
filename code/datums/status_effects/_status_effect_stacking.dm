@@ -76,7 +76,7 @@
 /datum/status_effect/stacking/proc/can_gain_stacks()
 	return owner.stat != DEAD
 
-/datum/status_effect/stacking/tick(delta_time)
+/datum/status_effect/stacking/tick(seconds_between_ticks)
 	if(!can_have_status())
 		qdel(src)
 		return
@@ -110,13 +110,13 @@
 	if(stacks <= 0 && consumed_on_fadeout)
 		fadeout_effect()
 		qdel(src) // Deletes status if stacks fall under one.
-		return
+		return FALSE
 
 	if(stacks >= stack_threshold && !threshold_crossed) // threshold_crossed check prevents threshold effect from occurring if changing from above threshold to still above threshold
 		threshold_crossed = TRUE
 		on_threshold_cross()
 		if(consumed_on_threshold)
-			return
+			return FALSE
 	else if(stacks < stack_threshold && threshold_crossed)
 		threshold_crossed = FALSE // Resets threshold effect if we fall below threshold so threshold effect can trigger again.
 		on_threshold_drop()
@@ -127,3 +127,5 @@
 	if(status_overlay)
 		status_overlay.icon_state = "[overlay_state][stacks]"
 		owner.add_overlay(status_overlay)
+
+	return TRUE

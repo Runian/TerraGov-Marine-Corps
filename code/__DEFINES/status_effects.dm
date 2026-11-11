@@ -77,9 +77,9 @@
 // DEBUFFS //
 /////////////
 
-#define STATUS_EFFECT_NO_PLASMA_REGEN /datum/status_effect/noplasmaregen // Stops plasma regeneration.
+#define STATUS_EFFECT_NO_PLASMA_REGEN /datum/status_effect/no_plasma_regen // Stops plasma regeneration.
 
-#define STATUS_EFFECT_PLASMA_DRAIN /datum/status_effect/plasmadrain // Drains xenomorph's maximum plasma over time.
+#define STATUS_EFFECT_PLASMA_DRAIN /datum/status_effect/plasma_drain // Drains xenomorph's maximum plasma over time.
 
 #define STATUS_EFFECT_STAGGER /datum/status_effect/incapacitating/stagger //reduces human gun damage or impairs xeno ability use
 
