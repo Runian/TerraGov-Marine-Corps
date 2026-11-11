@@ -14,4 +14,4 @@
 /datum/status_effect/plasmadrain/tick(seconds_per_tick)
 	var/mob/living/carbon/xenomorph/xenomorph_owner = owner
 	// This proc can handle everything and hud updating, use it.
-	xenomorph_owner.use_plasma(xenoowner.xeno_caste.plasma_max * 0.1)
+	xenomorph_owner.use_plasma(xenomorph_owner.xeno_caste.plasma_max * 0.1)

@@ -6,14 +6,11 @@
 	alert_type = /atom/movable/screen/alert/status_effect/dread
 
 /datum/status_effect/dread/on_apply()
-	. = ..()
-	if(!.)
-		return
 	owner.add_movespeed_modifier(MOVESPEED_ID_XENO_DREAD, TRUE, 0, NONE, TRUE, 0.4)
+	return TRUE
 
 /datum/status_effect/dread/on_remove()
 	owner.remove_movespeed_modifier(MOVESPEED_ID_XENO_DREAD)
-	return ..()
 
 /datum/status_effect/dread/tick(seconds_between_ticks)
 	. = ..()

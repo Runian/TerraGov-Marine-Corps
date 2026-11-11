@@ -34,6 +34,8 @@
 	var/show_duration = FALSE
 	/// Used to define if the status effect should be using SSfastprocess or SSprocessing.
 	var/processing_speed = STATUS_EFFECT_FAST_PROCESS
+	/// Do we self-terminate when a fullheal is called?
+	var/remove_on_fullheal = FALSE
 	/// Special behavior flags.
 	var/status_flags = NONE
 
@@ -51,6 +53,7 @@
 		return
 
 	LAZYADD(owner.status_effects, src)
+	RegisterSignal(owner, COMSIG_LIVING_POST_FULLY_HEAL, PROC_REF(remove_effect_on_heal))
 	if(status_flags & STATUS_FLAG_CHECK_OWNER_DEATH)
 		RegisterSignal(owner, COMSIG_MOB_DEATH, PROC_REF(on_owner_death))
 
@@ -146,6 +149,11 @@
 /datum/status_effect/proc/tick(seconds_between_ticks)
 	return
 
+/// Called before being fully removed (before on_remove).
+/// Returning FALSE will cancel removal.
+/datum/status_effect/proc/before_remove(...)
+	return TRUE
+
 /// Called whenever the buff expires or is removed (qdeleted).
 /// Note that at the point this is called, it is out of the owner's status_effects list, but owner is not yet null.
 /datum/status_effect/proc/on_remove()
@@ -153,30 +161,28 @@
 
 /// Called instead of on_remove when a status effect of status_type STATUS_EFFECT_REPLACE is replaced by itself,
 /// or when a status effect with on_remove_on_mob_delete set to FALSE has its mob deleted.
-/datum/status_effect/proc/be_replaced()
-	linked_alert = null
-	owner.clear_alert(id)
-	LAZYREMOVE(owner.status_effects, src)
-	owner = null
+/datum/status_effect/proc/on_replace()
 	qdel(src)
-
-/// Called before being fully removed (before on_remove).
-/// Returning FALSE will cancel removal.
-/datum/status_effect/proc/before_remove(...)
-	return TRUE
 
 /// Called when a status effect of status_type STATUS_EFFECT_REFRESH
 /// has its duration refreshed in apply_status_effect - is passed New() args.
-/datum/status_effect/proc/refresh(effect, ...)
+/datum/status_effect/proc/on_refresh(effect, ...)
 	duration = initial(duration)
 
 /// Adds nextmove modifier multiplicatively to the owner while applied.
 /datum/status_effect/proc/nextmove_modifier()
 	return 1
 
-/// Adds nextmove adjustment additiviely to the owner while applied.
+/// Adds nextmove adjustment additively to the owner while applied.
 /datum/status_effect/proc/nextmove_adjust()
 	return 0
+
+/// Signal proc for [COMSIG_LIVING_POST_FULLY_HEAL] to remove us on full heal.
+/datum/status_effect/proc/remove_effect_on_heal(datum/source, admin_revive)
+	SIGNAL_HANDLER
+	if(!remove_on_fullheal)
+		return
+	qdel(src)
 
 /// Removes [seconds] of duration from the status effect.
 /// Returns whether or not the status effect was qdeleted due to running out of duration.

@@ -2,57 +2,102 @@
 // HELPER PROCS //
 //////////////////
 
-/mob/living/proc/apply_status_effect(effect, ...) //applies a given status effect to this mob, returning the effect if it was successful
-	. = FALSE
-	var/datum/status_effect/S1 = effect
-	LAZYINITLIST(status_effects)
-	for(var/datum/status_effect/S in status_effects)
-		if(S.id == initial(S1.id) && S.status_type)
-			if(S.status_type == STATUS_EFFECT_REPLACE)
-				qdel(S)
-			else if(S.status_type == STATUS_EFFECT_REFRESH)
-				S.refresh()
-				return
-			else
-				return
+/**
+ * Applies a given status effect to this mob.
+ *
+ * new_effect - TYPEPATH of a status effect to apply.
+ * Additional status effect arguments can be passed.
+ *
+ * Returns the instance of the created effected, if successful.
+ * Returns 'null' if unsuccessful.
+ */
+/mob/living/proc/apply_status_effect(datum/status_effect/new_effect, ...)
+	RETURN_TYPE(/datum/status_effect)
+
 	var/list/arguments = args.Copy()
+
+	// If the status effect we're applying doesn't allow multiple effects, we need to handle it.
+	if(initial(new_effect.status_type) != STATUS_EFFECT_MULTIPLE)
+		for(var/datum/status_effect/existing_effect AS in status_effects)
+			if(existing_effect.id != initial(new_effect.id))
+				continue
+
+			switch(existing_effect.status_type)
+				// Multiple are allowed, continue as normal. (Not normally reachable)
+				if(STATUS_EFFECT_MULTIPLE)
+					break
+				// Only one is allowed of this type - early return.
+				if(STATUS_EFFECT_UNIQUE)
+					return
+				// Replace the existing instance (deletes it).
+				if(STATUS_EFFECT_REPLACE)
+					existing_effect.on_replace()
+				// Refresh the existing type, then early return.
+				if(STATUS_EFFECT_REFRESH)
+					existing_effect.on_refresh(arglist(arguments))
+					return
+
+	// For the new effect, the 1st argument is this mob
 	arguments[1] = src
-	S1 = new effect(arguments)
-	. = S1
 
-/mob/living/proc/remove_status_effect(effect) //removes all of a given status effect from this mob, returning TRUE if at least one was removed
-	. = FALSE
-	if(status_effects)
-		var/datum/status_effect/S1 = effect
-		for(var/datum/status_effect/S in status_effects)
-			if(initial(S1.id) == S.id)
-				qdel(S)
-				. = TRUE
-
-/mob/living/proc/has_status_effect(effect) //returns the effect if the mob calling the proc owns the given status effect
-	. = FALSE
-	if(status_effects)
-		var/datum/status_effect/S1 = effect
-		for(var/datum/status_effect/S in status_effects)
-			if(initial(S1.id) == S.id)
-				return S
-
-/mob/living/proc/has_status_effect_list(effect) //returns a list of effects with matching IDs that the mod owns; use for effects there can be multiple of
-	. = list()
-	if(status_effects)
-		var/datum/status_effect/S1 = effect
-		for(var/datum/status_effect/S in status_effects)
-			if(initial(S1.id) == S.id)
-				. += S
+	// Create the status effect with our mob + our arguments.
+	var/datum/status_effect/new_instance = new new_effect(arguments)
+	if(!QDELETED(new_instance))
+		return new_instance
 
 /**
- * Checks if this mob has a status effect that shares the passed effect's ID
- * and has the passed sources are in its list of sources (ONLY works for grouped efects!)
+ * Removes all instances of a given status effect from this mob
  *
- * checked_effect - TYPEPATH of a status effect to check for. Checks for its ID, not its typepath
+ * removed_effect - TYPEPATH of a status effect to remove.
+ * Additional status effect arguments can be passed - these are passed into before_remove.
+ *
+ * Returns TRUE if at least one was removed.
+ */
+/mob/living/proc/remove_status_effect(datum/status_effect/removed_effect, ...)
+	var/list/arguments = args.Copy(2)
+
+	. = FALSE
+	for(var/datum/status_effect/existing_effect as anything in status_effects)
+		if(existing_effect.id == initial(removed_effect.id) && existing_effect.before_remove(arglist(arguments)))
+			qdel(existing_effect)
+			. = TRUE
+
+	return .
+
+/**
+ * Checks if this mob has a status effect that shares the passed effect's ID.
+ *
+ * checked_effect - TYPEPATH of a status effect to check for. Checks for its ID, not its typepath.
  *
  * Returns an instance of a status effect, or NULL if none were found.
  */
+/mob/proc/has_status_effect(datum/status_effect/checked_effect)
+	// Yes I'm being cringe and putting this on the mob level even though status effects only apply to the living level.
+	// There's quite a few places (namely examine) where it's easier to not need to cast to living before checking
+	// for an effect such as blindness.
+	return null
+
+/mob/living/has_status_effect(datum/status_effect/checked_effect)
+	RETURN_TYPE(/datum/status_effect)
+
+	for(var/datum/status_effect/present_effect as anything in status_effects)
+		if(present_effect.id == initial(checked_effect.id))
+			return present_effect
+
+	return null
+
+/**
+ * Checks if this mob has a status effect that shares the passed effect's ID
+ * and has the passed sources are in its list of sources. (ONLY works for grouped effects!)
+ *
+ * checked_effect - TYPEPATH of a status effect to check for. Checks for its ID, not its typepath.
+ *
+ * Returns an instance of a status effect, or NULL if none were found.
+ */
+/mob/proc/has_status_effect_from_source(datum/status_effect/grouped/checked_effect, sources)
+	// See [/mob/proc/has_status_effect] for reason behind having this on the mob level.
+	return null
+
 /mob/living/proc/has_status_effect_from_source(datum/status_effect/grouped/checked_effect, sources)
 	RETURN_TYPE(/datum/status_effect)
 

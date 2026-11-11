@@ -19,21 +19,14 @@
 	. = ..()
 	if(!.)
 		return
-	set_creator(new_creator)
-
-
-/datum/status_effect/stacking/melting_fire/on_apply()
-	. = ..()
-	if(!.)
-		return
 	visual_fire = new
 	visual_fire.icon_state = "melting_low_stacks"
 	owner.vis_contents += visual_fire
 	owner.balloon_alert(owner, "melting fire!")
 	playsound(owner.loc, "sound/bullets/acid_impact1.ogg", 30)
 	RegisterSignal(owner, COMSIG_LIVING_DO_RESIST, PROC_REF(call_resist_debuff))
+	set_creator(new_creator)
 
-/// on remove has owner set to null
 /datum/status_effect/stacking/melting_fire/on_remove()
 	if(visual_fire)
 		owner.vis_contents -= visual_fire
@@ -45,7 +38,7 @@
 	. = ..()
 	if(QDELETED(src)) // Parent may delete us (no stacks, etc).
 		return
-	visual_fire.icon_state = (stacks > 4)  "melting_high_stacks" : "melting_low_stacks"
+	visual_fire.icon_state = (stacks > 4) ? "melting_high_stacks" : "melting_low_stacks"
 	playsound(owner.loc, "sound/bullets/acid_impact1.ogg", 4, FALSE, ADJACENT_SOUND_RANGE)
 	owner.take_overall_damage(PYROGEN_DAMAGE_PER_STACK * stacks, BURN, FIRE, updating_health = TRUE)
 
@@ -56,9 +49,9 @@
 	debuff_creator.gain_plasma(5, TRUE)
 
 /datum/status_effect/stacking/melting_fire/can_have_status()
-	if((owner.status_flags & GODMODE) || new_owner.soft_armor?.getRating(FIRE) >= 100)
+	if((owner.status_flags & GODMODE) || owner.soft_armor?.getRating(FIRE) >= 100)
 		return FALSE
-	return ..()
+	return ..() // Parent already checks if they're dead.
 
 /datum/status_effect/stacking/melting_fire/can_gain_stacks()
 	return can_have_status()

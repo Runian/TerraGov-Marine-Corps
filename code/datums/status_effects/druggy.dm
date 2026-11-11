@@ -1,8 +1,9 @@
 #define DRUGGY_OVERLAY "high"
 
-//applies the druggy overlay. That's it
+// Applies the druggy overlay. That's it.
 /datum/status_effect/incapacitating/druggy
 	id = "druggy"
+	remove_on_fullheal = TRUE
 
 /datum/status_effect/incapacitating/druggy/on_apply()
 	. = ..()

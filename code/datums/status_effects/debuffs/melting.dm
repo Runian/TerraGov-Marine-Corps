@@ -33,15 +33,15 @@
 		return
 	playsound(owner.loc, "sound/bullets/acid_impact1.ogg", 4, FALSE, ADJACENT_SOUND_RANGE)
 	particle_holder.particles.spawning = 1 + round(stacks / 2)
-	debuff_owner.apply_damage(STATUS_EFFECT_MELTING_DAMAGE, BURN, null, FIRE)
+	owner.apply_damage(STATUS_EFFECT_MELTING_DAMAGE, BURN, null, FIRE)
 
 	if(!isxeno(owner))
 		return
-	var/mob/living/carbon/xenomorph/xenomorph_owner = debuff_owner
+	var/mob/living/carbon/xenomorph/xenomorph_owner = owner
 	xenomorph_owner.adjust_sunder(STATUS_EFFECT_MELTING_SUNDER_DAMAGE)
 
 /datum/status_effect/stacking/melting/can_have_status()
-	if(owner.status_flags & GODMODE || owner.stat == DEAD)
+	if((owner.status_flags & GODMODE) || owner.stat == DEAD)
 		return FALSE
 	if(owner.has_status_effect(STATUS_EFFECT_RESIN_JELLY_COATING))
 		return FALSE
